@@ -1,74 +1,45 @@
 
-import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
-export const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
+const Navbar = () => {
   return (
-    <header 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out px-6 md:px-10",
-        isScrolled 
-          ? "py-2 glass-effect shadow-sm" 
-          : "py-6 bg-transparent"
-      )}
-    >
-      <nav className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center">
-          <a 
-            href="/" 
-            className="text-xl md:text-2xl font-medium tracking-tight" 
-            aria-label="Trendsetter home"
-          >
-            Trendsetter
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 flex">
+          <Link to="/" className="mr-6 flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="4"></circle>
+              <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+              <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+              <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+              <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+            </svg>
+            <span className="font-bold">Styler</span>
+          </Link>
+        </div>
+        
+        <nav className="flex items-center space-x-6 text-sm font-medium">
+          <Link to="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Home
+          </Link>
+          <Link to="/wardrobe" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            My Wardrobe
+          </Link>
+          <a href="#features" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Features
           </a>
-        </div>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <NavLinks className="flex space-x-8" />
-          <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
-            Get Started
+          <a href="#how-it-works" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            How It Works
+          </a>
+        </nav>
+        
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <Button variant="outline" size="sm">
+            Sign In
           </Button>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button 
-          onClick={toggleMobileMenu}
-          className="md:hidden p-2 focus:outline-none" 
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
-
-      {/* Mobile Navigation */}
-      <div 
-        className={cn(
-          "md:hidden fixed inset-0 bg-background pt-24 px-6 z-40 transition-transform duration-300 ease-in-out",
-          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <NavLinks className="flex flex-col space-y-6 items-center" />
-        <div className="mt-8 flex justify-center">
-          <Button className="bg-primary hover:bg-primary/90 rounded-full px-6 w-full">
+          <Button size="sm">
             Get Started
           </Button>
         </div>
@@ -76,29 +47,5 @@ export const Navbar = () => {
     </header>
   );
 };
-
-interface NavLinksProps {
-  className?: string;
-}
-
-const NavLinks = ({ className }: NavLinksProps) => (
-  <ul className={className}>
-    <li>
-      <a href="#features" className="text-foreground/80 hover:text-foreground transition-colors">
-        Features
-      </a>
-    </li>
-    <li>
-      <a href="#how-it-works" className="text-foreground/80 hover:text-foreground transition-colors">
-        How It Works
-      </a>
-    </li>
-    <li>
-      <a href="#ai-recommendations" className="text-foreground/80 hover:text-foreground transition-colors">
-        AI Style
-      </a>
-    </li>
-  </ul>
-);
 
 export default Navbar;
