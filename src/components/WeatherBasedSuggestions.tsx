@@ -95,7 +95,7 @@ const WeatherBasedSuggestions = () => {
         id: '4',
         style: 'Rainy Day',
         occasion: 'Work',
-        description: 'Trench coat over business attire, with water-resistant footwear. Carry a compact umbrella and choose dark colors that won't show water spots.'
+        description: "Trench coat over business attire, with water-resistant footwear. Carry a compact umbrella and choose dark colors that won't show water spots."
       });
     } else if (condition === 'cloudy' || (condition === 'sunny' && temperature < 20)) {
       recommendations.push({
@@ -121,7 +121,7 @@ const WeatherBasedSuggestions = () => {
         id: '8',
         style: 'Windy Day',
         occasion: 'Work',
-        description: 'Structured blazer or jacket that won't blow open, with pants or a pencil skirt. Choose heavier fabrics and avoid loose scarves or accessories.'
+        description: "Structured blazer or jacket that won't blow open, with pants or a pencil skirt. Choose heavier fabrics and avoid loose scarves or accessories."
       });
     } else if (condition === 'snowy' || temperature < 5) {
       recommendations.push({
