@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import OutfitCard from '@/components/OutfitCard';
-import { Briefcase, Party, Coffee, Utensils, Dumbbell, Moon } from 'lucide-react';
+import { Briefcase, Martini, Coffee, Utensils, Dumbbell, Moon } from 'lucide-react';
 
 const OccasionStyling = () => {
   const occasionCategories = [
@@ -12,7 +12,7 @@ const OccasionStyling = () => {
     { id: 'formal', label: 'Formal Events', icon: <Moon className="h-4 w-4 mr-2" /> },
     { id: 'casual', label: 'Casual', icon: <Coffee className="h-4 w-4 mr-2" /> },
     { id: 'dinner', label: 'Dinner', icon: <Utensils className="h-4 w-4 mr-2" /> },
-    { id: 'party', label: 'Party', icon: <Party className="h-4 w-4 mr-2" /> },
+    { id: 'party', label: 'Party', icon: <Martini className="h-4 w-4 mr-2" /> },
     { id: 'workout', label: 'Workout', icon: <Dumbbell className="h-4 w-4 mr-2" /> },
   ];
   
