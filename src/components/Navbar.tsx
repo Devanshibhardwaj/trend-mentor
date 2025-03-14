@@ -16,7 +16,7 @@ const Navbar = () => {
               <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
               <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
             </svg>
-            <span className="font-bold">Styler</span>
+            <span className="font-bold">Attirefy</span>
           </Link>
         </div>
         

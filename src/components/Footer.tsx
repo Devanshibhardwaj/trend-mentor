@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 
 const Footer = () => {
@@ -6,7 +5,7 @@ const Footer = () => {
     <footer className="border-t border-border/50 bg-secondary/30 py-12 px-6 md:px-10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
         <div className="md:col-span-2 space-y-4">
-          <h3 className="text-xl font-medium tracking-tight">Trendsetter</h3>
+          <h3 className="text-xl font-medium tracking-tight">Attirefy</h3>
           <p className="text-muted-foreground text-sm max-w-md">
             AI-powered outfit recommendations tailored to your unique style, preferences, and body type. Elevate your wardrobe with intelligent fashion suggestions.
           </p>
@@ -48,7 +47,7 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-border/50 flex flex-col md:flex-row justify-between items-center">
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Trendsetter. All rights reserved.
+          © {new Date().getFullYear()} Attirefy. All rights reserved.
         </p>
         <div className="flex space-x-6 mt-4 md:mt-0">
           <Button variant="link" className="p-0 h-auto text-xs text-muted-foreground hover:text-foreground">
