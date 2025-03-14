@@ -1,12 +1,197 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useEffect, useState } from 'react';
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/Hero';
+import RecommendationForm from '@/components/RecommendationForm';
+import OutfitCard from '@/components/OutfitCard';
+import Footer from '@/components/Footer';
+import { Separator } from '@/components/ui/separator';
+
+// Sample outfit data
+const SAMPLE_OUTFITS = [
+  {
+    style: "Casual",
+    occasion: "Everyday",
+    description: "Light blue denim jacket over a white t-shirt, paired with black slim-fit jeans and white sneakers. Accessorize with a minimal watch."
+  },
+  {
+    style: "Formal",
+    occasion: "Work",
+    description: "Navy blue tailored suit with a light blue button-up shirt. Brown leather Oxford shoes and a matching belt. Complete with a subtle patterned tie."
+  },
+  {
+    style: "Streetwear",
+    occasion: "Weekend",
+    description: "Oversized graphic tee layered with a flannel shirt, black cargo pants, and chunky sneakers. Add a beanie and silver chain accessories."
+  },
+  {
+    style: "Minimalist",
+    occasion: "Date Night",
+    description: "Black turtleneck sweater with charcoal grey trousers. Black Chelsea boots and a sleek silver watch. No patterns, just clean lines and monochrome colors."
+  },
+  {
+    style: "Vintage",
+    occasion: "Brunch",
+    description: "High-waisted mom jeans paired with a tucked-in band tee. Layer with an oversized blazer and finish with retro sneakers or loafers."
+  },
+  {
+    style: "Bohemian",
+    occasion: "Festival",
+    description: "Flowy floral maxi dress or wide-leg pants with a loose peasant top. Layer with a fringe vest and add leather sandals and layered jewelry."
+  }
+];
 
 const Index = () => {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(true);
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navbar />
+      
+      <main className="flex-grow">
+        <Hero />
+        
+        {/* Features Section */}
+        <section id="features" className="py-20 px-6 md:px-10 bg-secondary/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
+                Why Choose Us
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Intelligent Style Solutions
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Our AI-powered platform analyzes thousands of data points to deliver personalized style recommendations.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              {[
+                {
+                  title: "AI-Powered Recommendations",
+                  description: "Our advanced algorithms analyze your preferences and style to suggest perfect outfit combinations."
+                },
+                {
+                  title: "Personalized Style Profile",
+                  description: "Create your unique style profile and get recommendations tailored to your body type and preferences."
+                },
+                {
+                  title: "Trend Analysis",
+                  description: "Stay ahead of fashion trends with our AI that constantly analyzes the latest styles and seasonal changes."
+                }
+              ].map((feature, i) => (
+                <div 
+                  key={i}
+                  className={`space-y-4 transition-all duration-700 ${
+                    loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${i * 150}ms` }}
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-6 h-6 rounded-full bg-primary/20" />
+                  </div>
+                  <h3 className="text-xl font-medium">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* How It Works */}
+        <section id="how-it-works" className="py-20 px-6 md:px-10">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
+                The Process
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold">
+                How It Works
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Get personalized outfit recommendations in three simple steps.
+              </p>
+            </div>
+            
+            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-10 mt-16">
+              {/* Line connector (desktop only) */}
+              <div className="hidden md:block absolute top-16 left-[calc(16.67%-8px)] right-[calc(16.67%-8px)] h-0.5 bg-border" />
+              
+              {[
+                {
+                  step: "01",
+                  title: "Create Your Profile",
+                  description: "Answer questions about your style preferences, body type, and wardrobe needs."
+                },
+                {
+                  step: "02",
+                  title: "AI Analysis",
+                  description: "Our AI analyzes your inputs alongside fashion trends and style principles."
+                },
+                {
+                  step: "03",
+                  title: "Get Recommendations",
+                  description: "Receive personalized outfit suggestions tailored to your unique style."
+                }
+              ].map((step, i) => (
+                <div 
+                  key={i}
+                  className={`space-y-6 transition-all duration-700 ${
+                    loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${i * 150}ms` }}
+                >
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center z-10 relative">
+                      <span className="font-medium">{step.step}</span>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-medium">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        
+        <RecommendationForm />
+        
+        {/* Sample Outfit Recommendations */}
+        <section className="py-20 px-6 md:px-10 bg-secondary/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
+                Style Showcase
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Curated Outfit Examples
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Explore some of our AI-generated outfit recommendations.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {SAMPLE_OUTFITS.map((outfit, index) => (
+                <OutfitCard
+                  key={index}
+                  index={index}
+                  style={outfit.style}
+                  occasion={outfit.occasion}
+                  description={outfit.description}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+      
+      <Footer />
     </div>
   );
 };
