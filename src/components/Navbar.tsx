@@ -27,12 +27,12 @@ const Navbar = () => {
           <Link to="/wardrobe" className="transition-colors hover:text-foreground/80 text-foreground/60">
             My Wardrobe
           </Link>
-          <a href="#features" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            Features
-          </a>
-          <a href="#how-it-works" className="transition-colors hover:text-foreground/80 text-foreground/60">
-            How It Works
-          </a>
+          <Link to="/advanced-features" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Smart Features
+          </Link>
+          <Link to="/virtual-try-on" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            Virtual Try-On
+          </Link>
         </nav>
         
         <div className="flex flex-1 items-center justify-end space-x-2">
