@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 
@@ -13,7 +14,7 @@ const Hero = () => {
               </h1>
               <p className="text-muted-foreground text-sm md:text-base">
                 Revolutionize your wardrobe with our AI-driven platform. Get personalized outfit
-                suggestions tailored to your unique style and preferences.
+                suggestions tailored to your unique style, mood, and the weather.
               </p>
             </div>
             
