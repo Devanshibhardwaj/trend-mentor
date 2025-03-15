@@ -12,6 +12,7 @@ import VirtualTryOn from "./pages/VirtualTryOn";
 import AdvancedFeatures from "./pages/AdvancedFeatures";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import WeatherStyling from "./pages/WeatherStyling";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/advanced-features" element={<AdvancedFeatures />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/weather-styling" element={<WeatherStyling />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

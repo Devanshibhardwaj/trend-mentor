@@ -1,11 +1,13 @@
-
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import RecommendationForm from '@/components/RecommendationForm';
 import OutfitCard from '@/components/OutfitCard';
 import Footer from '@/components/Footer';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Cloud, Calendar, Map } from 'lucide-react';
 
 // Sample outfit data
 const SAMPLE_OUTFITS = [
@@ -99,6 +101,65 @@ const Index = () => {
                   <p className="text-muted-foreground">{feature.description}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+        
+        {/* What to Wear Today Feature */}
+        <section className="py-20 px-6 md:px-10 bg-primary/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div className="space-y-6">
+                <div className="inline-block p-2 bg-primary/10 rounded-lg">
+                  <Cloud className="h-6 w-6 text-primary" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold">What to Wear Today?</h2>
+                <p className="text-muted-foreground">
+                  Our smart outfit recommendation system adapts to real-time weather conditions, 
+                  upcoming events, and local trends to suggest the perfect outfit for every day.
+                </p>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                      <Cloud className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Weather-Based Suggestions</h3>
+                      <p className="text-sm text-muted-foreground">Get outfit recommendations tailored to today's weather forecast</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                      <Calendar className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Event-Appropriate Styling</h3>
+                      <p className="text-sm text-muted-foreground">Perfect outfits for work, parties, casual outings, or special events</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg mt-0.5">
+                      <Map className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Regional Style Trends</h3>
+                      <p className="text-sm text-muted-foreground">Location-specific recommendations including ethnic and cultural styles</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Link to="/weather-styling">
+                    <Button className="bg-primary hover:bg-primary/90 rounded-full px-6 py-2 text-base transition-all">
+                      Find Today's Perfect Outfit
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-black/20 rounded-xl p-6 shadow-xl">
+                <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="text-muted-foreground">Weather feature preview</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
