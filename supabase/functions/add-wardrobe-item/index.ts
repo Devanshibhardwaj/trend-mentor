@@ -34,19 +34,19 @@ serve(async (req) => {
     }
 
     // Get the request body
-    const { style, occasion, description, image_url } = await req.json()
+    const { name, category, description, image_url } = await req.json()
 
-    if (!style || !occasion || !description) {
+    if (!name || !category) {
       throw new Error('Missing required fields')
     }
 
-    // Create outfit
+    // Create wardrobe item
     const { data, error } = await supabaseClient
-      .from('outfits')
+      .from('wardrobe_items')
       .insert({
         user_id: user.id,
-        style,
-        occasion,
+        name,
+        category,
         description,
         image_url,
       })
