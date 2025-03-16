@@ -92,4 +92,79 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Improved touch targets for mobile */
+  .touch-target {
+    @apply p-3;
+  }
+
+  /* Consistent spacing for mobile */
+  .mobile-spacing {
+    @apply px-4 py-3;
+  }
+
+  /* Better card styling */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Improved focus states */
+  .focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary/50;
+  }
+
+  /* Mobile-friendly buttons */
+  .btn-mobile {
+    @apply min-h-11 min-w-11 flex items-center justify-center;
+  }
+}
+
+/* Improve form elements */
+input, select, textarea {
+  @apply text-base leading-relaxed;
+}
+
+/* Better mobile navigation */
+@media (max-width: 768px) {
+  .mobile-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40;
+  }
+
+  .mobile-menu {
+    @apply grid grid-cols-4 gap-1 p-2;
+  }
+
+  .mobile-menu-item {
+    @apply flex flex-col items-center justify-center p-2 rounded-md;
+  }
+}
+
+/* Enhance readability */
+@media (max-width: 640px) {
+  body {
+    @apply text-base;
+  }
+  
+  h1 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h2 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  h3 {
+    @apply text-lg md:text-xl;
+  }
+}
+
+/* Improved scrollable areas */
+.scrollable {
+  @apply overflow-y-auto overscroll-contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better card touch feedback */
+.card {
+  @apply active:scale-98 transition-transform;
 }
