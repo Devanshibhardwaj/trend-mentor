@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,37 +10,43 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Cloud, Calendar, Map } from 'lucide-react';
 
-// Sample outfit data
+// Sample outfit data with images
 const SAMPLE_OUTFITS = [
   {
     style: "Casual",
     occasion: "Everyday",
-    description: "Light blue denim jacket over a white t-shirt, paired with black slim-fit jeans and white sneakers. Accessorize with a minimal watch."
+    description: "Light blue denim jacket over a white t-shirt, paired with black slim-fit jeans and white sneakers. Accessorize with a minimal watch.",
+    image: "/outfit-casual.jpg"
   },
   {
     style: "Formal",
     occasion: "Work",
-    description: "Navy blue tailored suit with a light blue button-up shirt. Brown leather Oxford shoes and a matching belt. Complete with a subtle patterned tie."
+    description: "Navy blue tailored suit with a light blue button-up shirt. Brown leather Oxford shoes and a matching belt. Complete with a subtle patterned tie.",
+    image: "/outfit-formal.jpg"
+  },
+  {
+    style: "Traditional",
+    occasion: "Festive",
+    description: "Beautifully embroidered saree with modern styling, accessorized with minimal jewelry and a sleek handbag.",
+    image: "/outfit-traditional.jpg"
   },
   {
     style: "Streetwear",
     occasion: "Weekend",
-    description: "Oversized graphic tee layered with a flannel shirt, black cargo pants, and chunky sneakers. Add a beanie and silver chain accessories."
+    description: "Oversized graphic tee layered with a flannel shirt, black cargo pants, and chunky sneakers. Add a beanie and silver chain accessories.",
+    image: "/outfit-streetwear.jpg"
   },
   {
     style: "Minimalist",
     occasion: "Date Night",
-    description: "Black turtleneck sweater with charcoal grey trousers. Black Chelsea boots and a sleek silver watch. No patterns, just clean lines and monochrome colors."
-  },
-  {
-    style: "Vintage",
-    occasion: "Brunch",
-    description: "High-waisted mom jeans paired with a tucked-in band tee. Layer with an oversized blazer and finish with retro sneakers or loafers."
+    description: "Black turtleneck sweater with charcoal grey trousers. Black Chelsea boots and a sleek silver watch. No patterns, just clean lines and monochrome colors.",
+    image: "/outfit-minimalist.jpg"
   },
   {
     style: "Bohemian",
     occasion: "Festival",
-    description: "Flowy floral maxi dress or wide-leg pants with a loose peasant top. Layer with a fringe vest and add leather sandals and layered jewelry."
+    description: "Flowy floral maxi dress or wide-leg pants with a loose peasant top. Layer with a fringe vest and add leather sandals and layered jewelry.",
+    image: "/outfit-bohemian.jpg"
   }
 ];
 
@@ -239,13 +246,37 @@ const Index = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {SAMPLE_OUTFITS.map((outfit, index) => (
-                <OutfitCard
-                  key={index}
-                  index={index}
-                  style={outfit.style}
-                  occasion={outfit.occasion}
-                  description={outfit.description}
-                />
+                <div 
+                  key={index} 
+                  className={`overflow-hidden transition-all duration-300 bg-card text-card-foreground rounded-lg shadow-md card-hover ${
+                    loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                    <img 
+                      src={outfit.image} 
+                      alt={`${outfit.style} outfit for ${outfit.occasion}`}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                      <div className="bg-white/90 text-primary text-xs font-medium px-3 py-1 rounded-full shadow-sm">
+                        {outfit.style}
+                      </div>
+                      <div className="bg-white/90 text-primary text-xs font-medium px-3 py-1 rounded-full shadow-sm">
+                        {outfit.occasion}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xl font-semibold mb-2">{outfit.style} • {outfit.occasion}</h3>
+                    <p className="text-muted-foreground text-sm">{outfit.description}</p>
+                    <div className="mt-4 flex justify-between items-center">
+                      <Button variant="outline" size="sm" className="rounded-full">Save</Button>
+                      <Button variant="ghost" size="sm" className="rounded-full">Share</Button>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

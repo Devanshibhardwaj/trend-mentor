@@ -13,10 +13,11 @@ interface OutfitCardProps {
   style: string;
   occasion: string;
   description: string;
+  image?: string;
   className?: string;
 }
 
-const OutfitCard = ({ index, style, occasion, description, className }: OutfitCardProps) => {
+const OutfitCard = ({ index, style, occasion, description, image, className }: OutfitCardProps) => {
   const [liked, setLiked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -51,10 +52,18 @@ const OutfitCard = ({ index, style, occasion, description, className }: OutfitCa
       isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
       className
     )}>
-      <div className="relative aspect-[3/4] w-full bg-muted overflow-hidden">
-        <div className="w-full h-full bg-accent/30 flex items-center justify-center">
-          <div className="text-accent-foreground/30 text-sm">Outfit {index + 1}</div>
-        </div>
+      <div className="relative aspect-[3/4] w-full overflow-hidden">
+        {image ? (
+          <img 
+            src={image} 
+            alt={`${style} outfit for ${occasion}`}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full bg-accent/30 flex items-center justify-center">
+            <div className="text-accent-foreground/30 text-sm">Outfit {index + 1}</div>
+          </div>
+        )}
         
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <Badge variant="secondary" className="bg-white/90 text-primary text-xs font-medium shadow-sm">
