@@ -14,7 +14,7 @@ const Hero = () => {
               </h1>
               <p className="text-muted-foreground text-sm md:text-base">
                 Revolutionize your wardrobe with our AI-driven platform. Get personalized outfit
-                suggestions tailored to your unique style, mood, and the weather.
+                suggestions tailored to your unique style, mood, and confidence needs.
               </p>
             </div>
             
@@ -29,6 +29,21 @@ const Hero = () => {
                   Create an Account
                 </Button>
               </Link>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <p className="text-sm font-medium">Style Tips</p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <p className="text-sm font-medium">Mood Styling</p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <p className="text-sm font-medium">Weather-Based</p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <p className="text-sm font-medium">Confidence Boost</p>
+              </div>
             </div>
           </div>
           
