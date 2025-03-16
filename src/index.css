@@ -117,6 +117,11 @@
   .btn-mobile {
     @apply min-h-11 min-w-11 flex items-center justify-center;
   }
+  
+  /* Better card touch feedback */
+  .card {
+    @apply active:scale-98 transition-transform;
+  }
 }
 
 /* Improve form elements */
@@ -162,9 +167,4 @@ input, select, textarea {
 .scrollable {
   @apply overflow-y-auto overscroll-contain;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Better card touch feedback */
-.card {
-  @apply active:scale-98 transition-transform;
 }
