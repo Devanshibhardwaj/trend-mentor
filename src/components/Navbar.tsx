@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserCircle } from "lucide-react";
-
 const Navbar = () => {
-  const { user, signOut } = useAuth();
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  const {
+    user,
+    signOut
+  } = useAuth();
+  return <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link to="/" className="mr-6 flex items-center space-x-2">
@@ -17,7 +17,7 @@ const Navbar = () => {
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link to="/" className="transition-colors hover:text-foreground/80">
+            <Link to="/" className="transition-colors hover:text-foreground/80 mx-0">
               Home
             </Link>
             <Link to="/wardrobe" className="transition-colors hover:text-foreground/80">
@@ -38,8 +38,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-3">
           <ThemeToggle />
           
-          {user ? (
-            <div className="flex items-center space-x-3">
+          {user ? <div className="flex items-center space-x-3">
               <Link to="/profile">
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <UserCircle className="h-5 w-5" />
@@ -48,9 +47,7 @@ const Navbar = () => {
               <Button variant="outline" size="sm" onClick={() => signOut()}>
                 Sign Out
               </Button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2">
+            </div> : <div className="flex items-center space-x-2">
               <Link to="/auth">
                 <Button variant="outline" size="sm">
                   Sign In
@@ -61,12 +58,9 @@ const Navbar = () => {
                   Get Started
                 </Button>
               </Link>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Navbar;
