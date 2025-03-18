@@ -10,7 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import OutfitCard from '@/components/OutfitCard';
-import { Heart, Settings, ShoppingBag, User } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Heart, Settings, ShoppingBag, User, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SavedOutfit {
   id: string;
@@ -21,12 +23,20 @@ interface SavedOutfit {
 }
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, deleteAccount } = useAuth();
   const [savedOutfits, setSavedOutfits] = useState<SavedOutfit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
 
   // This would fetch actual saved outfits from Supabase in a real implementation
   useEffect(() => {
+    // Redirect if not signed in
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
     // Simulate loading saved outfits
     setLoading(true);
     setTimeout(() => {
@@ -49,7 +59,23 @@ const Profile = () => {
       setSavedOutfits(dummySavedOutfits);
       setLoading(false);
     }, 1000);
-  }, []);
+  }, [user, navigate]);
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsDeleting(true);
+      const { error } = await deleteAccount();
+      if (error) {
+        throw error;
+      }
+      toast.success('Your account has been deleted successfully');
+      navigate('/');
+    } catch (error: any) {
+      toast.error(`Failed to delete account: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -104,7 +130,11 @@ const Profile = () => {
                     <Heart className="mr-2 h-4 w-4" />
                     Saved Outfits
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/wardrobe')}
+                  >
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     My Wardrobe
                   </Button>
@@ -112,6 +142,34 @@ const Profile = () => {
                     <Settings className="mr-2 h-4 w-4" />
                     Preferences
                   </Button>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" className="w-full justify-start mt-8">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete your account
+                          and remove all your data from our servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleDeleteAccount}
+                          disabled={isDeleting}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {isDeleting ? 'Deleting...' : 'Delete Account'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </CardContent>
             </Card>

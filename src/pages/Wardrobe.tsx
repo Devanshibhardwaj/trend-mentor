@@ -10,6 +10,8 @@ import Footer from '@/components/Footer';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface WardrobeItemType {
   id: string;
@@ -22,20 +24,24 @@ const Wardrobe = () => {
   const [wardrobeItems, setWardrobeItems] = useState<WardrobeItemType[]>([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      toast.error('Please sign in to access your wardrobe');
+      navigate('/auth');
+      return;
+    }
+    
     fetchWardrobeItems();
-  }, []);
+  }, [user, navigate]);
 
   const fetchWardrobeItems = async () => {
     try {
       setLoading(true);
       
-      // Check if user is logged in
-      const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
-        // If not logged in, use empty array (or redirect to login)
         setWardrobeItems([]);
         setLoading(false);
         return;
@@ -45,6 +51,7 @@ const Wardrobe = () => {
       const { data, error } = await supabase
         .from('wardrobe_items')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
         
       if (error) {
@@ -83,6 +90,10 @@ const Wardrobe = () => {
     : wardrobeItems.filter(item => item.category === activeCategory);
 
   const categories = ['All', 'Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'];
+
+  if (!user) {
+    return null; // This will prevent flash of content before redirect
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +21,14 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp } = useAuth();
+
+  // Redirect if already signed in
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +47,7 @@ const Auth = () => {
         navigate('/');
       }
     } catch (error: any) {
+      console.error('Authentication error:', error);
       toast.error(error.message || 'Authentication failed');
     } finally {
       setIsLoading(false);
@@ -59,7 +67,7 @@ const Auth = () => {
             <CardDescription className="text-center">
               {activeTab === 'login' 
                 ? 'Sign in to your account to access your personal style recommendations'
-                : 'Join Attirefy and discover your perfect style'}
+                : 'Join StyleSage AI and discover your perfect style'}
             </CardDescription>
           </CardHeader>
           

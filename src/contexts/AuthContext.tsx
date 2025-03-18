@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 type AuthContextType = {
   user: User | null;
@@ -10,6 +11,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ error: any | null }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +22,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Set session expiration to 2 days (172800 seconds)
+    supabase.auth.setSession({
+      refresh_token: session?.refresh_token || '',
+      access_token: session?.access_token || '',
+      expires_in: 172800, // 2 days in seconds
+    });
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -35,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [session?.refresh_token, session?.access_token]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -55,10 +64,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    toast.info('You have been signed out');
+  };
+
+  const deleteAccount = async () => {
+    if (!user) {
+      return { error: new Error('No user is currently logged in') };
+    }
+
+    try {
+      // First delete all user data from the wardrobe_items table
+      const { error: deleteWardrobeError } = await supabase
+        .from('wardrobe_items')
+        .delete()
+        .eq('user_id', user.id);
+        
+      if (deleteWardrobeError) {
+        console.error('Error deleting wardrobe items:', deleteWardrobeError);
+        return { error: deleteWardrobeError };
+      }
+      
+      // Delete the user's account
+      const { error: deleteUserError } = await supabase.auth.admin.deleteUser(
+        user.id
+      );
+      
+      if (deleteUserError) {
+        return { error: deleteUserError };
+      }
+      
+      // Sign out after successful deletion
+      await signOut();
+      return { error: null };
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      return { error };
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
