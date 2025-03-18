@@ -22,13 +22,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set session expiration to 2 days (172800 seconds)
-    supabase.auth.setSession({
-      refresh_token: session?.refresh_token || '',
-      access_token: session?.access_token || '',
-      expires_in: 172800, // 2 days in seconds
-    });
-    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -38,18 +31,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Set session expiration - we'll handle this differently
+      if (session) {
+        // We can't directly set expires_in, but we can refresh the session
+        // which will extend its lifetime
+        supabase.auth.refreshSession();
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [session?.refresh_token, session?.access_token]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        // Set session to expire in 2 days (in seconds)
+        expiresIn: 172800
+      }
     });
     return { error };
   };
@@ -58,6 +62,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        // Set session to expire in 2 days (in seconds)
+        expiresIn: 172800
+      }
     });
     return { error };
   };
