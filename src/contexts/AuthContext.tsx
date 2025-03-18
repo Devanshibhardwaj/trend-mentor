@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -31,10 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Set session expiration - we'll handle this differently
+      // If a session exists, we can periodically refresh it to extend its lifetime
       if (session) {
-        // We can't directly set expires_in, but we can refresh the session
-        // which will extend its lifetime
+        // This will automatically refresh the session
         supabase.auth.refreshSession();
       }
       
@@ -47,25 +45,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    // For signInWithPassword, we can't directly set expiresIn in options
+    // The session expiration is handled on the server side and through refresh tokens
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password,
-      options: {
-        // Set session to expire in 2 days (in seconds)
-        expiresIn: 172800
-      }
+      password
     });
     return { error };
   };
 
   const signUp = async (email: string, password: string) => {
+    // For signUp, we can't directly set expiresIn in options
+    // The session expiration is handled on the server side
     const { error } = await supabase.auth.signUp({
       email,
-      password,
-      options: {
-        // Set session to expire in 2 days (in seconds)
-        expiresIn: 172800
-      }
+      password
     });
     return { error };
   };
