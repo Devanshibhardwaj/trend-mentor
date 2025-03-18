@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Camera, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
+import { v4 as uuidv4 } from 'uuid';
 
 interface ClothingUploaderProps {
   onAddItem: (item: { id: string; name: string; category: string; imageUrl: string }) => void;
@@ -18,24 +20,26 @@ const ClothingUploader = ({ onAddItem }: ClothingUploaderProps) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-    if (!file.type.startsWith('image/')) {
+    if (!selectedFile.type.startsWith('image/')) {
       toast.error('Please upload an image file');
       return;
     }
 
+    setFile(selectedFile);
     const reader = new FileReader();
     reader.onload = () => {
       setPreview(reader.result as string);
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(selectedFile);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!preview) {
@@ -55,28 +59,84 @@ const ClothingUploader = ({ onAddItem }: ClothingUploaderProps) => {
     
     setIsUploading(true);
     
-    // In a real app, you would upload the image to a server here
-    setTimeout(() => {
-      // Mock successful upload
-      const newItem = {
-        id: Date.now().toString(),
-        name,
-        category,
-        imageUrl: preview,
-      };
+    try {
+      // Check if the user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
       
-      onAddItem(newItem);
+      if (!user) {
+        toast.error('You must be logged in to add items to your wardrobe');
+        setIsUploading(false);
+        return;
+      }
+      
+      // Upload the image to Supabase Storage
+      let imageUrl = '';
+      if (file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('wardrobe_images')
+          .upload(filePath, file);
+          
+        if (uploadError) {
+          toast.error('Error uploading image: ' + uploadError.message);
+          setIsUploading(false);
+          return;
+        }
+        
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('wardrobe_images')
+          .getPublicUrl(filePath);
+          
+        imageUrl = publicUrl;
+      }
+      
+      // Add the item to the wardrobe_items table
+      const { error: insertError, data: insertedItem } = await supabase
+        .from('wardrobe_items')
+        .insert({
+          name,
+          category, 
+          image_url: imageUrl,
+          user_id: user.id
+        })
+        .select()
+        .single();
+        
+      if (insertError) {
+        toast.error('Error adding item to wardrobe: ' + insertError.message);
+        setIsUploading(false);
+        return;
+      }
+      
+      // Call the onAddItem prop with the new item
+      onAddItem({
+        id: insertedItem.id,
+        name: insertedItem.name,
+        category: insertedItem.category,
+        imageUrl: insertedItem.image_url || '',
+      });
       
       // Reset form
       setPreview(null);
       setName('');
       setCategory('');
+      setFile(null);
+      
+      toast.success('Item added to your wardrobe!');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
       setIsUploading(false);
       
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    }, 1000);
+    }
   };
 
   const triggerFileInput = () => {
@@ -85,6 +145,7 @@ const ClothingUploader = ({ onAddItem }: ClothingUploaderProps) => {
 
   const removeImage = () => {
     setPreview(null);
+    setFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

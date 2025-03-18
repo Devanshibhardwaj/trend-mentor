@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
 
 interface WardrobeItemProps {
   item: {
@@ -13,17 +14,44 @@ interface WardrobeItemProps {
     category: string;
     imageUrl: string;
   };
+  onDelete?: (id: string) => void;
 }
 
-const WardrobeItem = ({ item }: WardrobeItemProps) => {
+const WardrobeItem = ({ item, onDelete }: WardrobeItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleEdit = () => {
     toast.info(`Edit functionality for item: ${item.name}`);
   };
 
-  const handleDelete = () => {
-    toast.success(`${item.name} has been removed from your wardrobe`);
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('wardrobe_items')
+        .delete()
+        .eq('id', item.id);
+        
+      if (error) {
+        toast.error('Error deleting item: ' + error.message);
+        return;
+      }
+      
+      // Call the onDelete callback if provided
+      if (onDelete) {
+        onDelete(item.id);
+      }
+      
+      toast.success(`${item.name} has been removed from your wardrobe`);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Placeholder image if no image URL is provided
@@ -57,6 +85,7 @@ const WardrobeItem = ({ item }: WardrobeItemProps) => {
               size="icon"
               className="h-9 w-9 rounded-full bg-white text-destructive hover:bg-white/90"
               onClick={handleDelete}
+              disabled={isDeleting}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

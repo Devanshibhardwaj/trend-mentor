@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import ClothingUploader from '@/components/ClothingUploader';
@@ -7,22 +7,74 @@ import WardrobeItem from '@/components/WardrobeItem';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from 'lucide-react';
 
-// Temporary mock data for development
-const MOCK_WARDROBE_ITEMS = [
-  { id: '1', name: 'Blue denim jacket', category: 'Outerwear', imageUrl: '' },
-  { id: '2', name: 'White t-shirt', category: 'Tops', imageUrl: '' },
-  { id: '3', name: 'Black jeans', category: 'Bottoms', imageUrl: '' },
-  { id: '4', name: 'Leather boots', category: 'Footwear', imageUrl: '' },
-];
+interface WardrobeItemType {
+  id: string;
+  name: string;
+  category: string;
+  imageUrl: string;
+}
 
 const Wardrobe = () => {
-  const [wardrobeItems, setWardrobeItems] = useState(MOCK_WARDROBE_ITEMS);
+  const [wardrobeItems, setWardrobeItems] = useState<WardrobeItemType[]>([]);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
 
-  const handleAddItem = (newItem: { id: string; name: string; category: string; imageUrl: string }) => {
-    setWardrobeItems([...wardrobeItems, newItem]);
-    toast.success('Item added to your wardrobe!');
+  useEffect(() => {
+    fetchWardrobeItems();
+  }, []);
+
+  const fetchWardrobeItems = async () => {
+    try {
+      setLoading(true);
+      
+      // Check if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // If not logged in, use empty array (or redirect to login)
+        setWardrobeItems([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch wardrobe items from Supabase
+      const { data, error } = await supabase
+        .from('wardrobe_items')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching wardrobe items:', error);
+        toast.error('Failed to load your wardrobe items');
+        setWardrobeItems([]);
+      } else {
+        // Map the data to the expected format
+        const formattedItems: WardrobeItemType[] = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          imageUrl: item.image_url || '',
+        }));
+        
+        setWardrobeItems(formattedItems);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddItem = (newItem: WardrobeItemType) => {
+    setWardrobeItems([newItem, ...wardrobeItems]);
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    setWardrobeItems(wardrobeItems.filter(item => item.id !== itemId));
   };
 
   const filteredItems = activeCategory === 'All' 
@@ -61,7 +113,11 @@ const Wardrobe = () => {
             ))}
           </div>
           
-          {filteredItems.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filteredItems.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-muted-foreground">
                 No items found in this category. Upload some clothes to get started!
@@ -70,7 +126,11 @@ const Wardrobe = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredItems.map(item => (
-                <WardrobeItem key={item.id} item={item} />
+                <WardrobeItem 
+                  key={item.id} 
+                  item={item} 
+                  onDelete={handleDeleteItem}
+                />
               ))}
             </div>
           )}
