@@ -10,7 +10,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -20,8 +21,11 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [verificationNeeded, setVerificationNeeded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const navigate = useNavigate();
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, resendVerificationEmail } = useAuth();
 
   // Redirect if already signed in
   useEffect(() => {
@@ -33,22 +37,58 @@ const Auth = () => {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
       if (activeTab === 'login') {
         const { error } = await signIn(email, password);
-        if (error) throw error;
-        toast.success('Successfully signed in!');
-        navigate('/');
+        if (error) {
+          if (error.message === 'Email not confirmed') {
+            setVerificationNeeded(true);
+            setError('Your email has not been verified. Please check your inbox or request a new verification link.');
+          } else {
+            throw error;
+          }
+        } else {
+          toast.success('Successfully signed in!');
+          navigate('/');
+        }
       } else {
-        const { error } = await signUp(email, password);
-        if (error) throw error;
-        toast.success('Registration successful! Please check your email for verification.');
-        navigate('/');
+        const { error, isNewUser } = await signUp(email, password);
+        if (error) {
+          if (error.message === 'User already registered') {
+            setActiveTab('login');
+            setError('This email is already registered. Please sign in instead.');
+          } else {
+            throw error;
+          }
+        } else if (isNewUser) {
+          setVerificationNeeded(true);
+          setError('Registration successful! Please check your email for verification link.');
+        } else {
+          toast.success('Registration successful! You are now signed in.');
+          navigate('/');
+        }
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
-      toast.error(error.message || 'Authentication failed');
+      setError(error.message || 'Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await resendVerificationEmail(email);
+      if (error) {
+        throw error;
+      }
+      toast.success('Verification email has been sent!');
+    } catch (error: any) {
+      console.error('Error sending verification email:', error);
+      toast.error(error.message || 'Failed to send verification email');
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +116,33 @@ const Auth = () => {
               <TabsTrigger value="login">Sign In</TabsTrigger>
               <TabsTrigger value="register">Create Account</TabsTrigger>
             </TabsList>
+            
+            {error && (
+              <div className="px-6 pt-4">
+                <Alert variant="destructive" className={verificationNeeded ? "bg-amber-100 text-amber-800 border-amber-200" : ""}>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                  {verificationNeeded && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2 w-full" 
+                      onClick={handleResendVerification}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Resend Verification Email'
+                      )}
+                    </Button>
+                  )}
+                </Alert>
+              </div>
+            )}
             
             <TabsContent value="login">
               <form onSubmit={handleAuth}>

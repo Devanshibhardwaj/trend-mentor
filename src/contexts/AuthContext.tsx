@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -8,9 +9,10 @@ type AuthContextType = {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any; isNewUser?: boolean }>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<{ error: any | null }>;
+  resendVerificationEmail: (email: string) => Promise<{ error: any | null }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,8 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    // For signInWithPassword, we can't directly set expiresIn in options
-    // The session expiration is handled on the server side and through refresh tokens
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -55,12 +55,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    // For signUp, we can't directly set expiresIn in options
-    // The session expiration is handled on the server side
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password
     });
+    
+    return { 
+      error, 
+      isNewUser: data?.user && !data.user.identities?.[0]?.identity_data?.email_verified 
+    };
+  };
+
+  const resendVerificationEmail = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email
+    });
+    
     return { error };
   };
 
@@ -105,7 +116,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, deleteAccount }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      deleteAccount,
+      resendVerificationEmail 
+    }}>
       {children}
     </AuthContext.Provider>
   );
