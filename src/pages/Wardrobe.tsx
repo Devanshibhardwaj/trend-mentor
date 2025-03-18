@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import ClothingUploader from '@/components/ClothingUploader';
 import WardrobeItem from '@/components/WardrobeItem';
+import OutfitRecommendation from '@/components/OutfitRecommendation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { toast } from 'sonner';
@@ -88,53 +89,64 @@ const Wardrobe = () => {
       <Navbar />
       
       <main className="flex-grow container mx-auto px-4 py-8">
-        <section className="mb-10">
-          <h1 className="text-3xl font-bold mb-2">My Wardrobe</h1>
-          <p className="text-muted-foreground mb-6">
-            Upload and manage your clothing items to get personalized outfit recommendations.
-          </p>
-          
-          <ClothingUploader onAddItem={handleAddItem} />
-        </section>
-        
-        <Separator className="my-8" />
-        
-        <section>
-          <div className="flex flex-wrap gap-2 mb-6">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={activeCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </Button>
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <section className="mb-10">
+              <h1 className="text-3xl font-bold mb-2">My Wardrobe</h1>
+              <p className="text-muted-foreground mb-6">
+                Upload and manage your clothing items to get personalized outfit recommendations.
+              </p>
+              
+              <ClothingUploader onAddItem={handleAddItem} />
+            </section>
+            
+            <Separator className="my-8" />
+            
+            <section>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {categories.map(category => (
+                  <Button
+                    key={category}
+                    variant={activeCategory === category ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+              
+              {loading ? (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredItems.length === 0 ? (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground">
+                    No items found in this category. Upload some clothes to get started!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                  {filteredItems.map(item => (
+                    <WardrobeItem 
+                      key={item.id} 
+                      item={item} 
+                      onDelete={handleDeleteItem}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
           
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground">
-                No items found in this category. Upload some clothes to get started!
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredItems.map(item => (
-                <WardrobeItem 
-                  key={item.id} 
-                  item={item} 
-                  onDelete={handleDeleteItem}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+          <div className="lg:col-span-1">
+            <OutfitRecommendation 
+              wardrobeItems={wardrobeItems}
+              isLoading={loading}
+            />
+          </div>
+        </div>
       </main>
       
       <Footer />
