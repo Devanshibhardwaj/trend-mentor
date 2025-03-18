@@ -54,19 +54,22 @@ const Auth = () => {
           navigate('/');
         }
       } else {
+        // For registration flow
         const { error, isNewUser } = await signUp(email, password);
         if (error) {
           if (error.message === 'User already registered') {
+            // If user exists, show a helpful message and switch to login tab
             setActiveTab('login');
             setError('This email is already registered. Please sign in instead.');
           } else {
             throw error;
           }
         } else if (isNewUser) {
+          // If email verification is required by Supabase
           setVerificationNeeded(true);
           setError('Registration successful! Please check your email for verification link.');
         } else {
-          toast.success('Registration successful! You are now signed in.');
+          // User is auto-signed in (if email verification is disabled in Supabase)
           navigate('/');
         }
       }
