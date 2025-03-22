@@ -195,6 +195,84 @@
   animation: float 5s ease-in-out infinite;
 }
 
+/* New shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-effect {
+  background: linear-gradient(90deg, 
+    hsl(var(--background)) 0%,
+    hsl(var(--primary) / 0.2) 25%, 
+    hsl(var(--background)) 50%,
+    hsl(var(--primary) / 0.2) 75%, 
+    hsl(var(--background)) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+}
+
+/* Gentle rotate animation */
+@keyframes gentle-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.gentle-rotate {
+  animation: gentle-rotate 6s ease-in-out infinite;
+}
+
+/* Parallax movement */
+.parallax-element {
+  transition: transform 0.2s ease-out;
+}
+
+/* Bounce animation */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.bounce-animation {
+  animation: bounce-subtle 2s infinite ease-in-out;
+}
+
+/* Wave effect */
+@keyframes wave {
+  0% {
+    transform: translateX(0) translateZ(0);
+  }
+  50% {
+    transform: translateX(-25%) translateZ(0);
+  }
+  100% {
+    transform: translateX(0) translateZ(0);
+  }
+}
+
+.wave-animation {
+  background-size: 200% 100%;
+  animation: wave 15s infinite ease-in-out;
+}
+
 .read-the-docs {
   color: #888;
 }

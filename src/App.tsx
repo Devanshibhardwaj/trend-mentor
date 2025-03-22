@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import StepGuide from "./components/StepGuide";
 import Index from "./pages/Index";
 import Wardrobe from "./pages/Wardrobe";
 import VirtualTryOn from "./pages/VirtualTryOn";
@@ -25,6 +26,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <StepGuide />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/wardrobe" element={<Wardrobe />} />
