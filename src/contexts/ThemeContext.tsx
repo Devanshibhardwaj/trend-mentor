@@ -13,6 +13,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     // Check if user has previously set a theme preference
@@ -20,14 +21,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedTheme) {
       setTheme(savedTheme);
     } else {
-      // Default to dark mode
-      setTheme("dark");
+      // Check system preference
+      const systemPreference = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      setTheme(systemPreference);
     }
   }, []);
 
   useEffect(() => {
     // Update document class when theme changes
     const root = document.documentElement;
+    
+    // Add transitioning class for smooth animations
+    setIsTransitioning(true);
+    root.classList.add('theme-transitioning');
+    
     root.classList.remove("light", "dark");
     
     if (theme === "system") {
@@ -38,6 +45,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
     
     localStorage.setItem("theme", theme);
+    
+    // Remove transitioning class after animation completes
+    const timer = setTimeout(() => {
+      root.classList.remove('theme-transitioning');
+      setIsTransitioning(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [theme]);
 
   const toggleTheme = () => {

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -23,23 +22,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      console.log('Auth state changed:', event, newSession?.user?.email);
+      
+      if (newSession) {
+        setSession(newSession);
+        setUser(newSession.user);
+        supabase.auth.refreshSession();
+      } else {
+        setSession(null);
+        setUser(null);
+      }
+      
       setLoading(false);
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // If a session exists, we can periodically refresh it to extend its lifetime
-      if (session) {
-        // This will automatically refresh the session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log('Initial session check:', currentSession?.user?.email);
+      
+      if (currentSession) {
+        setSession(currentSession);
+        setUser(currentSession.user);
         supabase.auth.refreshSession();
       }
       
-      setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
     });
 
@@ -55,26 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    // When signing up, we use the signUp method from Supabase
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        // By default, the user will be signed in automatically after sign up
-        // unless email confirmation is enabled in Supabase
         emailRedirectTo: window.location.origin + '/auth'
       }
     });
     
     if (!error && data?.user) {
-      // Notify the user of successful account creation
       toast.success('Account created successfully!');
       
-      // If email verification is not required, the user will be automatically signed in
       if (data.session) {
         toast.success('You are now signed in!');
       } else {
-        // If email verification is required, prompt the user to check their email
         toast.info('Please check your email to verify your account.');
       }
     }
@@ -109,7 +109,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      // First delete all user data from the wardrobe_items table
       const { error: deleteWardrobeError } = await supabase
         .from('wardrobe_items')
         .delete()
@@ -120,7 +119,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: deleteWardrobeError };
       }
       
-      // Delete the user's account
       const { error: deleteUserError } = await supabase.auth.admin.deleteUser(
         user.id
       );
@@ -129,7 +127,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: deleteUserError };
       }
       
-      // Sign out after successful deletion
       await signOut();
       return { error: null };
     } catch (error) {
