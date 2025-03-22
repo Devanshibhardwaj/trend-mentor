@@ -2,11 +2,32 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Share2, Eye, Sparkles, ThumbsUp, Bookmark } from 'lucide-react';
+import { Heart, Share2, Eye, Sparkles, ThumbsUp, Bookmark, ShoppingBag, Star, DollarSign, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface ShoppingOption {
+  name: string;
+  url: string;
+  price: number;
+  rating: number;
+}
 
 interface OutfitCardProps {
   index: number;
@@ -15,14 +36,44 @@ interface OutfitCardProps {
   description: string;
   image?: string;
   className?: string;
+  shoppingOptions?: ShoppingOption[];
 }
 
-const OutfitCard = ({ index, style, occasion, description, image, className }: OutfitCardProps) => {
+const OutfitCard = ({ 
+  index, 
+  style, 
+  occasion, 
+  description, 
+  image, 
+  className,
+  shoppingOptions = [
+    { 
+      name: "Fashion Nova", 
+      url: "https://www.fashionnova.com", 
+      price: 49.99, 
+      rating: 4.2 
+    },
+    { 
+      name: "ASOS", 
+      url: "https://www.asos.com", 
+      price: 59.99, 
+      rating: 4.5 
+    },
+    { 
+      name: "Zara", 
+      url: "https://www.zara.com", 
+      price: 39.99, 
+      rating: 4.3 
+    }
+  ]
+}: OutfitCardProps) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const isMobile = useIsMobile();
   
   // Animation and visibility
@@ -72,6 +123,15 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
     setIsExpanded(!isExpanded);
   };
 
+  const handleRating = (value: number) => {
+    setRating(value);
+    setFeedbackSubmitted(true);
+    toast.success("Thank you for your feedback!", {
+      icon: <Star className="h-4 w-4 text-yellow-500" />,
+      description: `You rated this outfit ${value} stars`
+    });
+  };
+
   return (
     <Card 
       className={cn(
@@ -102,10 +162,10 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
         )}
         
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          <Badge className="bg-indigo-500/90 hover:bg-indigo-600/90 text-white text-xs font-medium shadow-md">
+          <Badge className="bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white text-xs font-medium shadow-md">
             {style}
           </Badge>
-          <Badge className="bg-blue-500/90 hover:bg-blue-600/90 text-white text-xs font-medium shadow-md">
+          <Badge className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-xs font-medium shadow-md">
             {occasion}
           </Badge>
         </div>
@@ -113,7 +173,7 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
         {/* Featured badge if it's one of the first 2 items */}
         {index < 2 && (
           <div className="absolute top-3 right-3">
-            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-medium shadow-sm flex items-center gap-1 px-3">
+            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-medium shadow-sm flex items-center gap-1 px-3 animate-pulse">
               <Sparkles className="h-3 w-3" />
               Featured
             </Badge>
@@ -127,15 +187,68 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
             isMobile ? "active:opacity-100" : "group-hover:opacity-100"
           )}
         >
-          <Button 
-            variant="secondary" 
-            size="sm"
-            className="rounded-full px-5 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white shadow-lg"
-            onClick={handleExpand}
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            <span>Quick View</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="secondary" 
+              size="sm"
+              className="rounded-full px-5 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white shadow-lg"
+              onClick={handleExpand}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              <span>Quick View</span>
+            </Button>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  className="rounded-full px-5 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white shadow-lg"
+                >
+                  <ShoppingBag className="h-4 w-4 mr-2" />
+                  <span>Shop</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Shop This Look</DialogTitle>
+                  <DialogDescription>
+                    Find this {style} outfit for {occasion} at these retailers
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 my-4">
+                  {shoppingOptions.map((option, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{option.name}</span>
+                        <div className="flex items-center gap-1 mt-1">
+                          <DollarSign className="h-3 w-3 text-green-500" />
+                          <span className="text-sm text-muted-foreground">${option.price}</span>
+                          <span className="mx-2 text-muted-foreground">•</span>
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map(star => (
+                              <Star 
+                                key={star} 
+                                className={`h-3 w-3 ${star <= option.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`} 
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <a 
+                        href={option.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center text-sm font-medium h-9 rounded-md px-3 bg-primary text-primary-foreground hover:bg-primary/90"
+                      >
+                        Visit <ExternalLink className="ml-2 h-3 w-3" />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
       
@@ -158,9 +271,40 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
             {isExpanded ? "Show less" : "Read more"}
           </button>
         )}
+        
+        {/* Rating component */}
+        <div className="mt-4">
+          <p className="text-xs text-muted-foreground mb-2">
+            {feedbackSubmitted ? "Thank you for your feedback!" : "Rate this outfit:"}
+          </p>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <TooltipProvider key={star}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className={`focus:outline-none ${feedbackSubmitted && star > rating ? "opacity-50" : ""}`}
+                      onClick={() => !feedbackSubmitted && handleRating(star)}
+                      disabled={feedbackSubmitted}
+                    >
+                      <Star
+                        className={`h-5 w-5 transition-all ${
+                          star <= rating ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"
+                        } ${!feedbackSubmitted && "hover:text-yellow-500 hover:scale-110"}`}
+                      />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{star} star{star !== 1 ? "s" : ""}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </div>
+        </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 flex justify-between">
+      <CardFooter className="p-4 pt-0 flex justify-between items-center">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -194,6 +338,57 @@ const OutfitCard = ({ index, style, occasion, description, image, className }: O
             <span className="sr-only">{saved ? "Unsave" : "Save"}</span>
           </Button>
         </div>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full flex items-center gap-1 px-3 shadow-sm hover:shadow border-primary/20 hover:border-primary/50"
+            >
+              <ShoppingBag className="h-4 w-4 text-primary" />
+              <span>Shop Now</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Shop This Look</DialogTitle>
+              <DialogDescription>
+                Find this {style} outfit for {occasion} at these retailers
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 my-4">
+              {shoppingOptions.map((option, i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
+                  <div className="flex flex-col">
+                    <span className="font-medium">{option.name}</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <DollarSign className="h-3 w-3 text-green-500" />
+                      <span className="text-sm text-muted-foreground">${option.price}</span>
+                      <span className="mx-2 text-muted-foreground">•</span>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star 
+                            key={star} 
+                            className={`h-3 w-3 ${star <= option.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`} 
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <a 
+                    href={option.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center text-sm font-medium h-9 rounded-md px-3 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    Visit <ExternalLink className="ml-2 h-3 w-3" />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
         
         <Button
           variant="ghost"
