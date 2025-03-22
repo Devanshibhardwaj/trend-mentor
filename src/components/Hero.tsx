@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Cloud, ChevronDown, Star, Wand2 } from "lucide-react";
+import { Sparkles, Zap, Cloud, ChevronDown, Star, Wand2, Calendar } from "lucide-react";
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
