@@ -1,7 +1,8 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
-	darkMode: ["class"],
+	darkMode: ["class", ".dark"],
 	content: [
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
@@ -19,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ["Inter", "system-ui", "sans-serif"],
+				sans: ["Inter", "Poppins", "system-ui", "sans-serif"],
+				display: ["Poppins", "Inter", "system-ui", "sans-serif"],
 			},
 			scale: {
 				'98': '0.98',
@@ -102,7 +104,19 @@ export default {
 				'slide-in-left': {
 					from: { transform: 'translateX(-100%)' },
 					to: { transform: 'translateX(0)' }
-				}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
+				'pulse-subtle': {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(1.05)' },
+				},
+				'shimmer': {
+					'0%': { backgroundPosition: '-200% 0' },
+					'100%': { backgroundPosition: '200% 0' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -112,9 +126,35 @@ export default {
 				'fade-down': 'fade-down 0.6s ease-out',
 				'slow-fade-in': 'fade-in 1.2s ease-out',
 				'slide-in-right': 'slide-in-right 0.6s ease-out',
-				'slide-in-left': 'slide-in-left 0.6s ease-out'
+				'slide-in-left': 'slide-in-left 0.6s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'float-slow': 'float 8s ease-in-out infinite',
+				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+				'shimmer': 'shimmer 3s infinite linear',
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function({ addBase, theme }) {
+			addBase({
+				':root': {
+					'--primary-rgb': '255, 255, 255',
+					'--accent-rgb': '200, 200, 200',
+				},
+				'.light': {
+					'--primary-rgb': '0, 0, 0',
+					'--accent-rgb': '50, 50, 50',
+				},
+				'.vibrant': {
+					'--primary-rgb': '157, 100, 255',
+					'--accent-rgb': '200, 100, 255',
+				},
+				'.pastel': {
+					'--primary-rgb': '100, 150, 255',
+					'--accent-rgb': '255, 150, 180',
+				},
+			});
+		},
+	],
 } satisfies Config;

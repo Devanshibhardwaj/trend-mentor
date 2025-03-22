@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light" | "vibrant" | "pastel" | "system";
 
 type ThemeContextType = {
   theme: Theme;
@@ -12,18 +12,17 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("vibrant");
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     // Check if user has previously set a theme preference
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme) {
+    if (savedTheme && ["dark", "light", "vibrant", "pastel", "system"].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
-      // Check system preference
-      const systemPreference = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      setTheme(systemPreference);
+      // Default to vibrant theme for new users
+      setTheme("vibrant");
     }
   }, []);
 
@@ -35,7 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setIsTransitioning(true);
     root.classList.add('theme-transitioning');
     
-    root.classList.remove("light", "dark");
+    root.classList.remove("light", "dark", "vibrant", "pastel");
     
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -50,7 +49,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(() => {
       root.classList.remove('theme-transitioning');
       setIsTransitioning(false);
-    }, 500);
+    }, 800);
     
     return () => clearTimeout(timer);
   }, [theme]);
@@ -58,7 +57,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     setTheme(prevTheme => {
       if (prevTheme === "light") return "dark";
-      if (prevTheme === "dark") return "system";
+      if (prevTheme === "dark") return "vibrant";
+      if (prevTheme === "vibrant") return "pastel";
+      if (prevTheme === "pastel") return "system";
       return "light";
     });
   };
