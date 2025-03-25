@@ -4,10 +4,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   // Avoid hydration mismatch
   useEffect(() => {
@@ -16,38 +18,110 @@ export default function ThemeToggle() {
   
   if (!mounted) return null;
   
+  const iconVariants = {
+    initial: { scale: 0.8, rotate: -10, opacity: 0 },
+    animate: { scale: 1, rotate: 0, opacity: 1 },
+    exit: { scale: 0.8, rotate: 10, opacity: 0 },
+    hover: { scale: 1.2, rotate: 5 }
+  };
+  
+  const bgVariants = {
+    initial: { scale: 0, borderRadius: "50%" },
+    animate: { scale: 1, borderRadius: "50%" },
+    hover: { scale: 1.1, borderRadius: "30%" }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full relative group">
-          {theme === "dark" && <Moon className="h-[1.2rem] w-[1.2rem] transition-all animate-gentle-rotate" />}
-          {theme === "light" && <Sun className="h-[1.2rem] w-[1.2rem] transition-all animate-pulse-sophisticated" />}
-          {theme === "vibrant" && <Gem className="h-[1.2rem] w-[1.2rem] transition-all text-primary/80" />}
-          {theme === "pastel" && <CloudSun className="h-[1.2rem] w-[1.2rem] transition-all text-primary/80" />}
-          {theme === "system" && <Palette className="h-[1.2rem] w-[1.2rem] transition-all" />}
-          <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full relative group"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <motion.div 
+            className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-full z-0"
+            variants={bgVariants}
+            initial="initial"
+            animate={isHovered ? "hover" : "animate"}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          />
+          
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={theme} 
+              className="relative z-10"
+              variants={iconVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              whileHover="hover"
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+            >
+              {theme === "dark" && (
+                <Moon className="h-[1.2rem] w-[1.2rem] text-primary/90" />
+              )}
+              {theme === "light" && (
+                <Sun className="h-[1.2rem] w-[1.2rem] text-yellow-500" />
+              )}
+              {theme === "vibrant" && (
+                <Gem className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+              )}
+              {theme === "pastel" && (
+                <CloudSun className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+              )}
+              {theme === "system" && (
+                <Palette className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+              )}
+            </motion.div>
+          </AnimatePresence>
+          
+          <motion.span 
+            className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary rounded-full"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          />
+          
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="animate-scale-in rounded-lg overflow-hidden">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="flex gap-2 cursor-pointer">
-          <Sun className="h-[1rem] w-[1rem]" />
+        <DropdownMenuItem 
+          onClick={() => setTheme("light")} 
+          className="flex gap-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
+        >
+          <Sun className="h-[1rem] w-[1rem] text-yellow-500" />
           <span>Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="flex gap-2 cursor-pointer">
-          <Moon className="h-[1rem] w-[1rem]" />
+        <DropdownMenuItem 
+          onClick={() => setTheme("dark")} 
+          className="flex gap-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+        >
+          <Moon className="h-[1rem] w-[1rem] text-blue-400" />
           <span>Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("vibrant")} className="flex gap-2 cursor-pointer">
-          <Gem className="h-[1rem] w-[1rem]" />
+        <DropdownMenuItem 
+          onClick={() => setTheme("vibrant")} 
+          className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+        >
+          <Gem className="h-[1rem] w-[1rem] text-purple-500" />
           <span>Vibrant</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("pastel")} className="flex gap-2 cursor-pointer">
-          <CloudSun className="h-[1rem] w-[1rem]" />
+        <DropdownMenuItem 
+          onClick={() => setTheme("pastel")} 
+          className="flex gap-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+        >
+          <CloudSun className="h-[1rem] w-[1rem] text-pink-400" />
           <span>Pastel</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="flex gap-2 cursor-pointer">
-          <Palette className="h-[1rem] w-[1rem]" />
+        <DropdownMenuItem 
+          onClick={() => setTheme("system")} 
+          className="flex gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        >
+          <Palette className="h-[1rem] w-[1rem] text-gray-500" />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

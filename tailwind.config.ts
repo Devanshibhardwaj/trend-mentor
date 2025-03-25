@@ -117,6 +117,24 @@ export default {
 					'0%': { backgroundPosition: '-200% 0' },
 					'100%': { backgroundPosition: '200% 0' },
 				},
+				'rotate-gradient': {
+					'0%': { backgroundPosition: '0% 50%' },
+					'50%': { backgroundPosition: '100% 50%' },
+					'100%': { backgroundPosition: '0% 50%' },
+				},
+				'morphing': {
+					'0%': { borderRadius: '60% 40% 30% 70%/60% 30% 70% 40%' },
+					'50%': { borderRadius: '30% 60% 70% 40%/50% 60% 30% 60%' },
+					'100%': { borderRadius: '60% 40% 30% 70%/60% 30% 70% 40%' },
+				},
+				'bounce-subtle': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' },
+				},
+				'scale-in-out': {
+					'0%, 100%': { transform: 'scale(1)' },
+					'50%': { transform: 'scale(0.95)' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -131,6 +149,11 @@ export default {
 				'float-slow': 'float 8s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
 				'shimmer': 'shimmer 3s infinite linear',
+				'scale-in': 'scale-in 0.2s ease-out forwards',
+				'rotate-gradient': 'rotate-gradient 6s linear infinite',
+				'morphing': 'morphing 8s ease-in-out infinite',
+				'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+				'scale-in-out': 'scale-in-out 2s ease-in-out infinite',
 			}
 		}
 	},
@@ -154,6 +177,23 @@ export default {
 					'--primary-rgb': '100, 150, 255',
 					'--accent-rgb': '255, 150, 180',
 				},
+                // Adding transition classes for theme changes
+                '.from-dark': {
+                    '--from-bg': '30, 30, 30',
+                    '--from-text': '255, 255, 255',
+                },
+                '.from-light': {
+                    '--from-bg': '255, 255, 255',
+                    '--from-text': '30, 30, 30',
+                },
+                '.from-vibrant': {
+                    '--from-bg': '36, 16, 56',
+                    '--from-text': '157, 100, 255',
+                },
+                '.from-pastel': {
+                    '--from-bg': '230, 240, 250',
+                    '--from-text': '100, 150, 255',
+                },
 			});
 		},
 	],
