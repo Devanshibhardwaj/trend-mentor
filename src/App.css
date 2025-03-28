@@ -11,6 +11,23 @@
   transition: background-color 0.8s ease, color 0.8s ease, border-color 0.8s ease, fill 0.8s ease, stroke 0.8s ease, transform 0.8s ease;
 }
 
+/* Theme-specific styles */
+.fun button {
+  border-radius: 1rem;
+}
+
+.elegant button {
+  border-radius: 0.5rem;
+}
+
+.playful button {
+  border-radius: 2rem;
+}
+
+.cosmic button {
+  border-radius: 0.75rem;
+}
+
 /* Enhanced background effects */
 .bg-gradient-sophisticated {
   background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--background)) 100%);
@@ -28,20 +45,38 @@
   pointer-events: none;
 }
 
-.bg-vibrant-gradient {
+.bg-fun-gradient {
   background: linear-gradient(135deg, 
-    hsl(var(--primary)) 0%, 
-    hsl(var(--accent)) 50%, 
-    hsl(var(--primary)) 100%);
+    #3b82f6 0%, 
+    #93c5fd 50%, 
+    #3b82f6 100%);
   background-size: 200% 200%;
   animation: gradient-shift 15s ease infinite;
 }
 
-.bg-pastel-gradient {
+.bg-elegant-gradient {
   background: linear-gradient(135deg, 
-    hsl(var(--card)) 0%, 
-    hsl(var(--accent)/0.3) 50%, 
-    hsl(var(--card)) 100%);
+    #6366f1 0%, 
+    #a5b4fc 50%, 
+    #6366f1 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.bg-playful-gradient {
+  background: linear-gradient(135deg, 
+    #ec4899 0%, 
+    #f9a8d4 50%, 
+    #ec4899 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.bg-cosmic-gradient {
+  background: linear-gradient(135deg, 
+    #9966ff 0%, 
+    #d8b4fe 50%, 
+    #9966ff 100%);
   background-size: 200% 200%;
   animation: gradient-shift 15s ease infinite;
 }
@@ -106,12 +141,20 @@
   transform: translateX(100%);
 }
 
-.vibrant .feature-card:hover {
-  box-shadow: 0 16px 30px hsl(var(--accent)/0.3);
+.fun .feature-card:hover {
+  box-shadow: 0 16px 30px rgba(59, 130, 246, 0.3);
 }
 
-.pastel .feature-card:hover {
-  box-shadow: 0 16px 30px hsl(var(--accent)/0.2);
+.elegant .feature-card:hover {
+  box-shadow: 0 16px 30px rgba(99, 102, 241, 0.3);
+}
+
+.playful .feature-card:hover {
+  box-shadow: 0 16px 30px rgba(236, 72, 153, 0.3);
+}
+
+.cosmic .feature-card:hover {
+  box-shadow: 0 16px 30px rgba(153, 102, 255, 0.3);
 }
 
 /* Sophisticated image hover effects */
@@ -140,6 +183,40 @@
 
 .image-hover:hover img {
   transform: scale(1.07);
+}
+
+/* Fun Mode Specifics */
+.fun .animated-bg {
+  background: linear-gradient(-45deg, #93c5fd, #3b82f6, #60a5fa, #2563eb);
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+/* Elegant Mode Specifics */
+.elegant .animated-bg {
+  background: linear-gradient(-45deg, #a5b4fc, #6366f1, #818cf8, #4f46e5);
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+/* Playful Mode Specifics */
+.playful .animated-bg {
+  background: linear-gradient(-45deg, #f9a8d4, #ec4899, #fbcfe8, #db2777);
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+/* Cosmic Mode Specifics */
+.cosmic .animated-bg {
+  background: linear-gradient(-45deg, #d8b4fe, #9966ff, #c4b5fd, #7c3aed);
+  background-size: 400% 400%;
+  animation: gradient-animation 15s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Enhanced text animations */
@@ -212,100 +289,170 @@
   animation: float-subtle 8s ease-in-out 1s infinite;
 }
 
-/* Shimmer effect animation */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Theme-specific buttons */
+.fun .theme-button {
+  background: linear-gradient(45deg, #3b82f6, #60a5fa);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
 }
 
-.shimmer-effect {
-  background: linear-gradient(90deg, 
-    hsl(var(--background)) 0%,
-    hsl(var(--primary)/0.2) 25%, 
-    hsl(var(--background)) 50%,
-    hsl(var(--primary)/0.2) 75%, 
-    hsl(var(--background)) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 3s infinite linear;
+.elegant .theme-button {
+  background: linear-gradient(45deg, #6366f1, #818cf8);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
 }
 
-/* Enhanced button animations */
-.button-glow {
-  position: relative;
+.playful .theme-button {
+  background: linear-gradient(45deg, #ec4899, #f472b6);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
 }
 
-.button-glow::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  background: conic-gradient(from 0deg, transparent, hsl(var(--primary)), transparent);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  border-radius: inherit;
-  animation: rotate 2s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s;
+.cosmic .theme-button {
+  background: linear-gradient(45deg, #9966ff, #a78bfa);
+  box-shadow: 0 4px 14px rgba(153, 102, 255, 0.4);
 }
 
-.button-glow:hover::after {
-  opacity: 1;
+.theme-button {
+  transition: all 0.3s ease;
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.theme-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.5);
 }
 
-/* Fun confetti effect for celebrations */
-@keyframes confetti-rain {
-  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(60vh) rotate(360deg); opacity: 0.3; }
-}
-
+/* Confetti Animation */
 .confetti {
   position: fixed;
   width: 10px;
   height: 10px;
-  background-color: hsl(var(--primary));
+  border-radius: 2px;
   opacity: 0;
   z-index: 999;
-  border-radius: 50%;
-  animation: confetti-rain 3s ease-in-out forwards;
+  pointer-events: none;
+  animation: confetti-fall 3s forwards;
 }
 
-/* Feedback form effects */
-.feedback-input {
-  transition: box-shadow 0.3s, transform 0.3s;
+@keyframes confetti-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0.3; }
 }
 
-.feedback-input:focus {
-  box-shadow: 0 0 0 3px hsl(var(--primary)/0.3);
-  transform: translateY(-2px);
+/* Fun rating star animation */
+@keyframes star-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
-/* Price tag styles */
-.price-tag {
+.star-rating:hover .star {
+  animation: star-pulse 0.5s ease-in-out;
+}
+
+.star-rating:hover .star:nth-child(1) { animation-delay: 0s; }
+.star-rating:hover .star:nth-child(2) { animation-delay: 0.1s; }
+.star-rating:hover .star:nth-child(3) { animation-delay: 0.2s; }
+.star-rating:hover .star:nth-child(4) { animation-delay: 0.3s; }
+.star-rating:hover .star:nth-child(5) { animation-delay: 0.4s; }
+
+/* Game-like elements */
+.achievement-badge {
   position: relative;
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  font-weight: bold;
-  border-radius: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(145deg, hsl(var(--primary)), hsl(var(--primary)/0.7));
+  box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.4);
+  transition: all 0.3s;
+  overflow: hidden;
 }
 
-.price-tag::after {
+.achievement-badge::before {
   content: '';
   position: absolute;
-  right: -7px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 7px solid transparent;
-  border-left: 7px solid hsl(var(--primary));
-  border-bottom: 7px solid transparent;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: badge-shine 3s ease-in-out infinite;
+}
+
+@keyframes badge-shine {
+  0% { transform: rotate(45deg) translateY(-100%); }
+  100% { transform: rotate(45deg) translateY(100%); }
+}
+
+.achievement-badge:hover {
+  transform: scale(1.1);
+}
+
+/* Message notifications */
+.message-notification {
+  position: relative;
+}
+
+.message-notification::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background-color: hsl(var(--destructive));
+  border-radius: 50%;
+  transform: scale(0);
+  animation: notification-pulse 2s ease-in-out infinite;
+}
+
+@keyframes notification-pulse {
+  0% { transform: scale(0); opacity: 1; }
+  70% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Progress bar animation */
+.animated-progress-bar {
+  height: 4px;
+  background: linear-gradient(90deg, 
+    hsl(var(--primary)),
+    hsl(var(--primary)/0.7),
+    hsl(var(--primary))
+  );
+  background-size: 200% 100%;
+  animation: progress-animation 2s linear infinite;
+}
+
+@keyframes progress-animation {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Theme-specific card styles */
+.fun .theme-card {
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+}
+
+.elegant .theme-card {
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2);
+}
+
+.playful .theme-card {
+  border-radius: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.2);
+}
+
+.cosmic .theme-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(153, 102, 255, 0.2);
 }
 
 /* Logo animations and legacy code */
@@ -338,20 +485,3 @@
     animation: logo-spin infinite 20s linear;
   }
 }
-
-/* Fun rating star animation */
-@keyframes star-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.star-rating:hover .star {
-  animation: star-pulse 0.5s ease-in-out;
-}
-
-.star-rating:hover .star:nth-child(1) { animation-delay: 0s; }
-.star-rating:hover .star:nth-child(2) { animation-delay: 0.1s; }
-.star-rating:hover .star:nth-child(3) { animation-delay: 0.2s; }
-.star-rating:hover .star:nth-child(4) { animation-delay: 0.3s; }
-.star-rating:hover .star:nth-child(5) { animation-delay: 0.4s; }

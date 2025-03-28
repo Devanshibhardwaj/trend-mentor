@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,7 +10,9 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles, Star, Zap } from 'lucide-react';
 import IntroAnimation from '@/components/IntroAnimation';
+import OnboardingSequence from '@/components/OnboardingSequence';
 import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 const SAMPLE_OUTFITS = [
   {
@@ -54,14 +57,21 @@ const Index = () => {
   const [loaded, setLoaded] = useState(false);
   const [likedOutfits, setLikedOutfits] = useState<{[key: number]: boolean}>({});
   const [showIntro, setShowIntro] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   
   useEffect(() => {
     const hasSeenIntro = localStorage.getItem('hasSeenIntro');
+    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
     
     if (hasSeenIntro) {
       setShowIntro(false);
-      setContentVisible(true);
+      
+      if (hasSeenOnboarding) {
+        setContentVisible(true);
+      } else {
+        setShowOnboarding(true);
+      }
     } else {
       document.body.style.overflow = 'hidden';
     }
@@ -75,9 +85,18 @@ const Index = () => {
     
     localStorage.setItem('hasSeenIntro', 'true');
     
-    setTimeout(() => {
-      setContentVisible(true);
-    }, 300);
+    // After intro, show onboarding
+    setShowOnboarding(true);
+  };
+  
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    setContentVisible(true);
+    
+    toast.success("Welcome to StyleSage!", {
+      description: "Your personal AI-powered fashion assistant",
+      duration: 5000,
+    });
   };
 
   const toggleLike = (index: number) => {
@@ -85,12 +104,45 @@ const Index = () => {
       ...prev,
       [index]: !prev[index]
     }));
+    
+    if (!likedOutfits[index]) {
+      // Create confetti effect on liking
+      createConfetti();
+      toast("Outfit saved to your favorites!");
+    }
+  };
+  
+  const createConfetti = () => {
+    const confettiCount = 30;
+    const container = document.body;
+    
+    for (let i = 0; i < confettiCount; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti animate-confetti-fall';
+      
+      // Random properties
+      confetti.style.left = `${Math.random() * 100}%`;
+      confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+      confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+      confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+      
+      container.appendChild(confetti);
+      
+      // Remove after animation
+      setTimeout(() => {
+        container.removeChild(confetti);
+      }, 5000);
+    }
   };
 
   return (
     <>
       <AnimatePresence>
         {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {showOnboarding && <OnboardingSequence onComplete={handleOnboardingComplete} />}
       </AnimatePresence>
       
       <motion.div
@@ -138,19 +190,22 @@ const Index = () => {
                     description: "Stay ahead of fashion trends with our AI that constantly analyzes the latest styles and seasonal changes."
                   }
                 ].map((feature, i) => (
-                  <div 
+                  <motion.div 
                     key={i}
-                    className={`p-6 rounded-xl bg-card border border-border/50 hover:border-primary/20 space-y-4 transition-all duration-700 hover:-translate-y-2 hover:shadow-xl ${
-                      loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                    }`}
-                    style={{ transitionDelay: `${i * 150}ms` }}
+                    className="feature-card theme-card p-6 space-y-4 transition-all duration-700 hover:-translate-y-2"
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ 
+                      opacity: loaded ? 1 : 0, 
+                      y: loaded ? 0 : 50 
+                    }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
                   >
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       {feature.icon}
                     </div>
                     <h3 className="text-xl font-medium">{feature.title}</h3>
                     <p className="text-muted-foreground">{feature.description}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -159,7 +214,12 @@ const Index = () => {
           <section className="py-20 px-6 md:px-10 bg-gradient-to-br from-background via-primary/5 to-background">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                <div className="space-y-6">
+                <motion.div 
+                  className="space-y-6"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
                   <div className="inline-block p-2 bg-primary/10 rounded-lg">
                     <Cloud className="h-6 w-6 text-primary" />
                   </div>
@@ -199,19 +259,24 @@ const Index = () => {
                   </div>
                   <div>
                     <Link to="/weather-styling">
-                      <Button className="bg-primary hover:bg-primary/90 rounded-full px-6 py-2 text-base transition-all flex items-center gap-2 group">
+                      <Button className="theme-button rounded-full px-6 py-6 text-base flex items-center gap-2 group">
                         Find Today's Perfect Outfit
                         <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </Link>
                   </div>
-                </div>
-                <div className="bg-white dark:bg-black/20 rounded-xl p-6 shadow-xl relative overflow-hidden">
-                  <div className="aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden">
+                </motion.div>
+                <motion.div 
+                  className="bg-card rounded-xl p-6 shadow-xl relative overflow-hidden hover-3d"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <div className="aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden image-hover">
                     <img 
                       src="https://images.unsplash.com/photo-1536593998369-f0d25ed0fb1d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" 
                       alt="Weather-based outfit recommendation" 
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute top-4 right-4 bg-white/80 dark:bg-black/50 backdrop-blur-sm p-3 rounded-lg shadow-lg">
                       <div className="flex flex-col items-center">
@@ -221,7 +286,7 @@ const Index = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </section>
@@ -232,7 +297,7 @@ const Index = () => {
                 <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
                   The Process
                 </p>
-                <h2 className="text-3xl md:text-4xl font-bold">
+                <h2 className="text-3xl md:text-4xl font-bold animated-text-gradient">
                   How It Works
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -263,28 +328,29 @@ const Index = () => {
                     image: "https://images.unsplash.com/photo-1479064555552-3ef4979f8908?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=500"
                   }
                 ].map((step, i) => (
-                  <div 
+                  <motion.div 
                     key={i}
-                    className={`space-y-6 transition-all duration-700 ${
-                      loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                    }`}
-                    style={{ transitionDelay: `${i * 150}ms` }}
+                    className="space-y-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.2 }}
                   >
                     <div className="relative">
                       <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center z-10 relative shadow-lg">
                         <span className="font-bold">{step.step}</span>
                       </div>
                     </div>
-                    <div className="rounded-xl overflow-hidden aspect-square mb-4">
+                    <div className="rounded-xl overflow-hidden aspect-square mb-4 image-hover">
                       <img 
                         src={step.image} 
                         alt={step.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <h3 className="text-xl font-medium">{step.title}</h3>
                     <p className="text-muted-foreground">{step.description}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -310,18 +376,19 @@ const Index = () => {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {SAMPLE_OUTFITS.map((outfit, index) => (
-                  <div 
+                  <motion.div 
                     key={index} 
-                    className={`overflow-hidden transition-all duration-500 bg-card text-card-foreground rounded-lg shadow-lg hover:shadow-xl card-hover ${
-                      loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                    }`}
-                    style={{ transitionDelay: `${index * 100}ms` }}
+                    className="theme-card overflow-hidden transition-all duration-500 rounded-lg shadow-lg hover:shadow-xl"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <div className="relative aspect-[3/4] w-full overflow-hidden">
+                    <div className="relative aspect-[3/4] w-full overflow-hidden image-hover">
                       <img 
                         src={outfit.image} 
                         alt={`${outfit.style} outfit for ${outfit.occasion}`}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                         <div className="bg-white/90 dark:bg-black/70 text-primary dark:text-white text-xs font-medium px-3 py-1 rounded-full shadow-sm backdrop-blur-sm">
@@ -347,10 +414,17 @@ const Index = () => {
                           />
                           {likedOutfits[index] ? 'Saved' : 'Save'}
                         </Button>
-                        <Button variant="ghost" size="sm" className="rounded-full">Share</Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="rounded-full"
+                          onClick={() => toast.info("Sharing options coming soon!")}
+                        >
+                          Share
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>

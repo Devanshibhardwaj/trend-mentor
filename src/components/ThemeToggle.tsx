@@ -1,5 +1,5 @@
 
-import { Palette, Moon, Sun, Gem, CloudSun } from "lucide-react";
+import { Sparkles, Moon, Sun, Zap, CloudSun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -60,20 +60,20 @@ export default function ThemeToggle() {
               whileHover="hover"
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              {theme === "dark" && (
-                <Moon className="h-[1.2rem] w-[1.2rem] text-primary/90" />
+              {theme === "elegant" && (
+                <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
               )}
-              {theme === "light" && (
+              {theme === "fun" && (
                 <Sun className="h-[1.2rem] w-[1.2rem] text-yellow-500" />
               )}
-              {theme === "vibrant" && (
-                <Gem className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+              {theme === "playful" && (
+                <Zap className="h-[1.2rem] w-[1.2rem] text-pink-500" />
               )}
-              {theme === "pastel" && (
-                <CloudSun className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+              {theme === "cosmic" && (
+                <Sparkles className="h-[1.2rem] w-[1.2rem] text-purple-500" />
               )}
               {theme === "system" && (
-                <Palette className="h-[1.2rem] w-[1.2rem] text-primary/80" />
+                <CloudSun className="h-[1.2rem] w-[1.2rem] text-blue-400" />
               )}
             </motion.div>
           </AnimatePresence>
@@ -90,38 +90,38 @@ export default function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="animate-scale-in rounded-lg overflow-hidden">
         <DropdownMenuItem 
-          onClick={() => setTheme("light")} 
+          onClick={() => setTheme("fun")} 
           className="flex gap-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
         >
           <Sun className="h-[1rem] w-[1rem] text-yellow-500" />
-          <span>Light</span>
+          <span>Fun Mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => setTheme("dark")} 
-          className="flex gap-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          onClick={() => setTheme("elegant")} 
+          className="flex gap-2 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
         >
-          <Moon className="h-[1rem] w-[1rem] text-blue-400" />
-          <span>Dark</span>
+          <Moon className="h-[1rem] w-[1rem] text-indigo-400" />
+          <span>Elegant Mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => setTheme("vibrant")} 
-          className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
-        >
-          <Gem className="h-[1rem] w-[1rem] text-purple-500" />
-          <span>Vibrant</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setTheme("pastel")} 
+          onClick={() => setTheme("playful")} 
           className="flex gap-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
         >
-          <CloudSun className="h-[1rem] w-[1rem] text-pink-400" />
-          <span>Pastel</span>
+          <Zap className="h-[1rem] w-[1rem] text-pink-500" />
+          <span>Playful Mode</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => setTheme("cosmic")} 
+          className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+        >
+          <Sparkles className="h-[1rem] w-[1rem] text-purple-500" />
+          <span>Cosmic Mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme("system")} 
-          className="flex gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="flex gap-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
         >
-          <Palette className="h-[1rem] w-[1rem] text-gray-500" />
+          <CloudSun className="h-[1rem] w-[1rem] text-blue-400" />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, Shirt, ShoppingBag, Wand2 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface IntroAnimationProps {
   onComplete: () => void;
@@ -9,6 +10,7 @@ interface IntroAnimationProps {
 
 const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
   const [step, setStep] = useState(0);
+  const { theme } = useTheme();
   
   useEffect(() => {
     const sequence = [1000, 2000, 3000, 4000];
@@ -28,6 +30,16 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
       timers.forEach(timer => clearTimeout(timer));
     };
   }, [onComplete]);
+  
+  const getThemeGradient = () => {
+    switch(theme) {
+      case "fun": return "from-blue-500 via-blue-400 to-blue-600";
+      case "elegant": return "from-indigo-500 via-indigo-400 to-indigo-600";
+      case "playful": return "from-pink-500 via-pink-400 to-pink-600";
+      case "cosmic": return "from-purple-500 via-purple-400 to-purple-600";
+      default: return "from-blue-500 via-blue-400 to-blue-600";
+    }
+  };
   
   const iconVariants = {
     hidden: { opacity: 0, scale: 0.6, y: 20 },
@@ -188,7 +200,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
                 transition={{ duration: 0.5 }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full"
+                  className={`absolute inset-0 bg-gradient-to-br ${getThemeGradient()} rounded-full`}
                   animate={{ 
                     scale: [1, 1.2, 1.2, 1, 1],
                     rotate: [0, 0, 180, 180, 0],
@@ -213,7 +225,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               </motion.div>
               <motion.h1 
                 variants={slideUpVariants}
-                className="text-4xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+                className={`text-4xl font-bold text-white mb-6 bg-gradient-to-r ${getThemeGradient()} bg-clip-text text-transparent`}
               >
                 StyleSage
               </motion.h1>
