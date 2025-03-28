@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "fun" | "elegant" | "playful" | "cosmic" | "system";
+type Theme = "elegant" | "system";
 
 type ThemeContextType = {
   theme: Theme;
@@ -13,18 +13,18 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("fun");
+  const [theme, setTheme] = useState<Theme>("elegant");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     // Check if user has previously set a theme preference
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme && ["fun", "elegant", "playful", "cosmic", "system"].includes(savedTheme)) {
+    if (savedTheme && ["elegant", "system"].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
-      // Default to fun theme for new users
-      setTheme("fun");
+      // Default to elegant theme for new users
+      setTheme("elegant");
     }
   }, []);
 
@@ -44,10 +44,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Remember the previous theme for transition effects
     root.classList.add(`from-${previousTheme}`);
     
-    root.classList.remove("fun", "elegant", "playful", "cosmic", "from-fun", "from-elegant", "from-playful", "from-cosmic");
+    root.classList.remove("elegant", "from-elegant");
     
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "elegant" : "fun";
+      const systemTheme = "elegant";
       root.classList.add(systemTheme);
     } else {
       root.classList.add(theme);
@@ -69,11 +69,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     setTheme(prevTheme => {
-      if (prevTheme === "fun") return "elegant";
-      if (prevTheme === "elegant") return "playful";
-      if (prevTheme === "playful") return "cosmic";
-      if (prevTheme === "cosmic") return "system";
-      return "fun";
+      if (prevTheme === "elegant") return "system";
+      return "elegant";
     });
   };
 

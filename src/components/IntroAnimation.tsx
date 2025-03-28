@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, Shirt, ShoppingBag, Wand2 } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface IntroAnimationProps {
   onComplete: () => void;
@@ -10,7 +9,6 @@ interface IntroAnimationProps {
 
 const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
   const [step, setStep] = useState(0);
-  const { theme } = useTheme();
   
   useEffect(() => {
     const sequence = [1000, 2000, 3000, 4000];
@@ -32,13 +30,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
   }, [onComplete]);
   
   const getThemeGradient = () => {
-    switch(theme) {
-      case "fun": return "from-blue-500 via-blue-400 to-blue-600";
-      case "elegant": return "from-indigo-500 via-indigo-400 to-indigo-600";
-      case "playful": return "from-pink-500 via-pink-400 to-pink-600";
-      case "cosmic": return "from-purple-500 via-purple-400 to-purple-600";
-      default: return "from-blue-500 via-blue-400 to-blue-600";
-    }
+    return "from-indigo-500 via-indigo-400 to-indigo-600";
   };
   
   const iconVariants = {
@@ -117,7 +109,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               className="flex flex-col items-center"
             >
               <motion.div variants={iconVariants} className="mb-6">
-                <Sparkles className="w-16 h-16 text-primary animate-pulse" />
+                <Sparkles className="w-16 h-16 text-indigo-400 animate-pulse" />
               </motion.div>
               <motion.h1 variants={textVariants} className="text-4xl font-bold text-white mb-2">
                 Welcome to StyleSage
@@ -134,7 +126,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               className="flex flex-col items-center"
             >
               <motion.div variants={iconVariants} className="mb-6">
-                <Shirt className="w-16 h-16 text-blue-400" />
+                <Shirt className="w-16 h-16 text-indigo-400" />
               </motion.div>
               <motion.h1 variants={textVariants} className="text-3xl font-bold text-white mb-2">
                 Discover Your Style
@@ -154,7 +146,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               className="flex flex-col items-center"
             >
               <motion.div variants={iconVariants} className="mb-6">
-                <ShoppingBag className="w-16 h-16 text-pink-400" />
+                <ShoppingBag className="w-16 h-16 text-indigo-400" />
               </motion.div>
               <motion.h1 variants={textVariants} className="text-3xl font-bold text-white mb-2">
                 Shop Smart
@@ -174,7 +166,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               className="flex flex-col items-center"
             >
               <motion.div variants={iconVariants} className="mb-6">
-                <Wand2 className="w-16 h-16 text-purple-400" />
+                <Wand2 className="w-16 h-16 text-indigo-400" />
               </motion.div>
               <motion.h1 variants={textVariants} className="text-3xl font-bold text-white mb-2">
                 Powered by AI
@@ -244,7 +236,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
             <div 
               key={dot} 
               className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                step >= dot ? 'bg-primary' : 'bg-white/30'
+                step >= dot ? 'bg-indigo-500' : 'bg-white/30'
               }`}
             />
           ))}

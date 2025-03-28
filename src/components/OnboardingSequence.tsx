@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { 
   AlignJustify, 
   Layout, 
-  Wand2, // Changed from MagicWand to Wand2
+  Wand2, 
   Search, 
   ShoppingBag, 
   Sparkles, 
@@ -39,32 +39,32 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
       image: "https://images.unsplash.com/photo-1551232864-3f0890e580d9?q=80&w=1600"
     },
     {
-      title: "Change Your Theme",
-      description: "Choose from fun, elegant, playful, or cosmic themes to match your mood",
-      icon: <Wand2 className="h-12 w-12 text-white" />, // Changed from MagicWand to Wand2
+      title: "Personalize Your Experience",
+      description: "Choose your preferred style theme to customize your journey",
+      icon: <Wand2 className="h-12 w-12 text-white" />,
       image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?q=80&w=1600"
     },
     {
-      title: "Shop Smart",
-      description: "Find the best prices and recommendations for your style preferences",
+      title: "Discover Fashion",
+      description: "Browse trending styles and find inspiration for your wardrobe",
       icon: <ShoppingBag className="h-12 w-12 text-white" />,
       image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?q=80&w=1600"
     },
     {
-      title: "Personalized Outfits",
-      description: "Get AI-generated outfit recommendations based on weather, occasion, and your style",
+      title: "Smart Recommendations",
+      description: "Get AI-powered outfit suggestions based on your preferences",
       icon: <Zap className="h-12 w-12 text-white" />,
       image: "https://images.unsplash.com/photo-1614771637369-ea5a465f8d82?q=80&w=1600"
     },
     {
-      title: "Explore Features",
-      description: "Use the navigation menu to discover all our features",
+      title: "Easy Navigation",
+      description: "Access all features through our intuitive menu",
       icon: <AlignJustify className="h-12 w-12 text-white" />,
       image: "https://images.unsplash.com/photo-1479064555552-3ef4979f8908?q=80&w=1600"
     },
     {
-      title: "Ready to Begin?",
-      description: "Let's start your style journey!",
+      title: "Ready to Start?",
+      description: "Let's begin your fashion journey!",
       icon: <Layout className="h-12 w-12 text-white" />,
       image: "https://images.unsplash.com/photo-1522682178963-7e3515e7e1af?q=80&w=1600"
     }
@@ -90,13 +90,8 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
   };
   
   const getThemeClass = () => {
-    switch(theme) {
-      case "fun": return "from-blue-600 to-blue-400";
-      case "elegant": return "from-indigo-600 to-indigo-400";
-      case "playful": return "from-pink-600 to-pink-400";
-      case "cosmic": return "from-purple-600 to-purple-400";
-      default: return "from-blue-600 to-blue-400";
-    }
+    // Using consistent primary colors across all themes for a more unified look
+    return "from-indigo-600 to-indigo-400";
   };
   
   return (
@@ -128,7 +123,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="bg-black/80 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+            className="bg-black/80 backdrop-blur-lg rounded-2xl p-8 border border-indigo-500/30"
           >
             <div className="text-center mb-8">
               <motion.div 
@@ -166,17 +161,17 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                <div className="bg-gradient-to-br from-blue-600 to-blue-400 p-4 rounded-lg text-center">
-                  <span className="text-white font-medium">Fun</span>
-                </div>
-                <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 p-4 rounded-lg text-center">
+                <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 p-4 rounded-lg text-center shadow-lg">
                   <span className="text-white font-medium">Elegant</span>
                 </div>
-                <div className="bg-gradient-to-br from-pink-600 to-pink-400 p-4 rounded-lg text-center">
-                  <span className="text-white font-medium">Playful</span>
+                <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 p-4 rounded-lg text-center shadow-lg opacity-70 hover:opacity-100 transition-opacity">
+                  <span className="text-white font-medium">Classic</span>
                 </div>
-                <div className="bg-gradient-to-br from-purple-600 to-purple-400 p-4 rounded-lg text-center">
-                  <span className="text-white font-medium">Cosmic</span>
+                <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 p-4 rounded-lg text-center shadow-lg opacity-70 hover:opacity-100 transition-opacity">
+                  <span className="text-white font-medium">Modern</span>
+                </div>
+                <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 p-4 rounded-lg text-center shadow-lg opacity-70 hover:opacity-100 transition-opacity">
+                  <span className="text-white font-medium">Casual</span>
                 </div>
               </motion.div>
             )}
@@ -189,19 +184,19 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
                 transition={{ delay: 0.5 }}
               >
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center mb-2">
                     <UserCircle2 className="h-5 w-5 text-white" />
                   </div>
                   <span className="text-white/80 text-xs">Profile</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center mb-2">
                     <Search className="h-5 w-5 text-white" />
                   </div>
                   <span className="text-white/80 text-xs">Explore</span>
                 </div>
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center mb-2">
                     <Zap className="h-5 w-5 text-white" />
                   </div>
                   <span className="text-white/80 text-xs">Recommendations</span>
@@ -214,7 +209,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
                 variant="ghost" 
                 onClick={prevStep} 
                 disabled={step === 0}
-                className="text-white hover:bg-white/10"
+                className="text-white hover:bg-indigo-500/20"
               >
                 Back
               </Button>
@@ -224,7 +219,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
                   <div 
                     key={i}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      i === step ? 'bg-primary w-4' : 'bg-white/30'
+                      i === step ? 'bg-indigo-500 w-4' : 'bg-white/30'
                     }`}
                   />
                 ))}
@@ -232,7 +227,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
               
               <Button 
                 onClick={nextStep}
-                className="theme-button"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
               >
                 {step < steps.length - 1 ? 'Next' : 'Start!'}
               </Button>
@@ -251,7 +246,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
               variant="ghost" 
               size="sm" 
               onClick={handleComplete}
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-indigo-500/20"
             >
               Skip Tour
             </Button>

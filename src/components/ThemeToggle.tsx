@@ -1,5 +1,5 @@
 
-import { Sparkles, Moon, Sun, Zap, CloudSun } from "lucide-react";
+import { Moon, CloudSun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -42,7 +42,7 @@ export default function ThemeToggle() {
           onMouseLeave={() => setIsHovered(false)}
         >
           <motion.div 
-            className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-full z-0"
+            className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full z-0"
             variants={bgVariants}
             initial="initial"
             animate={isHovered ? "hover" : "animate"}
@@ -63,23 +63,14 @@ export default function ThemeToggle() {
               {theme === "elegant" && (
                 <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
               )}
-              {theme === "fun" && (
-                <Sun className="h-[1.2rem] w-[1.2rem] text-yellow-500" />
-              )}
-              {theme === "playful" && (
-                <Zap className="h-[1.2rem] w-[1.2rem] text-pink-500" />
-              )}
-              {theme === "cosmic" && (
-                <Sparkles className="h-[1.2rem] w-[1.2rem] text-purple-500" />
-              )}
               {theme === "system" && (
-                <CloudSun className="h-[1.2rem] w-[1.2rem] text-blue-400" />
+                <CloudSun className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
               )}
             </motion.div>
           </AnimatePresence>
           
           <motion.span 
-            className="absolute -bottom-1 -right-1 w-2 h-2 bg-primary rounded-full"
+            className="absolute -bottom-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full"
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0 }}
             transition={{ duration: 0.2 }}
@@ -90,13 +81,6 @@ export default function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="animate-scale-in rounded-lg overflow-hidden">
         <DropdownMenuItem 
-          onClick={() => setTheme("fun")} 
-          className="flex gap-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
-        >
-          <Sun className="h-[1rem] w-[1rem] text-yellow-500" />
-          <span>Fun Mode</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
           onClick={() => setTheme("elegant")} 
           className="flex gap-2 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
         >
@@ -104,24 +88,10 @@ export default function ThemeToggle() {
           <span>Elegant Mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => setTheme("playful")} 
-          className="flex gap-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
-        >
-          <Zap className="h-[1rem] w-[1rem] text-pink-500" />
-          <span>Playful Mode</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setTheme("cosmic")} 
-          className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
-        >
-          <Sparkles className="h-[1rem] w-[1rem] text-purple-500" />
-          <span>Cosmic Mode</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
           onClick={() => setTheme("system")} 
-          className="flex gap-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          className="flex gap-2 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
         >
-          <CloudSun className="h-[1rem] w-[1rem] text-blue-400" />
+          <CloudSun className="h-[1rem] w-[1rem] text-indigo-400" />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
