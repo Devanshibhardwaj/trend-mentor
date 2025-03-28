@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Cloud, ChevronDown, Star, Wand2, Calendar } from "lucide-react";
@@ -56,21 +55,21 @@ const Hero = () => {
       ref={heroRef} 
       className="relative overflow-hidden py-20 lg:py-28"
       style={{
-        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)"
+        background: "linear-gradient(135deg, #4338ca 0%, #3730a3 100%)"
       }}
     >
       {/* Ambient background effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000')] bg-cover bg-center opacity-10"></div>
-        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-indigo-500/20 blur-3xl"></div>
-        <div className="absolute top-40 -left-40 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-teal-500/10 blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000')] bg-cover bg-center opacity-5"></div>
+        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-indigo-400/30 blur-3xl"></div>
+        <div className="absolute top-40 -left-40 h-96 w-96 rounded-full bg-blue-400/30 blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-indigo-300/20 blur-3xl"></div>
         
         {/* Animated light particles */}
-        {Array.from({ length: 15 }).map((_, i) => (
+        {Array.from({ length: 20 }).map((_, i) => (
           <div 
             key={i}
-            className="absolute rounded-full bg-white/20 animate-ping"
+            className="absolute rounded-full bg-white/40 animate-ping"
             style={{
               width: `${Math.random() * 12 + 4}px`,
               height: `${Math.random() * 12 + 4}px`,
@@ -78,10 +77,14 @@ const Hero = () => {
               left: `${Math.random() * 100}%`,
               animationDuration: `${Math.random() * 8 + 2}s`,
               animationDelay: `${Math.random() * 2}s`,
-              opacity: Math.random() * 0.5
+              opacity: Math.random() * 0.7
             }}
           ></div>
         ))}
+        
+        {/* Additional decorative elements */}
+        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full blur-2xl"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-gradient-to-tl from-blue-400/10 to-transparent rounded-full blur-2xl"></div>
       </div>
       
       <div className="container relative z-10">

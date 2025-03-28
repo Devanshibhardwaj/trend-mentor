@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -156,7 +155,7 @@ const Index = () => {
         <main className="flex-grow">
           <Hero />
           
-          <section id="features" className="py-20 px-6 md:px-10 bg-gradient-to-b from-secondary/30 to-background">
+          <section id="features" className="py-20 px-6 md:px-10 bg-gradient-to-b from-indigo-100/30 to-background">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16 space-y-4">
                 <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
@@ -211,7 +210,7 @@ const Index = () => {
             </div>
           </section>
           
-          <section className="py-20 px-6 md:px-10 bg-gradient-to-br from-background via-primary/5 to-background">
+          <section className="py-20 px-6 md:px-10 bg-gradient-to-br from-background via-indigo-50/20 to-background">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
                 <motion.div 
@@ -291,7 +290,7 @@ const Index = () => {
             </div>
           </section>
           
-          <section id="how-it-works" className="py-20 px-6 md:px-10 bg-gradient-to-t from-secondary/20 to-background">
+          <section id="how-it-works" className="py-20 px-6 md:px-10 bg-gradient-to-t from-indigo-100/30 to-background">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16 space-y-4">
                 <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
@@ -358,7 +357,7 @@ const Index = () => {
           
           <RecommendationForm />
           
-          <section className="py-20 px-6 md:px-10 bg-gradient-to-b from-secondary/30 to-background">
+          <section className="py-20 px-6 md:px-10 bg-gradient-to-b from-indigo-100/30 to-background">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16 space-y-4">
                 <p className="text-primary/80 text-sm md:text-base font-medium tracking-wider uppercase">
