@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { 
   AlignJustify, 
   Layout, 
-  MagicWand, 
+  Wand2, // Changed from MagicWand to Wand2
   Search, 
   ShoppingBag, 
   Sparkles, 
@@ -41,7 +41,7 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
     {
       title: "Change Your Theme",
       description: "Choose from fun, elegant, playful, or cosmic themes to match your mood",
-      icon: <MagicWand className="h-12 w-12 text-white" />,
+      icon: <Wand2 className="h-12 w-12 text-white" />, // Changed from MagicWand to Wand2
       image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?q=80&w=1600"
     },
     {
