@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Share2, Eye, Sparkles, ThumbsUp, Bookmark, ShoppingBag, Star, DollarSign, ExternalLink } from 'lucide-react';
+import { Heart, Share2, Eye, Sparkles, ThumbsUp, Bookmark, ShoppingBag, Star, DollarSign, ExternalLink, IndianRupee } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -21,6 +21,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ShoppingOption {
   name: string;
@@ -39,33 +46,40 @@ interface OutfitCardProps {
   shoppingOptions?: ShoppingOption[];
 }
 
+const getIndianShoppingOptions = (priceRange: string): ShoppingOption[] => {
+  const options: Record<string, ShoppingOption[]> = {
+    budget: [
+      { name: "Myntra", url: "https://www.myntra.com", price: 999, rating: 4.1 },
+      { name: "Ajio", url: "https://www.ajio.com", price: 799, rating: 4.0 },
+      { name: "Flipkart", url: "https://www.flipkart.com", price: 699, rating: 3.9 }
+    ],
+    midRange: [
+      { name: "Westside", url: "https://www.westside.com", price: 1999, rating: 4.3 },
+      { name: "Lifestyle", url: "https://www.lifestylestores.com", price: 2499, rating: 4.2 },
+      { name: "Shoppers Stop", url: "https://www.shoppersstop.com", price: 2799, rating: 4.4 }
+    ],
+    premium: [
+      { name: "Tata CLiQ Luxury", url: "https://luxury.tatacliq.com", price: 4999, rating: 4.7 },
+      { name: "Nykaa Fashion", url: "https://www.nykaafashion.com", price: 3999, rating: 4.5 },
+      { name: "Reliance AJIO Luxe", url: "https://luxe.ajio.com", price: 5499, rating: 4.6 }
+    ],
+    luxury: [
+      { name: "Darveys", url: "https://www.darveys.com", price: 9999, rating: 4.8 },
+      { name: "Elitify", url: "https://www.elitify.com", price: 12999, rating: 4.7 },
+      { name: "The Collective", url: "https://www.thecollective.in", price: 15999, rating: 4.9 }
+    ]
+  };
+  
+  return options[priceRange] || options.midRange;
+};
+
 const OutfitCard = ({ 
   index, 
   style, 
   occasion, 
   description, 
   image, 
-  className,
-  shoppingOptions = [
-    { 
-      name: "Fashion Nova", 
-      url: "https://www.fashionnova.com", 
-      price: 49.99, 
-      rating: 4.2 
-    },
-    { 
-      name: "ASOS", 
-      url: "https://www.asos.com", 
-      price: 59.99, 
-      rating: 4.5 
-    },
-    { 
-      name: "Zara", 
-      url: "https://www.zara.com", 
-      price: 39.99, 
-      rating: 4.3 
-    }
-  ]
+  className
 }: OutfitCardProps) => {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -74,6 +88,8 @@ const OutfitCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const [rating, setRating] = useState(0);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [priceRange, setPriceRange] = useState("midRange");
+  const [shoppingOptions, setShoppingOptions] = useState(getIndianShoppingOptions("midRange"));
   const isMobile = useIsMobile();
   
   // Animation and visibility
@@ -81,6 +97,11 @@ const OutfitCard = ({
     const timer = setTimeout(() => setIsVisible(true), index * 100);
     return () => clearTimeout(timer);
   }, [index]);
+
+  // Update shopping options when price range changes
+  useEffect(() => {
+    setShoppingOptions(getIndianShoppingOptions(priceRange));
+  }, [priceRange]);
 
   const handleLike = () => {
     setLiked(!liked);
@@ -130,6 +151,10 @@ const OutfitCard = ({
       icon: <Star className="h-4 w-4 text-yellow-500" />,
       description: `You rated this outfit ${value} stars`
     });
+  };
+
+  const handlePriceRangeChange = (value: string) => {
+    setPriceRange(value);
   };
 
   return (
@@ -216,14 +241,29 @@ const OutfitCard = ({
                     Find this {style} outfit for {occasion} at these retailers
                   </DialogDescription>
                 </DialogHeader>
+
+                <div className="my-4">
+                  <Select value={priceRange} onValueChange={handlePriceRangeChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select price range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="budget">Budget (Under ₹1,000)</SelectItem>
+                      <SelectItem value="midRange">Mid-Range (₹1,000 - ₹3,000)</SelectItem>
+                      <SelectItem value="premium">Premium (₹3,000 - ₹8,000)</SelectItem>
+                      <SelectItem value="luxury">Luxury (Above ₹8,000)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="space-y-4 my-4">
                   {shoppingOptions.map((option, i) => (
                     <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
                       <div className="flex flex-col">
                         <span className="font-medium">{option.name}</span>
                         <div className="flex items-center gap-1 mt-1">
-                          <DollarSign className="h-3 w-3 text-green-500" />
-                          <span className="text-sm text-muted-foreground">${option.price}</span>
+                          <IndianRupee className="h-3 w-3 text-green-500" />
+                          <span className="text-sm text-muted-foreground">{option.price.toLocaleString('en-IN')}</span>
                           <span className="mx-2 text-muted-foreground">•</span>
                           <div className="flex">
                             {[1, 2, 3, 4, 5].map(star => (
@@ -357,14 +397,29 @@ const OutfitCard = ({
                 Find this {style} outfit for {occasion} at these retailers
               </DialogDescription>
             </DialogHeader>
+
+            <div className="my-4">
+              <Select value={priceRange} onValueChange={handlePriceRangeChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select price range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="budget">Budget (Under ₹1,000)</SelectItem>
+                  <SelectItem value="midRange">Mid-Range (₹1,000 - ₹3,000)</SelectItem>
+                  <SelectItem value="premium">Premium (₹3,000 - ₹8,000)</SelectItem>
+                  <SelectItem value="luxury">Luxury (Above ₹8,000)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-4 my-4">
               {shoppingOptions.map((option, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/40 hover:bg-secondary/60 transition-colors">
                   <div className="flex flex-col">
                     <span className="font-medium">{option.name}</span>
                     <div className="flex items-center gap-1 mt-1">
-                      <DollarSign className="h-3 w-3 text-green-500" />
-                      <span className="text-sm text-muted-foreground">${option.price}</span>
+                      <IndianRupee className="h-3 w-3 text-green-500" />
+                      <span className="text-sm text-muted-foreground">{option.price.toLocaleString('en-IN')}</span>
                       <span className="mx-2 text-muted-foreground">•</span>
                       <div className="flex">
                         {[1, 2, 3, 4, 5].map(star => (

@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Sparkles, BookOpen, Lightbulb, Heart, Star } from 'lucide-react';
+import { Loader2, Sparkles, BookOpen, Lightbulb, Heart, Star, Backpack } from 'lucide-react';
 import { toast } from 'sonner';
+import StyleAvatar from './StyleAvatar';
 
 interface CoachingTip {
   id: string;
@@ -32,6 +33,7 @@ const PersonalizedCoaching = () => {
   const [affirmation, setAffirmation] = useState(initialAffirmations[0]);
   const [loading, setLoading] = useState(false);
   const [tips, setTips] = useState<CoachingTip[]>([]);
+  const [activeTab, setActiveTab] = useState('style');
   
   const handleGetCoaching = () => {
     if (!bodyType || !personality || !lifestyle) {
@@ -149,11 +151,18 @@ const PersonalizedCoaching = () => {
         title: 'Versatile Evening Wear',
         description: 'Have a few go-to outfits for different types of events. A classic cocktail dress or a sharp blazer with dark jeans can be styled differently with accessories for various occasions.'
       });
+    } else if (lifestyle === 'student') {
+      recommendations.push({
+        id: '13',
+        category: 'Lifestyle',
+        title: 'Campus Style',
+        description: 'Create a versatile wardrobe that transitions from lectures to study sessions to social events. Layer comfortable basics with statement pieces that express your individuality while remaining practical for long days on campus.'
+      });
     }
     
     // Add a confidence booster
     recommendations.push({
-      id: '13',
+      id: '14',
       category: 'Confidence',
       title: 'Body Language Matters',
       description: 'Stand tall with shoulders back and head held high. Research shows that good posture not only makes you look more confident but actually helps you feel more confident too.'
@@ -161,13 +170,14 @@ const PersonalizedCoaching = () => {
     
     // Add a communication tip
     recommendations.push({
-      id: '14',
+      id: '15',
       category: 'Communication',
       title: 'Authentic Conversations',
       description: 'Make eye contact, ask open-ended questions, and practice active listening. Remember that being interested makes you interesting to others.'
     });
     
     setTips(recommendations);
+    setActiveTab('avatar');
   };
   
   return (
@@ -221,6 +231,7 @@ const PersonalizedCoaching = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="professional">Corporate/Professional</SelectItem>
+                        <SelectItem value="student">Student/Academic</SelectItem>
                         <SelectItem value="active">Active/Athletic</SelectItem>
                         <SelectItem value="casual">Casual/Relaxed</SelectItem>
                         <SelectItem value="social">Social/Going Out</SelectItem>
@@ -273,9 +284,10 @@ const PersonalizedCoaching = () => {
       {tips.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-medium mb-6">Your Personalized Coaching Tips</h3>
-          <Tabs defaultValue="style" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8">
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-4 mb-8">
               <TabsTrigger value="style">Style Tips</TabsTrigger>
+              <TabsTrigger value="avatar">Virtual Avatar</TabsTrigger>
               <TabsTrigger value="confidence">Confidence</TabsTrigger>
               <TabsTrigger value="communication">Communication</TabsTrigger>
             </TabsList>
@@ -289,7 +301,11 @@ const PersonalizedCoaching = () => {
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <div className="p-2 bg-primary/10 rounded-full">
-                            <Sparkles className="h-5 w-5 text-primary" />
+                            {tip.category === 'Lifestyle' && tip.title === 'Campus Style' ? (
+                              <Backpack className="h-5 w-5 text-primary" />
+                            ) : (
+                              <Sparkles className="h-5 w-5 text-primary" />
+                            )}
                           </div>
                           <div>
                             <span className="text-xs font-medium px-2 py-1 rounded-full bg-secondary/50">{tip.category}</span>
@@ -301,6 +317,43 @@ const PersonalizedCoaching = () => {
                     </Card>
                   ))
                 }
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="avatar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-1">
+                  <StyleAvatar bodyType={bodyType} personality={personality} />
+                </div>
+                <div className="md:col-span-1">
+                  <Card>
+                    <CardContent className="p-6">
+                      <h4 className="font-medium mb-4">How to Apply Your Style Tips</h4>
+                      <div className="space-y-4">
+                        <div className="bg-secondary/20 p-4 rounded-lg">
+                          <h5 className="font-medium text-sm">Your Body Language</h5>
+                          <p className="text-sm mt-1">
+                            Research shows that 55% of first impressions are based on appearance and body language. Practicing confident posture can actually influence how you feel about yourself.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-secondary/20 p-4 rounded-lg">
+                          <h5 className="font-medium text-sm">Matching Posture to Occasion</h5>
+                          <p className="text-sm mt-1">
+                            Different settings call for different body language. In professional settings, maintain an upright, engaged posture. In social settings, a more relaxed but still attentive posture works well.
+                          </p>
+                        </div>
+                        
+                        <div className="bg-secondary/20 p-4 rounded-lg">
+                          <h5 className="font-medium text-sm">Posture and Your Clothing</h5>
+                          <p className="text-sm mt-1">
+                            Good posture enhances how your clothes look on you. When trying on outfits, practice the posture you'll have when wearing them to ensure they flatter your body in motion.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </TabsContent>
             

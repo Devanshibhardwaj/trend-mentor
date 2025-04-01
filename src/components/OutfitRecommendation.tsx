@@ -27,10 +27,50 @@ interface Outfit {
   accessories?: WardrobeItem;
 }
 
+// Sample outfit images for different categories and occasions
+const outfitImages = {
+  casual: [
+    '/images/outfits/casual-1.jpg',
+    '/images/outfits/casual-2.jpg',
+    '/images/outfits/casual-3.jpg',
+  ],
+  formal: [
+    '/images/outfits/formal-1.jpg',
+    '/images/outfits/formal-2.jpg',
+    '/images/outfits/formal-3.jpg',
+  ],
+  business: [
+    '/images/outfits/business-1.jpg',
+    '/images/outfits/business-2.jpg',
+    '/images/outfits/business-3.jpg',
+  ],
+  sports: [
+    '/images/outfits/sports-1.jpg',
+    '/images/outfits/sports-2.jpg',
+    '/images/outfits/sports-3.jpg',
+  ],
+  party: [
+    '/images/outfits/party-1.jpg',
+    '/images/outfits/party-2.jpg',
+    '/images/outfits/party-3.jpg',
+  ],
+  default: '/images/outfits/default-outfit.jpg'
+};
+
+// Function to get a random image for an occasion
+const getRandomOutfitImage = (occasion: string) => {
+  const images = outfitImages[occasion as keyof typeof outfitImages] || outfitImages.default;
+  if (Array.isArray(images)) {
+    return images[Math.floor(Math.random() * images.length)];
+  }
+  return images;
+};
+
 const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendationProps) => {
   const [generatingOutfit, setGeneratingOutfit] = useState(false);
   const [outfit, setOutfit] = useState<Outfit | null>(null);
   const [occasion, setOccasion] = useState<string>("casual");
+  const [outfitImage, setOutfitImage] = useState<string | null>(null);
 
   const occasionOptions = [
     { value: "casual", label: "Casual" },
@@ -119,6 +159,9 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       }
       
       setOutfit(newOutfit);
+
+      // Set a random outfit image based on occasion
+      setOutfitImage(getRandomOutfitImage(occasion));
       
       // Save recommendation to database if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
@@ -169,6 +212,7 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
   const handleOccasionChange = (newOccasion: string) => {
     setOccasion(newOccasion);
     setOutfit(null); // Reset outfit when occasion changes
+    setOutfitImage(null); // Reset outfit image when occasion changes
   };
 
   if (isLoading) {
@@ -226,6 +270,16 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
         {outfit && (
           <div className="space-y-4 mt-4">
             <h4 className="font-medium text-md">Your {occasion} outfit:</h4>
+            
+            {outfitImage && (
+              <div className="overflow-hidden rounded-lg mb-4">
+                <img 
+                  src={outfitImage} 
+                  alt={`Complete ${occasion} outfit`}
+                  className="w-full object-cover h-64" 
+                />
+              </div>
+            )}
             
             <div className="grid grid-cols-2 gap-4">
               {outfit.top && (
