@@ -29,6 +29,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (newSession) {
         setSession(newSession);
         setUser(newSession.user);
+        
+        // Ensures session refresh to maintain authentication
         supabase.auth.refreshSession();
       } else {
         setSession(null);
@@ -38,12 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
+    // Initial session check
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       console.log('Initial session check:', currentSession?.user?.email);
       
       if (currentSession) {
         setSession(currentSession);
         setUser(currentSession.user);
+        
+        // Ensures session refresh to maintain authentication
         supabase.auth.refreshSession();
       }
       
@@ -61,6 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     if (!error) {
       toast.success('Successfully signed in!');
+      
+      // Profile data will be automatically updated via the trigger
+      // we created in the database for sign-ins
     }
     
     return { error };
@@ -77,6 +85,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     if (!error && data?.user) {
       toast.success('Account created successfully!');
+      
+      // New user profile will be automatically created via the trigger
+      // we created in the database for new user signups
       
       if (data.session) {
         toast.success('You are now signed in!');
@@ -105,6 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // The last_sign_in field in profiles won't be updated on signout
+    // It represents the last time the user signed in
     await supabase.auth.signOut();
     toast.info('You have been signed out');
   };
@@ -115,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // Delete wardrobe items first to avoid foreign key constraints
       const { error: deleteWardrobeError } = await supabase
         .from('wardrobe_items')
         .delete()
@@ -125,6 +139,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: deleteWardrobeError };
       }
       
+      // Delete the user - this will cascade to the profiles table
+      // due to the ON DELETE CASCADE constraint we set up
       const { error: deleteUserError } = await supabase.auth.admin.deleteUser(
         user.id
       );
