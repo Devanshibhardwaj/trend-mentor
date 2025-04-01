@@ -81,6 +81,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          last_sign_in: string | null
+          sign_in_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          last_sign_in?: string | null
+          sign_in_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_sign_in?: string | null
+          sign_in_count?: number | null
+        }
+        Relationships: []
+      }
       wardrobe_items: {
         Row: {
           category: string

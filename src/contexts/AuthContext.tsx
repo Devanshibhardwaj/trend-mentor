@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -57,6 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password
     });
+    
+    if (!error) {
+      toast.success('Successfully signed in!');
+    }
+    
     return { error };
   };
 
