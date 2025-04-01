@@ -24,18 +24,22 @@ const Wardrobe = () => {
   const [wardrobeItems, setWardrobeItems] = useState<WardrobeItemType[]>([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    // Only redirect if we're sure the user is not logged in (auth is not still loading)
+    if (!authLoading && !user) {
       toast.error('Please sign in to access your wardrobe');
       navigate('/auth');
       return;
     }
     
-    fetchWardrobeItems();
-  }, [user, navigate]);
+    // Only fetch wardrobe items if the user is logged in
+    if (user) {
+      fetchWardrobeItems();
+    }
+  }, [user, authLoading, navigate]);
 
   const fetchWardrobeItems = async () => {
     try {
@@ -91,8 +95,22 @@ const Wardrobe = () => {
 
   const categories = ['All', 'Tops', 'Bottoms', 'Outerwear', 'Footwear', 'Accessories'];
 
+  // Show loading state when auth is still being determined
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If auth is done loading and there's no user, we'll be redirected by the useEffect
   if (!user) {
-    return null; // This will prevent flash of content before redirect
+    return null;
   }
 
   return (
