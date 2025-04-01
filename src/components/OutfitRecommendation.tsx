@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface WardrobeItem {
   id: string;
@@ -71,6 +73,9 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
   const [outfit, setOutfit] = useState<Outfit | null>(null);
   const [occasion, setOccasion] = useState<string>("casual");
   const [outfitImage, setOutfitImage] = useState<string | null>(null);
+  const [useAI, setUseAI] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [aiTrend, setAiTrend] = useState<string | null>(null);
 
   const occasionOptions = [
     { value: "casual", label: "Casual" },
@@ -87,7 +92,105 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
     }
 
     setGeneratingOutfit(true);
+    setAiExplanation(null);
+    setAiTrend(null);
     
+    try {
+      if (useAI) {
+        await generateAIOutfit();
+      } else {
+        await generateBasicOutfit();
+      }
+      
+      // Set a random outfit image based on occasion
+      setOutfitImage(getRandomOutfitImage(occasion));
+      
+      toast.success("Outfit generated successfully!");
+    } catch (error) {
+      console.error("Error generating outfit:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to generate outfit");
+      setOutfit(null);
+      setOutfitImage(null);
+    } finally {
+      setGeneratingOutfit(false);
+    }
+  };
+
+  const generateAIOutfit = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-outfit-recommendations', {
+        body: { wardrobeItems, occasion }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data || !data.outfit) {
+        throw new Error("AI could not generate a recommendation");
+      }
+
+      // Convert AI response to outfit structure
+      const newOutfit: Outfit = {};
+      const categories = ['top', 'bottom', 'outerwear', 'footwear', 'accessories'];
+      
+      categories.forEach(category => {
+        if (data.outfit[category]) {
+          const itemId = data.outfit[category].id;
+          const item = wardrobeItems.find(item => item.id === itemId);
+          
+          if (item) {
+            newOutfit[category as keyof Outfit] = item;
+          } else {
+            // If the exact item isn't found (perhaps AI returned a name without proper ID),
+            // try to find an item in the same category
+            const itemsByCategory = wardrobeItems.filter(i => 
+              i.category.toLowerCase() === (category === 'top' ? 'Tops' : 
+                                         category === 'bottom' ? 'Bottoms' : 
+                                         category === 'outerwear' ? 'Outerwear' : 
+                                         category === 'footwear' ? 'Footwear' : 
+                                         'Accessories'));
+            
+            if (itemsByCategory.length > 0) {
+              newOutfit[category as keyof Outfit] = itemsByCategory[0];
+            }
+          }
+        }
+      });
+
+      // Save explanation and trend if provided
+      if (data.explanation) {
+        setAiExplanation(data.explanation);
+      }
+      
+      if (data.trend) {
+        setAiTrend(data.trend);
+      }
+      
+      setOutfit(newOutfit);
+      
+      // Save recommendation to database if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const outfitItems = Object.values(newOutfit).filter(Boolean);
+        const outfitName = `AI ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} outfit`;
+        
+        await supabase.from('outfit_recommendations').insert({
+          user_id: user.id,
+          name: outfitName,
+          occasion: occasion,
+          items: outfitItems,
+          is_ai_generated: true,
+          description: data.explanation || `An AI-generated ${occasion} outfit`
+        });
+      }
+    } catch (error) {
+      console.error("Error in AI outfit generation:", error);
+      throw error;
+    }
+  };
+  
+  const generateBasicOutfit = async () => {
     try {
       // Group items by category
       const categorizedItems: Record<string, WardrobeItem[]> = {};
@@ -159,9 +262,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       }
       
       setOutfit(newOutfit);
-
-      // Set a random outfit image based on occasion
-      setOutfitImage(getRandomOutfitImage(occasion));
       
       // Save recommendation to database if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
@@ -178,13 +278,9 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
           description: `A ${occasion} outfit created from your wardrobe items`
         });
       }
-      
-      toast.success("Outfit generated successfully!");
     } catch (error) {
-      console.error("Error generating outfit:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to generate outfit");
-    } finally {
-      setGeneratingOutfit(false);
+      console.error("Error in basic outfit generation:", error);
+      throw error;
     }
   };
   
@@ -213,6 +309,8 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
     setOccasion(newOccasion);
     setOutfit(null); // Reset outfit when occasion changes
     setOutfitImage(null); // Reset outfit image when occasion changes
+    setAiExplanation(null);
+    setAiTrend(null);
   };
 
   if (isLoading) {
@@ -232,6 +330,20 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
     <Card className="overflow-hidden">
       <CardContent className="p-6">
         <h3 className="text-xl font-semibold mb-4">Outfit Recommendations</h3>
+        
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2">
+            <Switch 
+              id="ai-mode" 
+              checked={useAI}
+              onCheckedChange={setUseAI}
+            />
+            <Label htmlFor="ai-mode" className="flex items-center cursor-pointer">
+              <span>AI Mode</span>
+              {useAI && <Sparkles className="h-4 w-4 ml-1 text-yellow-400" />}
+            </Label>
+          </div>
+        </div>
         
         <div className="flex flex-wrap gap-2 mb-4">
           {occasionOptions.map(opt => (
@@ -256,12 +368,16 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
             {generatingOutfit ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Generating...
+                {useAI ? "AI is thinking..." : "Generating..."}
               </>
             ) : (
               <>
-                <RefreshCw className="h-4 w-4" />
-                Generate Outfit
+                {useAI ? (
+                  <Sparkles className="h-4 w-4" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+                {useAI ? "Generate AI Outfit" : "Generate Outfit"}
               </>
             )}
           </Button>
@@ -302,6 +418,24 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
                 <OutfitItem item={outfit.accessories} category="Accessories" />
               )}
             </div>
+            
+            {useAI && aiExplanation && (
+              <div className="p-4 bg-primary/5 rounded-lg mt-4">
+                <h5 className="font-medium flex items-center">
+                  <Sparkles className="h-4 w-4 mr-2 text-yellow-400" /> 
+                  AI Styling Notes
+                </h5>
+                <p className="text-sm mt-2">{aiExplanation}</p>
+                
+                {aiTrend && (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="bg-primary/10">
+                      {aiTrend}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
         
