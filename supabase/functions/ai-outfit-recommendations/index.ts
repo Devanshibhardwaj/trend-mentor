@@ -2,7 +2,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+// Current fashion trends
+const fashionTrends = [
+  "Monochromatic outfits with one pop of color",
+  "Smart casual combinations",
+  "Sustainable and versatile pieces that can be mixed and matched",
+  "Relaxed fits combined with structured pieces",
+  "Neutral tones with bold accessories",
+  "Vintage-inspired modern outfits",
+  "Athleisure with a formal twist"
+];
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,14 +34,7 @@ serve(async (req) => {
       );
     }
 
-    if (!openAIApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'API key for AI service is not configured' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
-    // Format wardrobe items for the AI prompt
+    // Format wardrobe items for processing
     const itemsByCategory: Record<string, any[]> = {};
     wardrobeItems.forEach(item => {
       if (!itemsByCategory[item.category]) {
@@ -41,85 +43,124 @@ serve(async (req) => {
       itemsByCategory[item.category].push(item);
     });
 
-    // Create AI prompt
-    const categoriesText = Object.entries(itemsByCategory)
-      .map(([category, items]) => {
-        return `${category}: ${items.map(item => item.name).join(', ')}`;
-      })
-      .join('\n');
-
-    const prompt = `You are a fashion stylist assistant that creates trendy outfit combinations.
+    // Rule-based outfit generation
+    const outfit: Record<string, { id: string; name: string }> = {};
+    let usedItems = new Set<string>();
     
-Current fashion trends include:
-- Monochromatic outfits with one pop of color
-- Smart casual combinations
-- Sustainable and versatile pieces that can be mixed and matched
-- Relaxed fits combined with structured pieces
-
-Here are the available clothing items by category:
-${categoriesText}
-
-Based on these items, create a trendy ${occasion} outfit. Select one item from each available category that would create a cohesive, fashionable outfit. Explain why this combination works well and matches current trends.
-
-Return your response as JSON in this format:
-{
-  "outfit": {
-    "top": {"id": "item_id", "name": "item_name"},
-    "bottom": {"id": "item_id", "name": "item_name"},
-    "outerwear": {"id": "item_id", "name": "item_name"},
-    "footwear": {"id": "item_id", "name": "item_name"},
-    "accessories": {"id": "item_id", "name": "item_name"}
-  },
-  "explanation": "Explanation of why this outfit works and follows trends",
-  "trend": "The specific trend this outfit follows"
-}
-
-Note: Only include categories that exist in the provided wardrobe items.`;
-
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'You are a fashion stylist assistant that helps create trendy outfit combinations.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error('No response from AI service');
-    }
-
-    // Parse the AI response
-    let aiResponse;
-    try {
-      const responseText = data.choices[0].message.content;
-      // Extract JSON from the response (in case the AI wraps it in markdown or adds additional text)
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/) || 
-                       responseText.match(/```\n([\s\S]*?)\n```/) || 
-                       responseText.match(/{[\s\S]*?}/);
+    // Helper function to select items
+    const selectItemForCategory = (category: string, keywords: string[] = []) => {
+      if (!itemsByCategory[category] || itemsByCategory[category].length === 0) {
+        return null;
+      }
       
-      const jsonText = jsonMatch ? jsonMatch[0].replace(/```json\n|```\n|```/g, '') : responseText;
-      aiResponse = JSON.parse(jsonText.trim());
-    } catch (parseError) {
-      console.error('Error parsing AI response:', parseError);
-      console.log('Raw AI response:', data.choices[0].message.content);
-      throw new Error('Could not parse AI response');
+      // Try to find items matching keywords first
+      if (keywords.length > 0) {
+        const matchingItems = itemsByCategory[category].filter(
+          item => keywords.some(keyword => 
+            item.name.toLowerCase().includes(keyword.toLowerCase()) && 
+            !usedItems.has(item.id)
+          )
+        );
+        
+        if (matchingItems.length > 0) {
+          const selectedItem = matchingItems[Math.floor(Math.random() * matchingItems.length)];
+          usedItems.add(selectedItem.id);
+          return { id: selectedItem.id, name: selectedItem.name };
+        }
+      }
+      
+      // If no matching items or no keywords provided, pick a random one
+      const availableItems = itemsByCategory[category].filter(item => !usedItems.has(item.id));
+      if (availableItems.length > 0) {
+        const selectedItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+        usedItems.add(selectedItem.id);
+        return { id: selectedItem.id, name: selectedItem.name };
+      }
+      
+      return null;
+    };
+    
+    // Create outfit based on occasion
+    let occasionKeywords: Record<string, string[]> = {};
+    let explanation = '';
+    
+    if (occasion === 'casual') {
+      occasionKeywords = {
+        'Tops': ['t-shirt', 'casual', 'cotton', 'comfortable'],
+        'Bottoms': ['jeans', 'shorts', 'casual'],
+        'Outerwear': ['jacket', 'hoodie', 'cardigan'],
+        'Footwear': ['sneakers', 'casual', 'comfortable'],
+        'Accessories': ['casual', 'everyday']
+      };
+      explanation = "This casual outfit combines comfort with style, perfect for everyday activities. The pieces work well together with a relaxed aesthetic that follows the trend of versatile, mix-and-match pieces.";
+    } else if (occasion === 'formal') {
+      occasionKeywords = {
+        'Tops': ['dress shirt', 'blouse', 'formal', 'elegant'],
+        'Bottoms': ['slacks', 'dress pants', 'skirt', 'formal'],
+        'Outerwear': ['blazer', 'suit jacket', 'formal'],
+        'Footwear': ['dress shoes', 'heels', 'formal'],
+        'Accessories': ['elegant', 'refined', 'formal']
+      };
+      explanation = "This formal outfit presents a polished and sophisticated look appropriate for professional or dressy occasions. The combination exudes elegance and follows the trend of structured pieces with refined silhouettes.";
+    } else if (occasion === 'business') {
+      occasionKeywords = {
+        'Tops': ['blouse', 'button up', 'professional'],
+        'Bottoms': ['slacks', 'trousers', 'skirt', 'professional'],
+        'Outerwear': ['blazer', 'cardigan', 'professional'],
+        'Footwear': ['loafers', 'flats', 'professional'],
+        'Accessories': ['professional', 'business']
+      };
+      explanation = "This business outfit balances professionalism with comfort, ideal for workplace environments. The look is smart and put-together while still being practical, following the trend of smart casual combinations.";
+    } else if (occasion === 'party') {
+      occasionKeywords = {
+        'Tops': ['party', 'dressy', 'evening', 'going out'],
+        'Bottoms': ['dressy', 'evening', 'going out'],
+        'Outerwear': ['dressy', 'evening', 'jacket', 'stylish'],
+        'Footwear': ['heels', 'dress shoes', 'dressy'],
+        'Accessories': ['statement', 'dressy', 'evening']
+      };
+      explanation = "This party outfit creates a fun and eye-catching look for social events. The combination is stylish and festive, incorporating the trend of monochromatic outfits with one pop of color for visual interest.";
+    } else if (occasion === 'sports') {
+      occasionKeywords = {
+        'Tops': ['athletic', 'sporty', 'jersey', 'workout'],
+        'Bottoms': ['athletic', 'sporty', 'shorts', 'leggings'],
+        'Outerwear': ['track jacket', 'windbreaker', 'athletic'],
+        'Footwear': ['sneakers', 'running shoes', 'athletic'],
+        'Accessories': ['sporty', 'athletic', 'functional']
+      };
+      explanation = "This sports outfit prioritizes functionality and comfort while maintaining style. The athletic pieces work together for an active lifestyle, following the trend of athleisure with versatile performance features.";
     }
-
-    // Return the AI recommendation
-    return new Response(JSON.stringify(aiResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    
+    // Map wardrobe categories to API categories
+    const categoryMap: Record<string, string> = {
+      'Tops': 'top',
+      'Bottoms': 'bottom',
+      'Outerwear': 'outerwear',
+      'Footwear': 'footwear',
+      'Accessories': 'accessories'
+    };
+    
+    // Create the outfit with our occasion-specific keywords
+    Object.entries(occasionKeywords).forEach(([category, keywords]) => {
+      const item = selectItemForCategory(category, keywords);
+      if (item) {
+        const apiCategory = categoryMap[category] || category.toLowerCase();
+        outfit[apiCategory] = item;
+      }
     });
+    
+    // Select a random fashion trend
+    const trend = fashionTrends[Math.floor(Math.random() * fashionTrends.length)];
+    
+    // Return the recommendation
+    return new Response(
+      JSON.stringify({
+        outfit,
+        explanation,
+        trend
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   } catch (error) {
     console.error('Error in AI outfit recommendation function:', error);
     return new Response(JSON.stringify({ error: error.message }), {

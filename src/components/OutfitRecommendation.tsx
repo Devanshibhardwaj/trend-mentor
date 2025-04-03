@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { generateOutfitRecommendation, generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendation';
 
 interface WardrobeItem {
   id: string;
@@ -118,15 +118,12 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
 
   const generateAIOutfit = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-outfit-recommendations', {
-        body: { wardrobeItems, occasion }
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (!data || !data.outfit) {
+      // Use our local AI recommendation system
+      toast.info("Generating outfit with local AI model...");
+      
+      const result = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion);
+      
+      if (!result || !result.outfit) {
         throw new Error("AI could not generate a recommendation");
       }
 
@@ -135,36 +132,23 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       const categories = ['top', 'bottom', 'outerwear', 'footwear', 'accessories'];
       
       categories.forEach(category => {
-        if (data.outfit[category]) {
-          const itemId = data.outfit[category].id;
-          const item = wardrobeItems.find(item => item.id === itemId);
+        if (result.outfit[category as keyof typeof result.outfit]) {
+          const itemId = result.outfit[category as keyof typeof result.outfit]?.id;
+          const item = itemId ? wardrobeItems.find(item => item.id === itemId) : undefined;
           
           if (item) {
             newOutfit[category as keyof Outfit] = item;
-          } else {
-            // If the exact item isn't found (perhaps AI returned a name without proper ID),
-            // try to find an item in the same category
-            const itemsByCategory = wardrobeItems.filter(i => 
-              i.category.toLowerCase() === (category === 'top' ? 'Tops' : 
-                                         category === 'bottom' ? 'Bottoms' : 
-                                         category === 'outerwear' ? 'Outerwear' : 
-                                         category === 'footwear' ? 'Footwear' : 
-                                         'Accessories'));
-            
-            if (itemsByCategory.length > 0) {
-              newOutfit[category as keyof Outfit] = itemsByCategory[0];
-            }
           }
         }
       });
 
       // Save explanation and trend if provided
-      if (data.explanation) {
-        setAiExplanation(data.explanation);
+      if (result.explanation) {
+        setAiExplanation(result.explanation);
       }
       
-      if (data.trend) {
-        setAiTrend(data.trend);
+      if (result.trend) {
+        setAiTrend(result.trend);
       }
       
       setOutfit(newOutfit);
@@ -181,7 +165,7 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
           occasion: occasion,
           items: outfitItems,
           is_ai_generated: true,
-          description: data.explanation || `An AI-generated ${occasion} outfit`
+          description: result.explanation || `An AI-generated ${occasion} outfit`
         });
       }
     } catch (error) {
@@ -342,6 +326,9 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
               <span>AI Mode</span>
               {useAI && <Sparkles className="h-4 w-4 ml-1 text-yellow-400" />}
             </Label>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {useAI && "Using browser AI (no costs)"}
           </div>
         </div>
         
