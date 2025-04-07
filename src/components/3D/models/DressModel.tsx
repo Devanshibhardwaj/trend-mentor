@@ -1,7 +1,6 @@
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
 import { toast } from 'sonner';
 import { useModelLoader } from '../hooks/useModelLoader';
 import SimplePlaceholderModel from './SimplePlaceholderModel';
@@ -17,7 +16,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
   const { isValidModel, model, loadError } = useModelLoader(url);
   
   // Auto-rotate effect
-  useFrame((state) => {
+  useFrame(() => {
     if (meshRef.current && autoRotate) {
       meshRef.current.rotation.y += 0.003;
     }
