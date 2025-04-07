@@ -1,113 +1,12 @@
 
-import { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stage, useGLTF, PresentationControls } from '@react-three/drei';
-import { Mesh, BoxGeometry, MeshStandardMaterial } from 'three';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, RotateCw, Move, ZoomIn } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage, PresentationControls } from '@react-three/drei';
 import { useTheme } from "@/contexts/ThemeContext";
-import { toast } from 'sonner';
-
-// Simple box model for demonstration when no 3D model is available
-const SimplePlaceholderModel = ({ url, ...props }) => {
-  const meshRef = useRef(null);
-  const [autoRotate, setAutoRotate] = useState(true);
-  
-  // Auto-rotate effect
-  useFrame((state) => {
-    if (meshRef.current && autoRotate) {
-      meshRef.current.rotation.y += 0.003;
-    }
-  });
-  
-  useEffect(() => {
-    toast.info("3D model placeholder is being displayed", {
-      description: "This is a simple 3D object as a placeholder",
-      duration: 3000,
-    });
-    
-    return () => {
-      // Cleanup
-    };
-  }, [url]);
-  
-  return (
-    <mesh
-      ref={meshRef}
-      {...props}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#f3a5c3" />
-    </mesh>
-  );
-};
-
-// Attempt to load a real 3D model, fallback to placeholder if fails
-const DressModel = ({ url, ...props }) => {
-  const meshRef = useRef(null);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [autoRotate, setAutoRotate] = useState(true);
-  
-  // Only attempt to load the model if we have a proper 3D model URL (not an image)
-  const is3DModelURL = url.endsWith('.glb') || url.endsWith('.gltf');
-  
-  // Auto-rotate effect
-  useFrame((state) => {
-    if (meshRef.current && autoRotate) {
-      meshRef.current.rotation.y += 0.003;
-    }
-  });
-  
-  useEffect(() => {
-    // Notify user about the placeholder
-    if (!is3DModelURL) {
-      toast.info("Using placeholder 3D model", {
-        description: "This is a visualization only, not the actual item",
-        duration: 3000,
-      });
-    }
-  }, [is3DModelURL, url]);
-  
-  // If we can't load a real model, use our simple placeholder
-  if (!is3DModelURL || loadFailed) {
-    return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
-  }
-  
-  // Attempt to load the actual 3D model
-  try {
-    // Properly handle the GLTF type which can be a single object or an array
-    const gltfResult = useGLTF(url);
-    
-    // Safe way to access the scene property regardless of return type
-    let scene = null;
-    if (Array.isArray(gltfResult)) {
-      // If it's an array, take the first item's scene
-      scene = gltfResult[0]?.scene;
-    } else {
-      // If it's a single object
-      scene = gltfResult.scene;
-    }
-    
-    if (!scene) {
-      console.error("Failed to load 3D model scene");
-      return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
-    }
-    
-    return (
-      <primitive 
-        ref={meshRef} 
-        object={scene} 
-        scale={1.5} 
-        {...props} 
-      />
-    );
-  } catch (error) {
-    console.error("Failed to load 3D model:", error);
-    setLoadFailed(true);
-    return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
-  }
-};
+import DressModel from './3D/DressModel';
+import InstructionsOverlay from './3D/InstructionsOverlay';
+import ControlsOverlay from './3D/ControlsOverlay';
+import FallbackImage from './3D/FallbackImage';
 
 interface ThreeDModelViewerProps {
   modelUrl?: string;
@@ -125,8 +24,9 @@ const ThreeDModelViewer = ({
   const { theme } = useTheme();
   const [autoRotate, setAutoRotate] = useState(true);
   const [showInstructions, setShowInstructions] = useState(true);
+  const [modelFailed, setModelFailed] = useState(false);
   
-  // Different environment colors based on theme
+  // Different environment presets based on theme
   const getEnvironmentPreset = () => {
     switch (theme) {
       case 'elegant': return 'city';
@@ -146,28 +46,20 @@ const ThreeDModelViewer = ({
     return () => clearTimeout(timer);
   }, []);
   
-  // Fallback for non-3D models - show image instead
-  const [modelFailed, setModelFailed] = useState(false);
+  // Handle toggle auto rotation
+  const handleToggleAutoRotate = () => {
+    setAutoRotate(!autoRotate);
+  };
   
+  // Fallback for non-3D models - show image instead
   if (modelFailed) {
     return (
-      <div className={`relative overflow-hidden rounded-lg bg-muted ${className}`}>
-        <img 
-          src={modelUrl} 
-          alt={title}
-          className="w-full h-full object-contain"
-        />
-        <div className="absolute bottom-4 right-4">
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="bg-background/80 backdrop-blur-sm"
-            onClick={() => setModelFailed(false)}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" /> Try 3D Again
-          </Button>
-        </div>
-      </div>
+      <FallbackImage 
+        modelUrl={modelUrl} 
+        title={title}
+        onRetry={() => setModelFailed(false)}
+        className={className}
+      />
     );
   }
   
@@ -207,60 +99,16 @@ const ThreeDModelViewer = ({
       
       {/* Interactive controls overlay */}
       {showControls && (
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex space-x-2"
-          >
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              className="bg-background/80 backdrop-blur-sm"
-              onClick={() => setAutoRotate(!autoRotate)}
-            >
-              <RotateCw className={`h-4 w-4 mr-2 ${autoRotate ? 'text-primary' : ''}`} />
-              {autoRotate ? 'Stop' : 'Auto Rotate'}
-            </Button>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs"
-          >
-            {title}
-          </motion.div>
-        </div>
+        <ControlsOverlay 
+          title={title}
+          autoRotate={autoRotate}
+          onToggleAutoRotate={handleToggleAutoRotate}
+        />
       )}
       
       {/* Tutorial overlay */}
       {showInstructions && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-background/40 backdrop-blur-sm flex flex-col items-center justify-center"
-          onClick={() => setShowInstructions(false)}
-        >
-          <div className="bg-card p-6 rounded-lg shadow-lg max-w-xs text-center">
-            <h3 className="font-bold text-lg mb-4">Interactive 3D View</h3>
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="flex flex-col items-center">
-                <Move className="h-8 w-8 mb-2 text-primary" />
-                <p className="text-sm">Drag to rotate</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <ZoomIn className="h-8 w-8 mb-2 text-primary" />
-                <p className="text-sm">Scroll to zoom</p>
-              </div>
-            </div>
-            <Button variant="default" size="sm" className="mt-2" onClick={() => setShowInstructions(false)}>
-              Got it
-            </Button>
-          </div>
-        </motion.div>
+        <InstructionsOverlay onClose={() => setShowInstructions(false)} />
       )}
     </div>
   );
