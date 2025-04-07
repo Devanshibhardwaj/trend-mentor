@@ -76,10 +76,18 @@ const DressModel = ({ url, ...props }) => {
   
   // Attempt to load the actual 3D model
   try {
-    // Fix for TypeScript error - properly extracting the scene from the GLTF result
-    const gltf = useGLTF(url);
-    // Access scene property correctly based on the return type
-    const scene = gltf.scene || (Array.isArray(gltf) ? gltf[0].scene : null);
+    // Properly handle the GLTF type which can be a single object or an array
+    const gltfResult = useGLTF(url);
+    
+    // Safe way to access the scene property regardless of return type
+    let scene = null;
+    if (Array.isArray(gltfResult)) {
+      // If it's an array, take the first item's scene
+      scene = gltfResult[0]?.scene;
+    } else {
+      // If it's a single object
+      scene = gltfResult.scene;
+    }
     
     if (!scene) {
       console.error("Failed to load 3D model scene");
