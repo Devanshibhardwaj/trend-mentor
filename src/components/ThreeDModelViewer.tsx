@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stage, useGLTF, PresentationControls } from '@react-three/drei';
@@ -75,7 +76,16 @@ const DressModel = ({ url, ...props }) => {
   
   // Attempt to load the actual 3D model
   try {
-    const { scene } = useGLTF(url);
+    // Fix for TypeScript error - properly extracting the scene from the GLTF result
+    const gltf = useGLTF(url);
+    // Access scene property correctly based on the return type
+    const scene = gltf.scene || (Array.isArray(gltf) ? gltf[0].scene : null);
+    
+    if (!scene) {
+      console.error("Failed to load 3D model scene");
+      return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
+    }
+    
     return (
       <primitive 
         ref={meshRef} 
