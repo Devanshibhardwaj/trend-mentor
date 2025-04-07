@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, PresentationControls } from '@react-three/drei';
 import { useTheme } from "@/contexts/ThemeContext";
-import DressModel from './3D/DressModel';
-import InstructionsOverlay from './3D/InstructionsOverlay';
-import ControlsOverlay from './3D/ControlsOverlay';
-import FallbackImage from './3D/FallbackImage';
+import DressModel from './models/DressModel';
+import InstructionsOverlay from './overlays/InstructionsOverlay';
+import ControlsOverlay from './overlays/ControlsOverlay';
+import FallbackImage from './fallbacks/FallbackImage';
 
 interface ThreeDModelViewerProps {
   modelUrl?: string;
@@ -82,7 +82,7 @@ const ThreeDModelViewer = ({
           azimuth={[-Math.PI / 4, Math.PI / 4]}
         >
           <Stage environment={getEnvironmentPreset()} preset="soft" intensity={0.5}>
-            <DressModel url={modelUrl} />
+            <DressModel url={modelUrl} autoRotate={autoRotate} />
           </Stage>
         </PresentationControls>
         

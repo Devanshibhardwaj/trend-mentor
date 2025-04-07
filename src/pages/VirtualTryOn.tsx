@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import ThreeDModelViewer from '@/components/ThreeDModelViewer';
+import { ThreeDModelViewer } from '@/components/3D';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

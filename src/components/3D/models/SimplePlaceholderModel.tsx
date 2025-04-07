@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 
 interface SimplePlaceholderModelProps {
   url: string;
+  autoRotate: boolean;
   [key: string]: any;
 }
 
-const SimplePlaceholderModel = ({ url, ...props }: SimplePlaceholderModelProps) => {
+const SimplePlaceholderModel = ({ url, autoRotate, ...props }: SimplePlaceholderModelProps) => {
   const meshRef = useRef(null);
-  const [autoRotate, setAutoRotate] = useState(true);
   
   // Auto-rotate effect
   useFrame((state) => {
