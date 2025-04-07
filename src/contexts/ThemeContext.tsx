@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Theme = "elegant" | "vibrant" | "playful" | "cosmic" | "system";
 
@@ -11,6 +12,23 @@ type ThemeContextType = {
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// Animation for theme transitions
+const ThemeTransition = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={Math.random()} // Force re-render on theme change
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("elegant");
@@ -76,7 +94,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, isTransitioning }}>
-      {children}
+      <ThemeTransition>
+        {children}
+      </ThemeTransition>
     </ThemeContext.Provider>
   );
 }
