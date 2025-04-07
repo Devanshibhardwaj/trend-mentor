@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, View, Cube, Sparkles } from 'lucide-react';
+import { Pencil, Trash2, View, Box, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from 'framer-motion';
@@ -123,7 +123,7 @@ const WardrobeItem = ({ item, onDelete }: WardrobeItemProps) => {
                 className={`h-9 w-9 rounded-full bg-white hover:bg-white/90 ${view3D ? 'text-primary' : 'text-slate-700'}`}
                 onClick={toggle3DView}
               >
-                <Cube className="h-4 w-4" />
+                <Box className="h-4 w-4" />
               </Button>
             </div>
           )}
@@ -148,7 +148,7 @@ const WardrobeItem = ({ item, onDelete }: WardrobeItemProps) => {
                 variant="outline" 
                 className="bg-primary/20 text-primary text-xs font-medium backdrop-blur-sm"
               >
-                <Cube className="h-3 w-3 mr-1" /> 3D View
+                <Box className="h-3 w-3 mr-1" /> 3D View
               </Badge>
             </motion.div>
           )}
