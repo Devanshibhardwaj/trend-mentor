@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "elegant" | "system";
+type Theme = "elegant" | "vibrant" | "playful" | "cosmic" | "system";
 
 type ThemeContextType = {
   theme: Theme;
@@ -20,7 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Check if user has previously set a theme preference
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme && ["elegant", "system"].includes(savedTheme)) {
+    if (savedTheme && ["elegant", "vibrant", "playful", "cosmic", "system"].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
       // Default to elegant theme for new users
@@ -44,14 +44,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Remember the previous theme for transition effects
     root.classList.add(`from-${previousTheme}`);
     
-    root.classList.remove("elegant", "from-elegant");
+    // Remove all possible theme classes
+    root.classList.remove("elegant", "vibrant", "playful", "cosmic", "system", "from-elegant", "from-vibrant", "from-playful", "from-cosmic", "from-system");
     
-    if (theme === "system") {
-      const systemTheme = "elegant";
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
-    }
+    // Add the new theme class
+    root.classList.add(theme);
     
     localStorage.setItem("theme", theme);
     
@@ -69,8 +66,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     setTheme(prevTheme => {
-      if (prevTheme === "elegant") return "system";
-      return "elegant";
+      // Cycle through themes
+      const themes: Theme[] = ["elegant", "vibrant", "playful", "cosmic", "system"];
+      const currentIndex = themes.indexOf(prevTheme);
+      const nextIndex = (currentIndex + 1) % themes.length;
+      return themes[nextIndex];
     });
   };
 

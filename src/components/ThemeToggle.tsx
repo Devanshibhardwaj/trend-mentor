@@ -1,5 +1,5 @@
 
-import { Moon, CloudSun } from "lucide-react";
+import { Sun, Moon, Sparkles, Star, CloudSun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -63,6 +63,15 @@ export default function ThemeToggle() {
               {theme === "elegant" && (
                 <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
               )}
+              {theme === "vibrant" && (
+                <Sparkles className="h-[1.2rem] w-[1.2rem] text-pink-400" />
+              )}
+              {theme === "playful" && (
+                <Star className="h-[1.2rem] w-[1.2rem] text-yellow-400" />
+              )}
+              {theme === "cosmic" && (
+                <Sun className="h-[1.2rem] w-[1.2rem] text-purple-400" />
+              )}
               {theme === "system" && (
                 <CloudSun className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
               )}
@@ -88,10 +97,31 @@ export default function ThemeToggle() {
           <span>Elegant Mode</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => setTheme("system")} 
-          className="flex gap-2 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+          onClick={() => setTheme("vibrant")} 
+          className="flex gap-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
         >
-          <CloudSun className="h-[1rem] w-[1rem] text-indigo-400" />
+          <Sparkles className="h-[1rem] w-[1rem] text-pink-400" />
+          <span>Vibrant Mode</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => setTheme("playful")} 
+          className="flex gap-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors"
+        >
+          <Star className="h-[1rem] w-[1rem] text-yellow-400" />
+          <span>Playful Mode</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => setTheme("cosmic")} 
+          className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+        >
+          <Sun className="h-[1rem] w-[1rem] text-purple-400" />
+          <span>Cosmic Mode</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => setTheme("system")} 
+          className="flex gap-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors"
+        >
+          <CloudSun className="h-[1rem] w-[1rem] text-gray-400" />
           <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
