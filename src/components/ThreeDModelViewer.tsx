@@ -1,18 +1,16 @@
-
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stage, useGLTF, PresentationControls } from '@react-three/drei';
-import { Mesh } from 'three';
+import { Mesh, BoxGeometry, MeshStandardMaterial } from 'three';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, RotateCw, Move, ZoomIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from 'sonner';
 
-// Sample model for demonstration
-const DressModel = ({ url, ...props }: { url: string }) => {
-  const meshRef = useRef<Mesh>(null);
-  const { scene } = useGLTF('/placeholder.svg'); // Placeholder until real model
+// Simple box model for demonstration when no 3D model is available
+const SimplePlaceholderModel = ({ url, ...props }) => {
+  const meshRef = useRef(null);
   const [autoRotate, setAutoRotate] = useState(true);
   
   // Auto-rotate effect
@@ -23,9 +21,8 @@ const DressModel = ({ url, ...props }: { url: string }) => {
   });
   
   useEffect(() => {
-    // Would normally load the model from url
     toast.info("3D model placeholder is being displayed", {
-      description: "Real models would be loaded from actual files",
+      description: "This is a simple 3D object as a placeholder",
       duration: 3000,
     });
     
@@ -35,13 +32,63 @@ const DressModel = ({ url, ...props }: { url: string }) => {
   }, [url]);
   
   return (
-    <primitive 
-      ref={meshRef} 
-      object={scene} 
-      scale={1.5} 
-      {...props} 
-    />
+    <mesh
+      ref={meshRef}
+      {...props}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#f3a5c3" />
+    </mesh>
   );
+};
+
+// Attempt to load a real 3D model, fallback to placeholder if fails
+const DressModel = ({ url, ...props }) => {
+  const meshRef = useRef(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
+  
+  // Only attempt to load the model if we have a proper 3D model URL (not an image)
+  const is3DModelURL = url.endsWith('.glb') || url.endsWith('.gltf');
+  
+  // Auto-rotate effect
+  useFrame((state) => {
+    if (meshRef.current && autoRotate) {
+      meshRef.current.rotation.y += 0.003;
+    }
+  });
+  
+  useEffect(() => {
+    // Notify user about the placeholder
+    if (!is3DModelURL) {
+      toast.info("Using placeholder 3D model", {
+        description: "This is a visualization only, not the actual item",
+        duration: 3000,
+      });
+    }
+  }, [is3DModelURL, url]);
+  
+  // If we can't load a real model, use our simple placeholder
+  if (!is3DModelURL || loadFailed) {
+    return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
+  }
+  
+  // Attempt to load the actual 3D model
+  try {
+    const { scene } = useGLTF(url);
+    return (
+      <primitive 
+        ref={meshRef} 
+        object={scene} 
+        scale={1.5} 
+        {...props} 
+      />
+    );
+  } catch (error) {
+    console.error("Failed to load 3D model:", error);
+    setLoadFailed(true);
+    return <SimplePlaceholderModel ref={meshRef} url={url} {...props} />;
+  }
 };
 
 interface ThreeDModelViewerProps {
