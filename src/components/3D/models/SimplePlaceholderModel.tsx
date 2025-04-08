@@ -11,11 +11,12 @@ interface SimplePlaceholderModelProps {
   [key: string]: any;
 }
 
-const SimplePlaceholderModel = forwardRef<THREE.Mesh, SimplePlaceholderModelProps>(
+// Update the type to accept either Mesh or Group
+const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceholderModelProps>(
   ({ url, autoRotate, color = "#f3a5c3", ...props }, ref) => {
     // Create a local ref if one wasn't passed in
     const localRef = useRef<THREE.Mesh>(null);
-    const actualRef = (ref as React.MutableRefObject<THREE.Mesh>) || localRef;
+    const actualRef = (ref as React.MutableRefObject<THREE.Mesh | THREE.Group | null>) || localRef;
     
     // Auto-rotate effect with proper null checking
     useFrame(() => {
@@ -42,7 +43,7 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh, SimplePlaceholderModelProp
     
     return (
       <mesh
-        ref={actualRef}
+        ref={localRef}
         {...props}
       >
         <boxGeometry args={[1, 1, 1]} />

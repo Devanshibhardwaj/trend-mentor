@@ -12,6 +12,7 @@ interface DressModelProps {
 }
 
 const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
+  // Update the ref to explicitly accept either Mesh or Group
   const meshRef = useRef<THREE.Mesh | THREE.Group | null>(null);
   const { isValidModel, model, loadError } = useModelLoader(url || '');
   
