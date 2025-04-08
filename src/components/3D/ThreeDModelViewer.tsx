@@ -29,6 +29,8 @@ const ThreeDModelViewer = ({
   
   // Different environment presets based on theme
   const getEnvironmentPreset = () => {
+    if (!theme) return 'studio';
+    
     switch (theme) {
       case 'elegant': return 'city';
       case 'vibrant': return 'sunset';
@@ -83,7 +85,7 @@ const ThreeDModelViewer = ({
   }
   
   return (
-    <div className={`relative overflow-hidden rounded-lg ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg ${className || ''}`}>
       {/* 3D Canvas with error boundary */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Canvas 
@@ -93,7 +95,7 @@ const ThreeDModelViewer = ({
           className="touch-none"
           onCreated={(state) => {
             // Ensure renderer exists
-            if (!state.gl) {
+            if (!state || !state.gl) {
               console.error("WebGL renderer not available");
               setModelFailed(true);
             }
@@ -111,7 +113,7 @@ const ThreeDModelViewer = ({
               azimuth={[-Math.PI / 4, Math.PI / 4]}
             >
               <Stage environment={getEnvironmentPreset()} preset="soft" intensity={0.5}>
-                <DressModel url={modelUrl} autoRotate={autoRotate} />
+                <DressModel url={modelUrl || ''} autoRotate={autoRotate} />
               </Stage>
             </PresentationControls>
             
