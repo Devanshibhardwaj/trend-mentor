@@ -12,13 +12,13 @@ interface DressModelProps {
 }
 
 const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<THREE.Mesh | THREE.Group | null>(null);
   const { isValidModel, model, loadError } = useModelLoader(url || '');
   
   // Auto-rotate effect with safe null checking
   useFrame(() => {
     if (meshRef.current && autoRotate) {
-      meshRef.current.rotation.y += 0.003;
+      meshRef.current.rotation.y += 0.01; // Increased rotation speed for better visibility
     }
   });
   
@@ -44,6 +44,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
   
   // If there's an error loading the model, use our simple placeholder
   if (loadError || !model) {
+    console.log("Using placeholder model due to load error or missing model");
     return (
       <SimplePlaceholderModel 
         ref={meshRef} 

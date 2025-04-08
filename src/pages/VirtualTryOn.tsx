@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { ThreeDModelViewer } from '@/components/3D';
@@ -21,7 +21,7 @@ const VirtualTryOn = () => {
   const [cameraActive, setCameraActive] = useState(false);
   const [selectedOutfit, setSelectedOutfit] = useState<number | null>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  const [activeModel, setActiveModel] = useState<string>('/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png');
+  const [activeModel, setActiveModel] = useState<string>('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
   
   // Filter states
   const [activeFilter, setActiveFilter] = useState<string>('none');
@@ -35,35 +35,58 @@ const VirtualTryOn = () => {
   
   // Sample outfits for demonstration
   const outfits = [
-    { id: 1, name: "Floral Summer Dress", image: "/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png" },
+    { id: 1, name: "Floral Summer Dress", image: "/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png" },
     { id: 2, name: "Business Formal", image: "/placeholder.svg" },
     { id: 3, name: "Evening Attire", image: "/placeholder.svg" },
     { id: 4, name: "Sporty Look", image: "/placeholder.svg" },
   ];
 
+  // Cleanup camera on component unmount
+  useEffect(() => {
+    return () => {
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [videoStream]);
+
   const activateCamera = async () => {
     try {
+      console.log("Attempting to activate camera...");
+      // Stop any existing streams
+      if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'user',
           width: { ideal: 1280 },
           height: { ideal: 720 }
-        } 
+        },
+        audio: false
       });
       
+      console.log("Camera stream obtained:", stream);
       setVideoStream(stream);
       setCameraActive(true);
       
       toast.success('Camera activated successfully!');
+      return Promise.resolve();
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast.error('Unable to access camera. Please check permissions.');
+      return Promise.reject(error);
     }
   };
 
   const stopCamera = () => {
+    console.log("Stopping camera...");
     if (videoStream) {
-      videoStream.getTracks().forEach(track => track.stop());
+      videoStream.getTracks().forEach(track => {
+        console.log("Stopping track:", track.kind, track.id);
+        track.stop();
+      });
       setVideoStream(null);
     }
     setCameraActive(false);
@@ -73,6 +96,12 @@ const VirtualTryOn = () => {
     setSaturation(100);
     setShowAccessories(false);
     setSelectedAccessory(null);
+    toast.success('Camera stopped');
+  };
+
+  const resetToModel = () => {
+    stopCamera();
+    setActiveModel('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
   };
 
   const selectOutfit = (id: number, image: string) => {
@@ -194,7 +223,7 @@ const VirtualTryOn = () => {
                 <CameraController 
                   cameraActive={cameraActive} 
                   activateCamera={activateCamera}
-                  onResetToModel={() => setActiveModel('/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png')}
+                  onResetToModel={resetToModel}
                 />
                 
                 {/* Camera filter and accessories controls */}

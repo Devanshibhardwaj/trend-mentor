@@ -1,7 +1,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, Sparkles } from 'lucide-react';
+import { Camera, Sparkles, CameraOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -36,29 +36,66 @@ const CameraView = ({
 }: CameraViewProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isStreamActive, setIsStreamActive] = useState(false);
+
+  useEffect(() => {
+    // Clean up function to handle component unmounting
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (cameraActive && videoRef.current && videoStream) {
+      console.log("Setting video stream to video element");
       videoRef.current.srcObject = videoStream;
+      
+      // Handle when video is ready
       videoRef.current.onloadedmetadata = () => {
-        videoRef.current?.play();
+        console.log("Video metadata loaded, playing video");
+        if (videoRef.current) {
+          videoRef.current.play()
+            .then(() => {
+              console.log("Video playing successfully");
+              setIsStreamActive(true);
+            })
+            .catch(err => {
+              console.error("Error playing video:", err);
+              toast.error("Failed to start video: " + err.message);
+              setIsStreamActive(false);
+            });
+        }
       };
+      
+      // Handle errors
+      videoRef.current.onerror = (e) => {
+        console.error("Video element error:", e);
+        toast.error("Camera error occurred");
+        setIsStreamActive(false);
+      };
+    } else {
+      setIsStreamActive(false);
     }
   }, [cameraActive, videoStream]);
 
   useEffect(() => {
-    if (cameraActive && videoRef.current && canvasRef.current) {
+    if (cameraActive && isStreamActive && videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       
       if (!ctx) return;
       
+      let animationFrameId: number;
+      
       const renderFrame = () => {
         if (video.readyState === video.HAVE_ENOUGH_DATA) {
           // Set canvas dimensions to match video
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+          canvas.width = video.videoWidth || 640;
+          canvas.height = video.videoHeight || 480;
           
           // Draw the video frame
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -144,12 +181,17 @@ const CameraView = ({
             }
           }
         }
-        requestAnimationFrame(renderFrame);
+        animationFrameId = requestAnimationFrame(renderFrame);
       };
       
       renderFrame();
+      
+      // Clean up animation frame on unmount or when dependencies change
+      return () => {
+        cancelAnimationFrame(animationFrameId);
+      };
     }
-  }, [cameraActive, activeFilter, brightness, contrast, saturation, showAccessories, selectedAccessory]);
+  }, [cameraActive, isStreamActive, activeFilter, brightness, contrast, saturation, showAccessories, selectedAccessory]);
 
   return (
     <div className="aspect-video bg-black relative overflow-hidden">
@@ -167,6 +209,15 @@ const CameraView = ({
         ref={canvasRef}
         className="w-full h-full object-cover"
       ></canvas>
+      
+      {!isStreamActive && cameraActive && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <CameraOff className="h-12 w-12 text-white opacity-50" />
+          <p className="text-white text-center mt-4">
+            Camera not available. Check permissions.
+          </p>
+        </div>
+      )}
       
       <motion.div 
         className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm rounded-md px-3 py-1 text-sm"
@@ -191,7 +242,7 @@ const CameraView = ({
         </Button>
         <Button 
           onClick={onCapture} 
-          disabled={!selectedOutfit}
+          disabled={!selectedOutfit || !isStreamActive}
           className="bg-primary/90 hover:bg-primary"
         >
           Capture Try-On

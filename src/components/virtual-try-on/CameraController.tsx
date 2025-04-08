@@ -15,6 +15,15 @@ const CameraController = ({
   activateCamera,
   onResetToModel
 }: CameraControllerProps) => {
+  const handleActivateCamera = async () => {
+    try {
+      await activateCamera();
+    } catch (error) {
+      console.error('Failed to activate camera:', error);
+      toast.error('Camera activation failed. Please check permissions.');
+    }
+  };
+
   return (
     <motion.div 
       className="flex justify-center space-x-4 mt-4"
@@ -24,7 +33,7 @@ const CameraController = ({
     >
       {!cameraActive ? (
         <Button 
-          onClick={activateCamera} 
+          onClick={handleActivateCamera} 
           variant="outline"
           className="group relative overflow-hidden"
         >

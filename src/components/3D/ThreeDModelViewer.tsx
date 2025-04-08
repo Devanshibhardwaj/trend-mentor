@@ -51,6 +51,7 @@ const ThreeDModelViewer = ({
   
   // Handle toggle auto rotation
   const handleToggleAutoRotate = () => {
+    console.log("Toggling auto rotation:", !autoRotate);
     setAutoRotate(!autoRotate);
   };
   
@@ -119,7 +120,7 @@ const ThreeDModelViewer = ({
             
             <OrbitControls 
               autoRotate={autoRotate}
-              autoRotateSpeed={3}
+              autoRotateSpeed={5} // Increased from 3 to 5 for better visibility
               enableZoom={true}
               enablePan={true}
               dampingFactor={0.05}
