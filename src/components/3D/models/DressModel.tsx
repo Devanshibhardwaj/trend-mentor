@@ -1,7 +1,6 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { toast } from 'sonner';
 import { useModelLoader } from '../hooks/useModelLoader';
 import SimplePlaceholderModel from './SimplePlaceholderModel';
 
@@ -12,7 +11,7 @@ interface DressModelProps {
 }
 
 const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
-  const meshRef = useRef(null);
+  const meshRef = useRef<THREE.Mesh>(null);
   const { isValidModel, model, loadError } = useModelLoader(url);
   
   // Auto-rotate effect
@@ -23,7 +22,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
   });
   
   // If we can't load a real model, use our simple placeholder
-  if (!isValidModel || loadError) {
+  if (!isValidModel || loadError || !model) {
     return <SimplePlaceholderModel ref={meshRef} url={url} autoRotate={autoRotate} {...props} />;
   }
   

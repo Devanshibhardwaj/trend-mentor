@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { toast } from 'sonner';
-import { GLTF } from 'three-stdlib';
-import { ObjectMap } from '@react-three/fiber';
 
 export const useModelLoader = (url: string) => {
   const [loadError, setLoadError] = useState(false);
@@ -12,8 +10,9 @@ export const useModelLoader = (url: string) => {
   // Determine if URL is a valid 3D model
   const isValidModel = url.endsWith('.glb') || url.endsWith('.gltf');
   
-  // Use the useGLTF hook at component level, not inside useEffect
+  // Use the useGLTF hook at component level (not inside useEffect)
   // This will return undefined for non-GLB/GLTF files
+  // We use null as a fallback to prevent errors
   const gltfResult = isValidModel ? useGLTF(url) : null;
   
   useEffect(() => {
@@ -38,12 +37,9 @@ export const useModelLoader = (url: string) => {
       
       // Safe way to access the scene property regardless of return type
       let scene = null;
-      if (Array.isArray(gltfResult)) {
-        // If it's an array, take the first item's scene
-        scene = gltfResult[0]?.scene;
-      } else {
-        // If it's a single object
-        scene = gltfResult.scene;
+      if (gltfResult && typeof gltfResult === 'object') {
+        // If it's an object with a scene property
+        scene = (gltfResult as any).scene;
       }
       
       if (!scene) {
