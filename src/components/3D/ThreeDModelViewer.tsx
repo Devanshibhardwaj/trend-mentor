@@ -1,12 +1,13 @@
 
 import { useState, useEffect, Suspense } from 'react';
-import { Canvas, ErrorBoundary } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, PresentationControls } from '@react-three/drei';
 import { useTheme } from "@/contexts/ThemeContext";
 import DressModel from './models/DressModel';
 import InstructionsOverlay from './overlays/InstructionsOverlay';
 import ControlsOverlay from './overlays/ControlsOverlay';
 import FallbackImage from './fallbacks/FallbackImage';
+import { ErrorBoundary } from 'react-error-boundary';
 
 interface ThreeDModelViewerProps {
   modelUrl?: string;
@@ -51,10 +52,22 @@ const ThreeDModelViewer = ({
     setAutoRotate(!autoRotate);
   };
   
-  // Handle Canvas errors - now properly typed as a React event handler
+  // Handle Canvas errors
   const handleCanvasError = () => {
     console.error("Canvas rendering failed");
     setModelFailed(true);
+  };
+
+  // Error fallback component
+  const ErrorFallback = () => {
+    return (
+      <FallbackImage 
+        modelUrl={modelUrl} 
+        title={title}
+        onRetry={() => setModelFailed(false)}
+        className={className}
+      />
+    );
   };
   
   // Fallback for non-3D models - show image instead
@@ -72,7 +85,7 @@ const ThreeDModelViewer = ({
   return (
     <div className={`relative overflow-hidden rounded-lg ${className}`}>
       {/* 3D Canvas with error boundary */}
-      <ErrorBoundary fallback={<FallbackImage modelUrl={modelUrl} title={title} onRetry={() => {}} className={className} />}>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Canvas 
           shadows 
           dpr={[1, 2]} 
