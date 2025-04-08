@@ -7,11 +7,12 @@ import * as THREE from 'three';
 interface SimplePlaceholderModelProps {
   url: string;
   autoRotate: boolean;
+  color?: string;
   [key: string]: any;
 }
 
 const SimplePlaceholderModel = forwardRef<THREE.Mesh, SimplePlaceholderModelProps>(
-  ({ url, autoRotate, ...props }, ref) => {
+  ({ url, autoRotate, color = "#f3a5c3", ...props }, ref) => {
     // Create a local ref if one wasn't passed in
     const localRef = useRef<THREE.Mesh>(null);
     const actualRef = (ref as React.MutableRefObject<THREE.Mesh>) || localRef;
@@ -37,28 +38,17 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh, SimplePlaceholderModelProp
       } catch (error) {
         console.error("Toast error:", error);
       }
-      
-      return () => {
-        // Cleanup
-      };
     }, []);
     
-    // Create a simple colored box as placeholder
-    try {
-      return (
-        <mesh
-          ref={ref}
-          {...props}
-        >
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#f3a5c3" />
-        </mesh>
-      );
-    } catch (error) {
-      console.error("Error rendering placeholder model:", error);
-      // Return an empty group as absolute fallback
-      return <group />;
-    }
+    return (
+      <mesh
+        ref={actualRef}
+        {...props}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color={color} />
+      </mesh>
+    );
   }
 );
 

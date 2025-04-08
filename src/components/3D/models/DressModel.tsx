@@ -22,8 +22,28 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     }
   });
   
-  // If we can't load a real model, use our simple placeholder
-  if (!isValidModel || loadError || !model) {
+  // If we're loading a 2D image (not a 3D model), use a textured placeholder
+  if (!isValidModel) {
+    // For non-3D model URLs, create a colored box with a different color based on URL
+    const colorHash = url.split('').reduce((acc, char) => {
+      return char.charCodeAt(0) + ((acc << 5) - acc);
+    }, 0);
+    
+    const color = `hsl(${Math.abs(colorHash) % 360}, 70%, 80%)`;
+    
+    return (
+      <SimplePlaceholderModel 
+        ref={meshRef} 
+        url={url || ''} 
+        autoRotate={Boolean(autoRotate)} 
+        color={color}
+        {...props} 
+      />
+    );
+  }
+  
+  // If there's an error loading the model, use our simple placeholder
+  if (loadError || !model) {
     return (
       <SimplePlaceholderModel 
         ref={meshRef} 

@@ -1,13 +1,17 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ThreeDModelViewer } from '@/components/3D';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Camera, Upload, RefreshCw, Sparkles, RotateCw } from 'lucide-react';
+import { Camera, Upload, RefreshCw, Sparkles, RotateCw, Sliders, Wand2, Shapes, Crown, Glasses } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const VirtualTryOn = () => {
@@ -15,6 +19,18 @@ const VirtualTryOn = () => {
   const [selectedOutfit, setSelectedOutfit] = useState<number | null>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [activeModel, setActiveModel] = useState<string>('/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png');
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Filter states
+  const [activeFilter, setActiveFilter] = useState<string>('none');
+  const [brightness, setBrightness] = useState<number>(100);
+  const [contrast, setContrast] = useState<number>(100);
+  const [saturation, setSaturation] = useState<number>(100);
+  
+  // Accessories states
+  const [selectedAccessory, setSelectedAccessory] = useState<string | null>(null);
+  const [showAccessories, setShowAccessories] = useState<boolean>(false);
   
   // Sample outfits for demonstration
   const outfits = [
@@ -23,17 +39,152 @@ const VirtualTryOn = () => {
     { id: 3, name: "Evening Attire", image: "/placeholder.svg" },
     { id: 4, name: "Sporty Look", image: "/placeholder.svg" },
   ];
+  
+  // Sample accessories for demonstration
+  const accessories = [
+    { id: 1, name: "Sunglasses", icon: <Glasses className="h-5 w-5" /> },
+    { id: 2, name: "Crown", icon: <Crown className="h-5 w-5" /> },
+    { id: 3, name: "Earrings", icon: <Shapes className="h-5 w-5" /> },
+    { id: 4, name: "Necklace", icon: <Shapes className="h-5 w-5" /> },
+  ];
+  
+  // Sample filters
+  const filters = [
+    { id: 'none', name: 'None' },
+    { id: 'grayscale', name: 'Grayscale' },
+    { id: 'sepia', name: 'Sepia' },
+    { id: 'vintage', name: 'Vintage' },
+    { id: 'cool', name: 'Cool' },
+    { id: 'warm', name: 'Warm' }
+  ];
+  
+  // Apply filters to video
+  useEffect(() => {
+    if (cameraActive && videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) return;
+      
+      const renderFrame = () => {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          // Set canvas dimensions to match video
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          
+          // Draw the video frame
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Apply filters
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          // Apply brightness, contrast, saturation
+          for (let i = 0; i < data.length; i += 4) {
+            // Apply brightness
+            const brightnessAdjust = brightness / 100;
+            data[i] = Math.min(255, Math.max(0, data[i] * brightnessAdjust));
+            data[i + 1] = Math.min(255, Math.max(0, data[i + 1] * brightnessAdjust));
+            data[i + 2] = Math.min(255, Math.max(0, data[i + 2] * brightnessAdjust));
+            
+            // Apply filter effects
+            switch (activeFilter) {
+              case 'grayscale':
+                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;
+                data[i + 1] = avg;
+                data[i + 2] = avg;
+                break;
+              case 'sepia':
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                break;
+              case 'cool':
+                data[i + 2] = Math.min(255, data[i + 2] * 1.2); // Boost blue
+                break;
+              case 'warm':
+                data[i] = Math.min(255, data[i] * 1.2); // Boost red
+                break;
+              case 'vintage':
+                data[i] = Math.min(255, data[i] * 1.1);
+                data[i + 1] = Math.min(255, data[i + 1] * 0.9);
+                data[i + 2] = Math.min(255, data[i + 2] * 0.8);
+                break;
+            }
+            
+            // Apply contrast
+            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+            data[i] = Math.min(255, Math.max(0, factor * (data[i] - 128) + 128));
+            data[i + 1] = Math.min(255, Math.max(0, factor * (data[i + 1] - 128) + 128));
+            data[i + 2] = Math.min(255, Math.max(0, factor * (data[i + 2] - 128) + 128));
+            
+            // Apply saturation
+            const satFactor = saturation / 100;
+            const gray = 0.2989 * data[i] + 0.5870 * data[i + 1] + 0.1140 * data[i + 2];
+            data[i] = Math.min(255, Math.max(0, gray + satFactor * (data[i] - gray)));
+            data[i + 1] = Math.min(255, Math.max(0, gray + satFactor * (data[i + 1] - gray)));
+            data[i + 2] = Math.min(255, Math.max(0, gray + satFactor * (data[i + 2] - gray)));
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+          
+          // Draw accessories if enabled
+          if (showAccessories && selectedAccessory) {
+            // Here we would position accessories based on face detection
+            // For demo, just position in center
+            ctx.font = '100px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.textAlign = 'center';
+            
+            // Simple accessory placement - in a real app, you'd use face detection
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 3;
+            
+            if (selectedAccessory === 'Sunglasses') {
+              ctx.fillText('🕶️', centerX, centerY);
+            } else if (selectedAccessory === 'Crown') {
+              ctx.fillText('👑', centerX, centerY - 50);
+            } else if (selectedAccessory === 'Earrings') {
+              ctx.fillText('💎', centerX - 100, centerY);
+              ctx.fillText('💎', centerX + 100, centerY);
+            } else if (selectedAccessory === 'Necklace') {
+              ctx.fillText('📿', centerX, centerY + 100);
+            }
+          }
+        }
+        requestAnimationFrame(renderFrame);
+      };
+      
+      renderFrame();
+    }
+  }, [cameraActive, activeFilter, brightness, contrast, saturation, showAccessories, selectedAccessory]);
 
   const activateCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      
       setVideoStream(stream);
       setCameraActive(true);
       
-      const videoElement = document.getElementById('camera-preview') as HTMLVideoElement;
-      if (videoElement) {
-        videoElement.srcObject = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+        };
       }
+      
+      toast.success('Camera activated successfully!');
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast.error('Unable to access camera. Please check permissions.');
@@ -46,6 +197,12 @@ const VirtualTryOn = () => {
       setVideoStream(null);
     }
     setCameraActive(false);
+    setActiveFilter('none');
+    setBrightness(100);
+    setContrast(100);
+    setSaturation(100);
+    setShowAccessories(false);
+    setSelectedAccessory(null);
   };
 
   const selectOutfit = (id: number, image: string) => {
@@ -60,11 +217,22 @@ const VirtualTryOn = () => {
       return;
     }
     
+    if (!cameraActive) {
+      toast.error('Please activate your camera first');
+      return;
+    }
+    
     toast.success('Processing your virtual try-on...');
     // In a real implementation, this would process the image with AR technology
     setTimeout(() => {
       toast.success('Virtual try-on complete! How does it look?');
     }, 2000);
+  };
+  
+  const handleAccessorySelect = (name: string) => {
+    setSelectedAccessory(name);
+    setShowAccessories(true);
+    toast.success(`Added ${name} to your look!`);
   };
 
   // Animation variants
@@ -126,12 +294,20 @@ const VirtualTryOn = () => {
                   <CardContent className="p-0 relative">
                     {cameraActive ? (
                       <div className="aspect-video bg-black relative overflow-hidden">
+                        {/* Hidden video element for capturing camera feed */}
                         <video 
-                          id="camera-preview" 
+                          ref={videoRef}
                           autoPlay 
                           playsInline 
-                          className="w-full h-full object-cover"
+                          muted
+                          className="hidden"
                         ></video>
+                        
+                        {/* Canvas for displaying processed video with filters/accessories */}
+                        <canvas 
+                          ref={canvasRef}
+                          className="w-full h-full object-cover"
+                        ></canvas>
                         
                         <motion.div 
                           className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm rounded-md px-3 py-1 text-sm"
@@ -202,6 +378,122 @@ const VirtualTryOn = () => {
                     </Button>
                   )}
                 </motion.div>
+                
+                {/* Camera filter and accessories controls */}
+                {cameraActive && (
+                  <motion.div 
+                    className="mt-6 space-y-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <div className="bg-card rounded-lg p-4 border">
+                      <div className="flex items-center mb-4">
+                        <Sliders className="w-5 h-5 mr-2 text-primary" />
+                        <h3 className="text-lg font-medium">Adjust Filters</h3>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select 
+                            value={activeFilter} 
+                            onValueChange={setActiveFilter}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select filter" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {filters.map(filter => (
+                                <SelectItem key={filter.id} value={filter.id}>
+                                  {filter.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          
+                          <div className="flex items-center space-x-2">
+                            <Label htmlFor="show-accessories" className="flex-grow">Accessories</Label>
+                            <Switch
+                              id="show-accessories"
+                              checked={showAccessories}
+                              onCheckedChange={setShowAccessories}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <div className="flex justify-between">
+                              <Label>Brightness</Label>
+                              <span className="text-xs text-muted-foreground">{brightness}%</span>
+                            </div>
+                            <Slider
+                              value={[brightness]}
+                              min={50}
+                              max={150}
+                              step={1}
+                              onValueChange={([value]) => setBrightness(value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex justify-between">
+                              <Label>Contrast</Label>
+                              <span className="text-xs text-muted-foreground">{contrast}%</span>
+                            </div>
+                            <Slider
+                              value={[contrast]}
+                              min={50}
+                              max={150}
+                              step={1}
+                              onValueChange={([value]) => setContrast(value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex justify-between">
+                              <Label>Saturation</Label>
+                              <span className="text-xs text-muted-foreground">{saturation}%</span>
+                            </div>
+                            <Slider
+                              value={[saturation]}
+                              min={0}
+                              max={200}
+                              step={1}
+                              onValueChange={([value]) => setSaturation(value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {showAccessories && (
+                      <div className="bg-card rounded-lg p-4 border">
+                        <div className="flex items-center mb-4">
+                          <Wand2 className="w-5 h-5 mr-2 text-primary" />
+                          <h3 className="text-lg font-medium">Accessories</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          {accessories.map(accessory => (
+                            <Card 
+                              key={accessory.id}
+                              className={`cursor-pointer transition-all hover:border-primary ${selectedAccessory === accessory.name ? 'border-2 border-primary' : ''}`}
+                              onClick={() => handleAccessorySelect(accessory.name)}
+                            >
+                              <CardContent className="p-3 flex flex-col items-center justify-center text-center">
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                                  {accessory.icon}
+                                </div>
+                                <span className="text-sm">{accessory.name}</span>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
               </motion.div>
               
               <motion.div variants={itemVariants}>
