@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useModelLoader } from '../hooks/useModelLoader';
 import SimplePlaceholderModel from './SimplePlaceholderModel';
+import * as THREE from 'three';
 
 interface DressModelProps {
   url: string;
@@ -26,11 +27,14 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     return <SimplePlaceholderModel ref={meshRef} url={url} autoRotate={autoRotate} {...props} />;
   }
   
+  // Clone the model to avoid manipulation of shared objects
+  const safeModel = model.clone();
+  
   // If we have a valid model, render it
   return (
     <primitive 
       ref={meshRef} 
-      object={model} 
+      object={safeModel} 
       scale={1.5} 
       {...props} 
     />

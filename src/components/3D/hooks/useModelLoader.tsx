@@ -10,9 +10,8 @@ export const useModelLoader = (url: string) => {
   // Determine if URL is a valid 3D model
   const isValidModel = url.endsWith('.glb') || url.endsWith('.gltf');
   
-  // Use the useGLTF hook at component level (not inside useEffect)
-  // This will return undefined for non-GLB/GLTF files
-  // We use null as a fallback to prevent errors
+  // Use the useGLTF hook only for valid models
+  // This hook must be called at the component level, not conditionally
   const gltfResult = isValidModel ? useGLTF(url) : null;
   
   useEffect(() => {
@@ -35,20 +34,20 @@ export const useModelLoader = (url: string) => {
         throw new Error("Failed to load 3D model");
       }
       
-      // Safe way to access the scene property regardless of return type
-      let scene = null;
-      if (gltfResult && typeof gltfResult === 'object') {
-        // If it's an object with a scene property
-        scene = (gltfResult as any).scene;
-      }
-      
-      if (!scene) {
-        console.error("Failed to load 3D model scene");
+      // Safe way to access the scene property
+      if (gltfResult && typeof gltfResult === 'object' && 'scene' in gltfResult) {
+        const scene = gltfResult.scene;
+        
+        if (scene) {
+          setModel(scene);
+        } else {
+          console.error("Model scene is undefined");
+          setLoadError(true);
+        }
+      } else {
+        console.error("Invalid GLTF result format");
         setLoadError(true);
-        return;
       }
-      
-      setModel(scene);
     } catch (error) {
       console.error("Failed to load 3D model:", error);
       setLoadError(true);

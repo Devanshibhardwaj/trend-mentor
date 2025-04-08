@@ -1,6 +1,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, ErrorBoundary } from '@react-three/fiber';
 import { OrbitControls, Stage, PresentationControls } from '@react-three/drei';
 import { useTheme } from "@/contexts/ThemeContext";
 import DressModel from './models/DressModel';
@@ -25,7 +25,6 @@ const ThreeDModelViewer = ({
   const [autoRotate, setAutoRotate] = useState(true);
   const [showInstructions, setShowInstructions] = useState(true);
   const [modelFailed, setModelFailed] = useState(false);
-  const [canvasError, setCanvasError] = useState(false);
   
   // Different environment presets based on theme
   const getEnvironmentPreset = () => {
@@ -52,23 +51,19 @@ const ThreeDModelViewer = ({
     setAutoRotate(!autoRotate);
   };
   
-  // Error boundary for Canvas
-  const handleCanvasError = (error: Error) => {
-    console.error("Canvas error:", error);
-    setCanvasError(true);
+  // Handle Canvas errors - now properly typed as a React event handler
+  const handleCanvasError = () => {
+    console.error("Canvas rendering failed");
     setModelFailed(true);
   };
   
   // Fallback for non-3D models - show image instead
-  if (modelFailed || canvasError) {
+  if (modelFailed) {
     return (
       <FallbackImage 
         modelUrl={modelUrl} 
         title={title}
-        onRetry={() => {
-          setModelFailed(false);
-          setCanvasError(false);
-        }}
+        onRetry={() => setModelFailed(false)}
         className={className}
       />
     );
@@ -76,40 +71,42 @@ const ThreeDModelViewer = ({
   
   return (
     <div className={`relative overflow-hidden rounded-lg ${className}`}>
-      {/* 3D Canvas */}
-      <Canvas 
-        shadows 
-        dpr={[1, 2]} 
-        camera={{ fov: 45 }}
-        className="touch-none"
-        onError={handleCanvasError}
-      >
-        <color attach="background" args={[theme === 'elegant' ? '#f8f9fa' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />
-        
-        <Suspense fallback={null}>
-          <PresentationControls
-            global
-            zoom={0.8}
-            rotation={[0, -Math.PI / 4, 0]}
-            polar={[-Math.PI / 4, Math.PI / 4]}
-            azimuth={[-Math.PI / 4, Math.PI / 4]}
-          >
-            <Stage environment={getEnvironmentPreset()} preset="soft" intensity={0.5}>
-              <DressModel url={modelUrl} autoRotate={autoRotate} />
-            </Stage>
-          </PresentationControls>
+      {/* 3D Canvas with error boundary */}
+      <ErrorBoundary fallback={<FallbackImage modelUrl={modelUrl} title={title} onRetry={() => {}} className={className} />}>
+        <Canvas 
+          shadows 
+          dpr={[1, 2]} 
+          camera={{ fov: 45 }}
+          className="touch-none"
+          onError={handleCanvasError}
+        >
+          <color attach="background" args={[theme === 'elegant' ? '#f8f9fa' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />
           
-          <OrbitControls 
-            autoRotate={autoRotate}
-            autoRotateSpeed={3}
-            enableZoom={true}
-            enablePan={true}
-            dampingFactor={0.05}
-            minDistance={3}
-            maxDistance={10}
-          />
-        </Suspense>
-      </Canvas>
+          <Suspense fallback={null}>
+            <PresentationControls
+              global
+              zoom={0.8}
+              rotation={[0, -Math.PI / 4, 0]}
+              polar={[-Math.PI / 4, Math.PI / 4]}
+              azimuth={[-Math.PI / 4, Math.PI / 4]}
+            >
+              <Stage environment={getEnvironmentPreset()} preset="soft" intensity={0.5}>
+                <DressModel url={modelUrl} autoRotate={autoRotate} />
+              </Stage>
+            </PresentationControls>
+            
+            <OrbitControls 
+              autoRotate={autoRotate}
+              autoRotateSpeed={3}
+              enableZoom={true}
+              enablePan={true}
+              dampingFactor={0.05}
+              minDistance={3}
+              maxDistance={10}
+            />
+          </Suspense>
+        </Canvas>
+      </ErrorBoundary>
       
       {/* Interactive controls overlay */}
       {showControls && (
