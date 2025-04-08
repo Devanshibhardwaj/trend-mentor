@@ -2,13 +2,16 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 
 interface Outfit {
   id: number;
   name: string;
   image: string;
+  description?: string;
+  is3D: boolean;
 }
 
 interface OutfitSelectorProps {
@@ -57,24 +60,51 @@ const OutfitSelector = ({
       >
         {outfits.map((outfit) => (
           <motion.div key={outfit.id} variants={itemVariants}>
-            <Card 
-              className={`cursor-pointer transition-all hover:shadow-md ${selectedOutfit === outfit.id ? 'ring-2 ring-primary' : ''}`}
-              onClick={() => onSelectOutfit(outfit.id, outfit.image)}
-            >
-              <CardContent className="p-3 flex items-center space-x-3">
-                <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
-                  <img 
-                    src={outfit.image} 
-                    alt={outfit.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h4 className="font-medium">{outfit.name}</h4>
-                  <p className="text-xs text-muted-foreground">Click to try on</p>
-                </div>
-              </CardContent>
-            </Card>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Card 
+                  className={`cursor-pointer transition-all hover:shadow-md ${selectedOutfit === outfit.id ? 'ring-2 ring-primary' : ''}`}
+                  onClick={() => onSelectOutfit(outfit.id, outfit.image)}
+                >
+                  <CardContent className="p-3 flex items-center space-x-3">
+                    <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0 relative">
+                      <img 
+                        src={outfit.image} 
+                        alt={outfit.name} 
+                        className="w-full h-full object-cover"
+                      />
+                      {outfit.is3D && (
+                        <div className="absolute top-0 right-0 bg-primary text-white text-xs px-1 rounded-bl">
+                          3D
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-medium flex items-center">
+                        {outfit.name}
+                        {outfit.description && (
+                          <Info className="h-3 w-3 ml-1 text-muted-foreground" />
+                        )}
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        {outfit.is3D ? "Interactive 3D model" : "Click to try on"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </HoverCardTrigger>
+              {outfit.description && (
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">{outfit.name}</h4>
+                    <p className="text-sm text-muted-foreground">{outfit.description}</p>
+                    {outfit.is3D && (
+                      <p className="text-xs text-primary">Hover and drag to rotate the 3D model</p>
+                    )}
+                  </div>
+                </HoverCardContent>
+              )}
+            </HoverCard>
           </motion.div>
         ))}
       </motion.div>

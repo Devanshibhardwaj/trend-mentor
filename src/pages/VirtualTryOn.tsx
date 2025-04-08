@@ -33,12 +33,36 @@ const VirtualTryOn = () => {
   const [selectedAccessory, setSelectedAccessory] = useState<string | null>(null);
   const [showAccessories, setShowAccessories] = useState<boolean>(false);
   
-  // Sample outfits for demonstration
+  // Enhanced outfits with both 2D images and 3D models
   const outfits = [
-    { id: 1, name: "Floral Summer Dress", image: "/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png" },
-    { id: 2, name: "Business Formal", image: "/placeholder.svg" },
-    { id: 3, name: "Evening Attire", image: "/placeholder.svg" },
-    { id: 4, name: "Sporty Look", image: "/placeholder.svg" },
+    { 
+      id: 1, 
+      name: "Floral Summer Dress",
+      image: "/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png",
+      description: "A beautiful floral pattern summer dress perfect for daytime outings or beach walks.",
+      is3D: false 
+    },
+    { 
+      id: 2, 
+      name: "Red Evening Gown", 
+      image: "/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png",
+      description: "An elegant red evening gown for formal events and special occasions.",
+      is3D: false
+    },
+    { 
+      id: 3, 
+      name: "Modern Suit", 
+      image: "https://models.readyplayer.me/64b68c3fd857b9e67b51f2c6.glb",
+      description: "A modern, professional suit for business meetings and formal work environments.",
+      is3D: true
+    },
+    { 
+      id: 4, 
+      name: "Casual Outfit", 
+      image: "https://models.readyplayer.me/64b68bc8d857b9e67b51f29a.glb",
+      description: "A comfortable casual outfit perfect for everyday wear.",
+      is3D: true
+    },
   ];
 
   // Cleanup camera on component unmount
@@ -101,13 +125,27 @@ const VirtualTryOn = () => {
 
   const resetToModel = () => {
     stopCamera();
-    setActiveModel('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
+    // Reset to the last selected model
+    if (selectedOutfit) {
+      const outfit = outfits.find(o => o.id === selectedOutfit);
+      if (outfit) {
+        setActiveModel(outfit.image);
+      }
+    } else {
+      setActiveModel('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
+    }
   };
 
   const selectOutfit = (id: number, image: string) => {
     setSelectedOutfit(id);
     setActiveModel(image);
-    toast.success('Outfit selected for virtual try-on');
+    
+    const outfit = outfits.find(o => o.id === id);
+    if (outfit?.is3D) {
+      toast.success('3D model loaded! Drag to rotate and zoom with scroll');
+    } else {
+      toast.success('Outfit selected for virtual try-on');
+    }
   };
 
   const handleCapture = () => {
@@ -138,6 +176,7 @@ const VirtualTryOn = () => {
     document.querySelector('[value="try-on"]')?.dispatchEvent(new Event('click'));
   };
 
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 

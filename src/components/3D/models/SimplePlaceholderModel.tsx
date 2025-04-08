@@ -16,13 +16,17 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceh
   ({ url, autoRotate, color = "#f3a5c3", ...props }, ref) => {
     // Create a local ref if one wasn't passed in
     const localRef = useRef<THREE.Mesh>(null);
-    const actualRef = (ref as React.MutableRefObject<THREE.Mesh | THREE.Group | null>) || localRef;
     
-    // Auto-rotate effect with proper null checking
+    // Fix the ref handling to properly work with forwardRef
     useFrame(() => {
-      if (actualRef && actualRef.current) {
-        if (autoRotate) {
-          actualRef.current.rotation.y += 0.003;
+      if (autoRotate) {
+        if (localRef.current) {
+          localRef.current.rotation.y += 0.01;
+        }
+        
+        // If external ref is provided, also apply rotation there
+        if (ref && typeof ref === 'object' && ref.current) {
+          ref.current.rotation.y += 0.01;
         }
       }
     });

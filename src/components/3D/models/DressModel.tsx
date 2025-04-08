@@ -12,14 +12,15 @@ interface DressModelProps {
 }
 
 const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
-  // Update the ref to explicitly accept either Mesh or Group
-  const meshRef = useRef<THREE.Mesh | THREE.Group | null>(null);
+  // Correctly typed ref that can handle both Mesh and Group objects
+  const modelRef = useRef<THREE.Mesh | THREE.Group | null>(null);
   const { isValidModel, model, loadError } = useModelLoader(url || '');
   
-  // Auto-rotate effect with safe null checking
+  // Enhanced auto-rotate effect with more consistent rotation
   useFrame(() => {
-    if (meshRef.current && autoRotate) {
-      meshRef.current.rotation.y += 0.01; // Increased rotation speed for better visibility
+    if (modelRef.current && autoRotate) {
+      // Increased rotation speed for better user experience
+      modelRef.current.rotation.y += 0.015;
     }
   });
   
@@ -34,7 +35,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     
     return (
       <SimplePlaceholderModel 
-        ref={meshRef} 
+        ref={modelRef}
         url={url || ''} 
         autoRotate={Boolean(autoRotate)} 
         color={color}
@@ -48,7 +49,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     console.log("Using placeholder model due to load error or missing model");
     return (
       <SimplePlaceholderModel 
-        ref={meshRef} 
+        ref={modelRef}
         url={url || ''} 
         autoRotate={Boolean(autoRotate)} 
         {...props} 
@@ -66,7 +67,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
       console.error("Failed to clone model");
       return (
         <SimplePlaceholderModel 
-          ref={meshRef} 
+          ref={modelRef}
           url={url || ''} 
           autoRotate={Boolean(autoRotate)} 
           {...props} 
@@ -74,10 +75,13 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
       );
     }
     
+    // Apply initial rotation for better view
+    safeModel.rotation.y = Math.PI / 6;
+    
     // Return the cloned model
     return (
       <primitive 
-        ref={meshRef} 
+        ref={modelRef}
         object={safeModel} 
         scale={1.5} 
         {...props} 
@@ -88,7 +92,7 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     // Fallback to placeholder on any error
     return (
       <SimplePlaceholderModel 
-        ref={meshRef} 
+        ref={modelRef}
         url={url || ''} 
         autoRotate={Boolean(autoRotate)} 
         {...props} 
