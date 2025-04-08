@@ -27,18 +27,25 @@ const DressModel = ({ url, autoRotate, ...props }: DressModelProps) => {
     return <SimplePlaceholderModel ref={meshRef} url={url} autoRotate={autoRotate} {...props} />;
   }
   
-  // Clone the model to avoid manipulation of shared objects
-  const safeModel = model.clone();
-  
-  // If we have a valid model, render it
-  return (
-    <primitive 
-      ref={meshRef} 
-      object={safeModel} 
-      scale={1.5} 
-      {...props} 
-    />
-  );
+  // If we have a valid model, safely clone it before rendering
+  try {
+    // Create a deep clone to avoid manipulation of shared objects
+    const safeModel = model.clone();
+    
+    // Return the cloned model
+    return (
+      <primitive 
+        ref={meshRef} 
+        object={safeModel} 
+        scale={1.5} 
+        {...props} 
+      />
+    );
+  } catch (error) {
+    console.error("Error cloning model:", error);
+    // Fallback to placeholder on any error
+    return <SimplePlaceholderModel ref={meshRef} url={url} autoRotate={autoRotate} {...props} />;
+  }
 };
 
 export default DressModel;

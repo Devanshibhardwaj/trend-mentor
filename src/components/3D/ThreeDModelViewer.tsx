@@ -17,7 +17,7 @@ interface ThreeDModelViewerProps {
 }
 
 const ThreeDModelViewer = ({ 
-  modelUrl = "/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png", 
+  modelUrl = "/placeholder.svg", 
   title = "3D Model Viewer",
   showControls = true,
   className = ""
@@ -53,8 +53,8 @@ const ThreeDModelViewer = ({
   };
   
   // Handle Canvas errors
-  const handleCanvasError = () => {
-    console.error("Canvas rendering failed");
+  const handleCanvasError = (error: any) => {
+    console.error("Canvas rendering failed", error);
     setModelFailed(true);
   };
 
@@ -91,6 +91,13 @@ const ThreeDModelViewer = ({
           dpr={[1, 2]} 
           camera={{ fov: 45 }}
           className="touch-none"
+          onCreated={(state) => {
+            // Ensure renderer exists
+            if (!state.gl) {
+              console.error("WebGL renderer not available");
+              setModelFailed(true);
+            }
+          }}
           onError={handleCanvasError}
         >
           <color attach="background" args={[theme === 'elegant' ? '#f8f9fa' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />

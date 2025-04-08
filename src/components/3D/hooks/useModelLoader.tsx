@@ -7,39 +7,39 @@ export const useModelLoader = (url: string) => {
   const [loadError, setLoadError] = useState(false);
   const [model, setModel] = useState<THREE.Group | null>(null);
   
-  // Determine if URL is a valid 3D model
-  const isValidModel = url.endsWith('.glb') || url.endsWith('.gltf');
+  // Determine if URL is a valid 3D model (only GLB and GLTF are supported)
+  const isValidModel = url?.toLowerCase?.()?.endsWith('.glb') || url?.toLowerCase?.()?.endsWith('.gltf') || false;
   
-  // Use the useGLTF hook only for valid models
-  // This hook must be called at the component level, not conditionally
-  const gltfResult = isValidModel ? useGLTF(url) : null;
+  // We'll use a placeholder image for non-3D model URLs
+  // We disable the GLTF loader for non-3D models to prevent errors
+  const gltfResult = isValidModel ? useGLTF(url, true) : null;
   
   useEffect(() => {
     // Reset state when URL changes
     setLoadError(false);
     setModel(null);
     
-    // Notify user about the placeholder if not a valid model
+    // Skip processing for non-3D models
     if (!isValidModel) {
-      toast.info("Using placeholder 3D model", {
-        description: "This is a visualization only, not the actual item",
-        duration: 3000,
-      });
+      console.log("Not a valid 3D model format:", url);
       return;
     }
     
-    // Process the model from the useGLTF hook result
     try {
+      // Check if gltfResult is valid
       if (!gltfResult) {
-        throw new Error("Failed to load 3D model");
+        console.error("GLTF result is null");
+        setLoadError(true);
+        return;
       }
       
       // Safe way to access the scene property
-      if (gltfResult && typeof gltfResult === 'object' && 'scene' in gltfResult) {
+      if (typeof gltfResult === 'object' && gltfResult !== null && 'scene' in gltfResult) {
         const scene = gltfResult.scene;
         
         if (scene) {
-          setModel(scene);
+          // Create a deep clone to avoid reference issues
+          setModel(scene.clone());
         } else {
           console.error("Model scene is undefined");
           setLoadError(true);

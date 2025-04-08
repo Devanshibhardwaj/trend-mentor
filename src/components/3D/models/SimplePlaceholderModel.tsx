@@ -19,16 +19,20 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh, SimplePlaceholderModelProp
     });
     
     useEffect(() => {
-      toast.info("3D model placeholder is being displayed", {
-        description: "This is a simple 3D object as a placeholder",
+      // Notify once about the placeholder
+      const toastId = "placeholder-model";
+      toast.info("Using placeholder 3D model", {
+        id: toastId,
+        description: "This is a simplified visualization",
         duration: 3000,
       });
       
       return () => {
         // Cleanup
       };
-    }, [url]);
+    }, []);
     
+    // Create a simple colored box as placeholder
     return (
       <mesh
         ref={ref}
