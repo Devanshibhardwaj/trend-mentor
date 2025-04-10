@@ -2,9 +2,13 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Upload, Info } from 'lucide-react';
+import { Upload, Info, RotateCw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useState, useRef, useEffect } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
+import * as THREE from 'three';
 
 interface Outfit {
   id: number;
@@ -20,11 +24,31 @@ interface OutfitSelectorProps {
   onSelectOutfit: (id: number, image: string) => void;
 }
 
+// Simple box model for thumbnail preview
+const SimpleBox = ({ color, isRotating }: { color: string, isRotating: boolean }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useEffect(() => {
+    if (meshRef.current && isRotating) {
+      meshRef.current.rotation.y += 0.03;
+    }
+  });
+  
+  return (
+    <mesh ref={meshRef}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
+};
+
 const OutfitSelector = ({
   outfits,
   selectedOutfit,
   onSelectOutfit
 }: OutfitSelectorProps) => {
+  const [hoveredOutfit, setHoveredOutfit] = useState<number | null>(null);
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
@@ -59,7 +83,12 @@ const OutfitSelector = ({
         animate="visible"
       >
         {outfits.map((outfit) => (
-          <motion.div key={outfit.id} variants={itemVariants}>
+          <motion.div 
+            key={outfit.id} 
+            variants={itemVariants}
+            onMouseEnter={() => setHoveredOutfit(outfit.id)}
+            onMouseLeave={() => setHoveredOutfit(null)}
+          >
             <HoverCard>
               <HoverCardTrigger asChild>
                 <Card 
@@ -68,14 +97,39 @@ const OutfitSelector = ({
                 >
                   <CardContent className="p-3 flex items-center space-x-3">
                     <div className="w-16 h-16 bg-muted rounded overflow-hidden flex-shrink-0 relative">
-                      <img 
-                        src={outfit.image} 
-                        alt={outfit.name} 
-                        className="w-full h-full object-cover"
-                      />
-                      {outfit.is3D && (
-                        <div className="absolute top-0 right-0 bg-primary text-white text-xs px-1 rounded-bl">
-                          3D
+                      {outfit.is3D ? (
+                        <div className="w-full h-full">
+                          <Canvas 
+                            camera={{ position: [0, 0, 2.5] }} 
+                            className="w-full h-full"
+                          >
+                            <ambientLight intensity={0.8} />
+                            <pointLight position={[10, 10, 10]} />
+                            <SimpleBox 
+                              color={`hsl(${Math.abs(outfit.id * 40) % 360}, 70%, 60%)`}
+                              isRotating={hoveredOutfit === outfit.id} 
+                            />
+                            {hoveredOutfit === outfit.id && (
+                              <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={5} />
+                            )}
+                          </Canvas>
+                          <div className="absolute top-0 right-0 bg-primary text-white text-xs px-1 rounded-bl">
+                            3D
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <img 
+                            src={outfit.image} 
+                            alt={outfit.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </>
+                      )}
+                      
+                      {hoveredOutfit === outfit.id && outfit.is3D && (
+                        <div className="absolute top-0 left-0 bg-black/30 text-white text-xs flex items-center justify-center w-full h-full">
+                          <RotateCw className="w-4 h-4 animate-spin" />
                         </div>
                       )}
                     </div>

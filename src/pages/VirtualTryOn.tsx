@@ -21,7 +21,7 @@ const VirtualTryOn = () => {
   const [cameraActive, setCameraActive] = useState(false);
   const [selectedOutfit, setSelectedOutfit] = useState<number | null>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  const [activeModel, setActiveModel] = useState<string>('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
+  const [activeModel, setActiveModel] = useState<string>('https://models.readyplayer.me/64b68c3fd857b9e67b51f2c6.glb');
   
   // Filter states
   const [activeFilter, setActiveFilter] = useState<string>('none');
@@ -37,17 +37,17 @@ const VirtualTryOn = () => {
   const outfits = [
     { 
       id: 1, 
-      name: "Floral Summer Dress",
-      image: "/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png",
-      description: "A beautiful floral pattern summer dress perfect for daytime outings or beach walks.",
-      is3D: false 
+      name: "Blue Party Dress",
+      image: "https://models.readyplayer.me/64ac8accd857b9e67b51d39a.glb",
+      description: "An elegant blue party dress perfect for special events and evening parties.",
+      is3D: true
     },
     { 
       id: 2, 
       name: "Red Evening Gown", 
-      image: "/lovable-uploads/29e68d4d-0754-4c2c-b1af-217373bb4050.png",
+      image: "https://models.readyplayer.me/64ac8b62d857b9e67b51d3c4.glb",
       description: "An elegant red evening gown for formal events and special occasions.",
-      is3D: false
+      is3D: true
     },
     { 
       id: 3, 
@@ -61,6 +61,20 @@ const VirtualTryOn = () => {
       name: "Casual Outfit", 
       image: "https://models.readyplayer.me/64b68bc8d857b9e67b51f29a.glb",
       description: "A comfortable casual outfit perfect for everyday wear.",
+      is3D: true
+    },
+    { 
+      id: 5, 
+      name: "Summer Dress", 
+      image: "https://models.readyplayer.me/64ac8dedd857b9e67b51d43c.glb",
+      description: "A light and airy summer dress perfect for hot days and beach outings.",
+      is3D: true
+    },
+    { 
+      id: 6, 
+      name: "Wedding Dress", 
+      image: "https://models.readyplayer.me/64b86eecd857b9e67b51f9ca.glb",
+      description: "A beautiful white wedding dress for your special day.",
       is3D: true
     },
   ];
@@ -132,7 +146,7 @@ const VirtualTryOn = () => {
         setActiveModel(outfit.image);
       }
     } else {
-      setActiveModel('/lovable-uploads/9c3cf883-dec1-4378-a383-12e04bf4d02e.png');
+      setActiveModel('https://models.readyplayer.me/64b68c3fd857b9e67b51f2c6.glb');
     }
   };
 

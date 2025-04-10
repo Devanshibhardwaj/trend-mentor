@@ -7,26 +7,29 @@ import * as THREE from 'three';
 interface SimplePlaceholderModelProps {
   url: string;
   autoRotate: boolean;
+  hoverRotate?: boolean;
   color?: string;
   [key: string]: any;
 }
 
 // Update the type to accept either Mesh or Group
 const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceholderModelProps>(
-  ({ url, autoRotate, color = "#f3a5c3", ...props }, ref) => {
+  ({ url, autoRotate, hoverRotate = false, color = "#f3a5c3", ...props }, ref) => {
     // Create a local ref if one wasn't passed in
     const localRef = useRef<THREE.Mesh>(null);
     
-    // Fix the ref handling to properly work with forwardRef
+    // Enhanced rotation with hover support
     useFrame(() => {
-      if (autoRotate) {
+      if (autoRotate || hoverRotate) {
+        const rotationSpeed = hoverRotate ? 0.03 : 0.01;
+        
         if (localRef.current) {
-          localRef.current.rotation.y += 0.01;
+          localRef.current.rotation.y += rotationSpeed;
         }
         
         // If external ref is provided, also apply rotation there
         if (ref && typeof ref === 'object' && ref.current) {
-          ref.current.rotation.y += 0.01;
+          ref.current.rotation.y += rotationSpeed;
         }
       }
     });

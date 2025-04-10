@@ -24,6 +24,7 @@ const ThreeDModelViewer = ({
 }: ThreeDModelViewerProps) => {
   const { theme } = useTheme();
   const [autoRotate, setAutoRotate] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [modelFailed, setModelFailed] = useState(false);
   
@@ -61,6 +62,17 @@ const ThreeDModelViewer = ({
     setModelFailed(true);
   };
 
+  // Mouse hover handlers
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    console.log("Model hovered");
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    console.log("Model hover ended");
+  };
+
   // Error fallback component
   const ErrorFallback = () => {
     return (
@@ -86,7 +98,11 @@ const ThreeDModelViewer = ({
   }
   
   return (
-    <div className={`relative overflow-hidden rounded-lg ${className || ''}`}>
+    <div 
+      className={`relative overflow-hidden rounded-lg ${className || ''}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* 3D Canvas with error boundary */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Canvas 
@@ -114,13 +130,17 @@ const ThreeDModelViewer = ({
               azimuth={[-Math.PI / 4, Math.PI / 4]}
             >
               <Stage environment={getEnvironmentPreset()} preset="soft" intensity={0.5}>
-                <DressModel url={modelUrl || ''} autoRotate={autoRotate} />
+                <DressModel 
+                  url={modelUrl || ''} 
+                  autoRotate={autoRotate}
+                  hoverRotate={isHovered && !autoRotate} 
+                />
               </Stage>
             </PresentationControls>
             
             <OrbitControls 
-              autoRotate={autoRotate}
-              autoRotateSpeed={5} // Increased from 3 to 5 for better visibility
+              autoRotate={autoRotate || (isHovered && !autoRotate)}
+              autoRotateSpeed={isHovered ? 8 : 5} // Faster rotation on hover
               enableZoom={true}
               enablePan={true}
               dampingFactor={0.05}
