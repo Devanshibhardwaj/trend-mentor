@@ -1,5 +1,5 @@
 
-import { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { toast } from 'sonner';
 import * as THREE from 'three';
@@ -11,19 +11,22 @@ interface SimplePlaceholderModelProps {
   color?: string;
   wireframe?: boolean;
   detail?: number;
+  pulsate?: boolean;
   [key: string]: any;
 }
 
 // Update the type to accept either Mesh or Group
 const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceholderModelProps>(
-  ({ url, autoRotate, hoverRotate = false, color = "#f3a5c3", wireframe = false, detail = 1, ...props }, ref) => {
+  ({ url, autoRotate, hoverRotate = false, color = "#f3a5c3", wireframe = false, detail = 1, pulsate = false, ...props }, ref) => {
     // Create a local ref if one wasn't passed in
     const localRef = useRef<THREE.Mesh>(null);
+    const [scale, setScale] = useState(1);
+    const [hovered, setHovered] = useState(false);
     
     // Enhanced rotation with hover support
-    useFrame(() => {
-      if (autoRotate || hoverRotate) {
-        const rotationSpeed = hoverRotate ? 0.03 : 0.01;
+    useFrame((state, delta) => {
+      if (autoRotate || (hoverRotate && hovered)) {
+        const rotationSpeed = hovered ? 0.03 : 0.01;
         
         if (localRef.current) {
           localRef.current.rotation.y += rotationSpeed;
@@ -33,6 +36,15 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceh
         if (ref && typeof ref === 'object' && ref.current) {
           ref.current.rotation.y += rotationSpeed;
         }
+      }
+      
+      // Add pulsating effect if enabled
+      if (pulsate && localRef.current) {
+        const pulsateSpeed = 0.5;
+        const pulsateAmount = 0.1;
+        const newScale = 1 + Math.sin(state.clock.elapsedTime * pulsateSpeed) * pulsateAmount;
+        setScale(newScale);
+        localRef.current.scale.setScalar(newScale);
       }
     });
     
@@ -65,7 +77,7 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceh
         return char.charCodeAt(0) + acc;
       }, 0);
       
-      const geometryType = urlHash % 5;
+      const geometryType = urlHash % 7; // Extended to 7 different geometry types
       
       switch(geometryType) {
         case 0:
@@ -76,6 +88,10 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceh
           return <icosahedronGeometry args={[1, detail]} />;
         case 3:
           return <torusKnotGeometry args={[0.7, 0.3, 64, 16]} />;
+        case 4:
+          return <sphereGeometry args={[1, 32, 32]} />;
+        case 5:
+          return <coneGeometry args={[1, 2, 32]} />;
         default:
           return <boxGeometry args={[1, 1, 1]} />;
       }
@@ -85,13 +101,17 @@ const SimplePlaceholderModel = forwardRef<THREE.Mesh | THREE.Group, SimplePlaceh
       <mesh
         ref={localRef}
         {...props}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
       >
         {getGeometry()}
         <meshStandardMaterial 
-          color={derivedColor} 
+          color={hovered ? new THREE.Color(derivedColor).offsetHSL(0, 0.1, 0.2).getStyle() : derivedColor} 
           wireframe={wireframe}
           roughness={0.3}
           metalness={0.6}
+          emissive={hovered ? derivedColor : undefined}
+          emissiveIntensity={hovered ? 0.3 : 0}
         />
       </mesh>
     );
