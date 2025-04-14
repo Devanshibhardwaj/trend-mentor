@@ -77,6 +77,48 @@ const VirtualTryOn = () => {
       description: "A beautiful white wedding dress for your special day.",
       is3D: true
     },
+    { 
+      id: 7, 
+      name: "Leather Jacket Outfit", 
+      image: "https://models.readyplayer.me/64ac8c9ed857b9e67b51d3f0.glb",
+      description: "A stylish leather jacket outfit for a trendy, edgy look.",
+      is3D: true
+    },
+    { 
+      id: 8, 
+      name: "Cocktail Dress", 
+      image: "https://models.readyplayer.me/64b86dc9d857b9e67b51f982.glb",
+      description: "A sophisticated cocktail dress for semi-formal events and parties.",
+      is3D: true
+    },
+    { 
+      id: 9, 
+      name: "Business Casual", 
+      image: "https://models.readyplayer.me/64b68fcbd857b9e67b51f312.glb",
+      description: "A professional business casual outfit suitable for office environments.",
+      is3D: true
+    },
+    { 
+      id: 10, 
+      name: "Winter Coat Ensemble", 
+      image: "https://models.readyplayer.me/64b68e8dd857b9e67b51f2f8.glb",
+      description: "A warm winter coat with accessories for cold weather.",
+      is3D: true
+    },
+    { 
+      id: 11, 
+      name: "Sportswear Collection", 
+      image: "https://models.readyplayer.me/64c2a7d6d857b9e67b52078a.glb",
+      description: "Athletic wear perfect for workouts and sports activities.",
+      is3D: true
+    },
+    { 
+      id: 12, 
+      name: "Formal Tuxedo", 
+      image: "https://models.readyplayer.me/64bfe03dd857b9e67b520122.glb",
+      description: "An elegant tuxedo for black-tie events and formal occasions.",
+      is3D: true
+    }
   ];
 
   // Cleanup camera on component unmount

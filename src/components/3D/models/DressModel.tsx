@@ -9,32 +9,50 @@ interface DressModelProps {
   url: string;
   autoRotate: boolean;
   hoverRotate?: boolean;
+  wireframe?: boolean;
+  detail?: number;
   [key: string]: any;
 }
 
-const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressModelProps) => {
+const DressModel = ({ 
+  url, 
+  autoRotate, 
+  hoverRotate = false, 
+  wireframe = false,
+  detail = 2,
+  ...props 
+}: DressModelProps) => {
   // Correctly typed ref that can handle both Mesh and Group objects
   const modelRef = useRef<THREE.Mesh | THREE.Group | null>(null);
   const { isValidModel, model, loadError } = useModelLoader(url || '');
   const [isHovered, setIsHovered] = useState(false);
+  const [rotationSpeed, setRotationSpeed] = useState(0.015);
   
   // Enhanced auto-rotate effect with more consistent rotation and hover detection
   useFrame(() => {
     if (modelRef.current) {
       if (autoRotate) {
         // Base rotation speed
-        modelRef.current.rotation.y += 0.015;
+        modelRef.current.rotation.y += rotationSpeed;
       } else if (hoverRotate && isHovered) {
         // Faster rotation on hover
-        modelRef.current.rotation.y += 0.03;
+        modelRef.current.rotation.y += 0.035;
       }
     }
   });
 
   // Effect to handle hover state changes
   useEffect(() => {
+    // Handle hover state for 3D canvas
     const handleSetHover = (hover: boolean) => {
       setIsHovered(hover);
+      if (hover) {
+        // Increase rotation speed on hover
+        setRotationSpeed(0.025);
+      } else {
+        // Reset to base rotation speed
+        setRotationSpeed(0.015);
+      }
     };
 
     // Adding event listeners to parent canvas element
@@ -68,12 +86,14 @@ const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressMod
         autoRotate={Boolean(autoRotate)}
         hoverRotate={Boolean(hoverRotate)}
         color={color}
+        wireframe={wireframe}
+        detail={detail}
         {...props} 
       />
     );
   }
   
-  // If there's an error loading the model, use our simple placeholder
+  // If there's an error loading the model, use our enhanced placeholder
   if (loadError || !model) {
     console.log("Using placeholder model due to load error or missing model");
     return (
@@ -82,6 +102,8 @@ const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressMod
         url={url || ''} 
         autoRotate={Boolean(autoRotate)}
         hoverRotate={Boolean(hoverRotate)}
+        wireframe={wireframe}
+        detail={detail}
         {...props} 
       />
     );
@@ -101,6 +123,8 @@ const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressMod
           url={url || ''} 
           autoRotate={Boolean(autoRotate)}
           hoverRotate={Boolean(hoverRotate)}
+          wireframe={wireframe}
+          detail={detail}
           {...props} 
         />
       );
@@ -108,6 +132,19 @@ const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressMod
     
     // Apply initial rotation for better view
     safeModel.rotation.y = Math.PI / 6;
+    
+    // Center the model properly
+    const box = new THREE.Box3().setFromObject(safeModel);
+    const center = box.getCenter(new THREE.Vector3());
+    safeModel.position.sub(center); // Center the model
+    
+    // Normalize the scale based on bounding box
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim > 0) {
+      const scale = 2 / maxDim; // Normalize to a reasonable size
+      safeModel.scale.multiplyScalar(scale);
+    }
     
     // Return the cloned model
     return (
@@ -127,6 +164,8 @@ const DressModel = ({ url, autoRotate, hoverRotate = false, ...props }: DressMod
         url={url || ''}
         autoRotate={Boolean(autoRotate)}
         hoverRotate={Boolean(hoverRotate)}
+        wireframe={wireframe}
+        detail={detail}
         {...props} 
       />
     );
