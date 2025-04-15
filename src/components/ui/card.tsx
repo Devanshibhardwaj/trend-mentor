@@ -1,6 +1,6 @@
 
 import * as React from "react"
-import { motion } from "framer-motion"
+import { motion, HTMLMotionProps } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 const cardVariants = {
@@ -9,9 +9,13 @@ const cardVariants = {
   hover: { y: -5, boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)" }
 };
 
+interface CardProps extends Omit<HTMLMotionProps<"div">, "initial" | "animate" | "whileHover"> {
+  className?: string;
+}
+
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardProps
 >(({ className, ...props }, ref) => (
   <motion.div
     ref={ref}
