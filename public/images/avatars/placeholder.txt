@@ -1,0 +1,2 @@
+
+This directory contains avatar images for different body types and poses.
