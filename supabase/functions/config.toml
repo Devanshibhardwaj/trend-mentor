@@ -1,9 +1,0 @@
-
-project_id = "zecnstlasykrdlvclgya"
-
-[api]
-enabled = true
-
-[[api.path-override]]
-path = "/create-outfit"
-target = "/functions/v1/create-outfit"
