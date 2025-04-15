@@ -20,10 +20,10 @@ const Card = React.forwardRef<
       "backdrop-blur-sm transition-all duration-300",
       className
     )}
-    variants={cardVariants}
     initial="hidden"
     animate="visible"
     whileHover="hover"
+    variants={cardVariants}
     {...props}
   />
 ))

@@ -44,22 +44,14 @@ export interface ButtonProps
   asChild?: boolean
 }
 
-const buttonAnimation = {
-  rest: { scale: 1 },
-  hover: { scale: 1.05, y: -2 },
-  tap: { scale: 0.98 }
-};
-
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <motion.div
-        initial="rest"
-        whileHover="hover"
-        whileTap="tap"
-        animate="rest"
-        variants={buttonAnimation}
+        initial={{ scale: 1 }}
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.98 }}
       >
         <Comp
           className={cn(buttonVariants({ variant, size, className }))}
