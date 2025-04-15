@@ -8,6 +8,7 @@ import InstructionsOverlay from './overlays/InstructionsOverlay';
 import ControlsOverlay from './overlays/ControlsOverlay';
 import FallbackImage from './fallbacks/FallbackImage';
 import { ErrorBoundary } from 'react-error-boundary';
+import { motion } from 'framer-motion';
 
 interface ThreeDModelViewerProps {
   modelUrl?: string;
@@ -98,11 +99,21 @@ const ThreeDModelViewer = ({
   }
   
   return (
-    <div 
-      className={`relative overflow-hidden rounded-lg ${className || ''}`}
+    <motion.div 
+      className={`relative overflow-hidden rounded-lg shadow-md ${className || ''}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      whileHover={{ 
+        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.12)",
+        translateY: -3 
+      }}
     >
+      {/* Elegant frame */}
+      <div className="absolute inset-0 border border-luxury-gold-200/30 rounded-lg pointer-events-none z-10" />
+      
       {/* 3D Canvas with error boundary */}
       <ErrorBoundary FallbackComponent={ErrorFallback}>
         <Canvas 
@@ -119,7 +130,7 @@ const ThreeDModelViewer = ({
           }}
           onError={handleCanvasError}
         >
-          <color attach="background" args={[theme === 'elegant' ? '#f8f9fa' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />
+          <color attach="background" args={[theme === 'elegant' ? '#fcfbf9' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />
           
           <Suspense fallback={null}>
             <PresentationControls
@@ -164,7 +175,7 @@ const ThreeDModelViewer = ({
       {showInstructions && (
         <InstructionsOverlay onClose={() => setShowInstructions(false)} />
       )}
-    </div>
+    </motion.div>
   );
 };
 

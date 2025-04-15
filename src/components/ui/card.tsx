@@ -1,17 +1,29 @@
-import * as React from "react"
 
+import * as React from "react"
+import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hover: { y: -5, boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)" }
+};
 
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
+  <motion.div
     ref={ref}
     className={cn(
       "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "backdrop-blur-sm transition-all duration-300",
       className
     )}
+    variants={cardVariants}
+    initial="hidden"
+    animate="visible"
+    whileHover="hover"
     {...props}
   />
 ))
@@ -36,7 +48,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-2xl font-serif font-semibold leading-none tracking-tight",
       className
     )}
     {...props}
