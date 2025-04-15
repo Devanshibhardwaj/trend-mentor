@@ -173,7 +173,7 @@ const WeatherBasedSuggestions = () => {
         id: '3',
         style: 'Summer',
         occasion: 'Beach',
-        description: 'Swimwear with a light cover-up, sandals, and a sun hat. Don't forget sunscreen and a beach bag for your essentials.',
+        description: "Swimwear with a light cover-up, sandals, and a sun hat. Don't forget sunscreen and a beach bag for your essentials.",
         imageUrl: images[2],
         modelUrl: models[2]
       });
