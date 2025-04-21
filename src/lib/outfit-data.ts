@@ -4,7 +4,7 @@ export const outfitImages = {
   weather: {
     sunny: [
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800',
-      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=800',
+      'https://images.unsplash.com/photo-1496747611176-843222e1f52b?q=80&w=800',
       'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=800'
     ],
     rainy: [
@@ -55,7 +55,21 @@ export const outfitImages = {
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800',
       'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=800',
       'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=800'
+    ],
+    dinner: [
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800',
+      'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800',
+      'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?q=80&w=800'
+    ],
+    party: [
+      'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800',
+      'https://images.unsplash.com/photo-1496843916299-590492c751f4?q=80&w=800',
+      'https://images.unsplash.com/photo-1482575832494-771f74bf6857?q=80&w=800'
+    ],
+    workout: [
+      'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800',
+      'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800',
+      'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=800'
     ]
   }
 };
-
