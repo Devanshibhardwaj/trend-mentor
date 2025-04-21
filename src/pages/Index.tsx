@@ -15,40 +15,52 @@ import { toast } from 'sonner';
 
 const SAMPLE_OUTFITS = [
   {
-    style: "Casual",
-    occasion: "Everyday",
-    description: "Light blue denim jacket over a white t-shirt, paired with black slim-fit jeans and white sneakers. Accessorize with a minimal watch.",
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Luxury Casual",
+    occasion: "Weekend Brunch",
+    description: "Italian-crafted leather jacket in burnished brown, paired with a cream cashmere sweater and tailored wool trousers. Finished with handmade leather loafers and a vintage watch.",
+    image: "https://images.unsplash.com/photo-1483118714900-540cf339fd46?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   },
   {
-    style: "Formal",
-    occasion: "Work",
-    description: "Navy blue tailored suit with a light blue button-up shirt. Brown leather Oxford shoes and a matching belt. Complete with a subtle patterned tie.",
-    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Evening Elegance",
+    occasion: "Gala",
+    description: "Black silk tuxedo with satin peak lapels, crisp white evening shirt with mother-of-pearl buttons. Paired with patent leather Oxford shoes and a silk bow tie.",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   },
   {
-    style: "Traditional",
-    occasion: "Festive",
-    description: "Beautifully embroidered saree with modern styling, accessorized with minimal jewelry and a sleek handbag.",
-    image: "https://images.unsplash.com/photo-1610021684483-b06d360338a6?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Heritage",
+    occasion: "Cultural Event",
+    description: "Hand-embroidered silk sherwani with intricate gold threadwork, matched with ivory churidar and handcrafted leather juttis. Accessorized with a vintage brooch.",
+    image: "https://images.unsplash.com/photo-1598808503746-f34c53b9323e?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   },
   {
-    style: "Streetwear",
-    occasion: "Weekend",
-    description: "Oversized graphic tee layered with a flannel shirt, black cargo pants, and chunky sneakers. Add a beanie and silver chain accessories.",
-    image: "https://images.unsplash.com/photo-1552573102-2b44b44d85b5?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Modern Luxe",
+    occasion: "Fashion Week",
+    description: "Oversized cashmere coat in camel, layered over a black turtleneck and wide-leg pants. Finished with suede Chelsea boots and gold-plated accessories.",
+    image: "https://images.unsplash.com/photo-1516914943479-89db7d9ae7f2?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   },
   {
-    style: "Minimalist",
-    occasion: "Date Night",
-    description: "Black turtleneck sweater with charcoal grey trousers. Black Chelsea boots and a sleek silver watch. No patterns, just clean lines and monochrome colors.",
-    image: "https://images.unsplash.com/photo-1548126032-079a0fb0099d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Business Elite",
+    occasion: "Executive Meeting",
+    description: "Bespoke charcoal pinstripe suit in Italian wool, crisp white shirt with French cuffs, and silk pocket square. Complemented with burgundy Oxford shoes.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   },
   {
-    style: "Bohemian",
-    occasion: "Festival",
-    description: "Flowy floral maxi dress or wide-leg pants with a loose peasant top. Layer with a fringe vest and add leather sandals and layered jewelry.",
-    image: "https://images.unsplash.com/photo-1503146234394-631200675614?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+    style: "Artisanal",
+    occasion: "Gallery Opening",
+    description: "Handwoven silk-blend blazer with abstract patterns, paired with tailored black trousers and artisanal leather accessories. A statement piece for the artistically inclined.",
+    image: "https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+  },
+  {
+    style: "Resort Luxury",
+    occasion: "Summer Soirée",
+    description: "Lightweight linen suit in ivory, paired with a silk-cotton blend shirt and handmade leather sandals. Perfect for sophisticated summer events.",
+    image: "https://images.unsplash.com/photo-1496345875659-11f7dd282d1d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
+  },
+  {
+    style: "Avant-Garde",
+    occasion: "Art Exhibition",
+    description: "Deconstructed blazer in Japanese wool, layered with an asymmetric silk shirt and wide-leg trousers. Finished with architectural leather boots.",
+    image: "https://images.unsplash.com/photo-1520975954732-35dd22299614?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=720"
   }
 ];
 

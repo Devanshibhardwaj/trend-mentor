@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -92,13 +91,11 @@ const OutfitCard = ({
   const [shoppingOptions, setShoppingOptions] = useState(getIndianShoppingOptions("midRange"));
   const isMobile = useIsMobile();
   
-  // Animation and visibility
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), index * 100);
     return () => clearTimeout(timer);
   }, [index]);
 
-  // Update shopping options when price range changes
   useEffect(() => {
     setShoppingOptions(getIndianShoppingOptions(priceRange));
   }, [priceRange]);
@@ -160,9 +157,10 @@ const OutfitCard = ({
   return (
     <Card 
       className={cn(
-        "overflow-hidden transition-all duration-500 h-full hover-3d",
+        "overflow-hidden transition-all duration-700 h-full hover:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.2)]",
+        "bg-white/90 dark:bg-black/80 backdrop-blur-md",
         isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
-        isHovered ? "shadow-xl" : "shadow-md",
+        isHovered ? "transform-gpu scale-[1.02]" : "scale-100",
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -170,45 +168,35 @@ const OutfitCard = ({
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden group">
         {image ? (
-          <div className="image-hover w-full h-full">
+          <div className="w-full h-full">
             <img 
               src={image} 
               alt={`${style} outfit for ${occasion}`}
               className={cn(
-                "w-full h-full object-cover transition-all duration-700",
-                isHovered ? "scale-105" : "scale-100"
+                "w-full h-full object-cover transition-all duration-1000",
+                isHovered ? "scale-110 blur-[2px]" : "scale-100"
               )}
             />
           </div>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-            <div className="text-gray-400 text-sm">Outfit {index + 1}</div>
+          <div className="w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+            <div className="text-gray-400 text-sm font-serif">Outfit {index + 1}</div>
           </div>
         )}
         
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-          <Badge className="bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white text-xs font-medium shadow-md">
+          <Badge className="bg-white/80 dark:bg-black/50 text-primary dark:text-white backdrop-blur-sm text-xs font-serif tracking-wide px-4 py-1 rounded-sm">
             {style}
           </Badge>
-          <Badge className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white text-xs font-medium shadow-md">
+          <Badge className="bg-white/80 dark:bg-black/50 text-primary dark:text-white backdrop-blur-sm text-xs font-serif tracking-wide px-4 py-1 rounded-sm">
             {occasion}
           </Badge>
         </div>
         
-        {/* Featured badge if it's one of the first 2 items */}
-        {index < 2 && (
-          <div className="absolute top-3 right-3">
-            <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-medium shadow-sm flex items-center gap-1 px-3 animate-pulse">
-              <Sparkles className="h-3 w-3" />
-              Featured
-            </Badge>
-          </div>
-        )}
-        
-        {/* Quick view overlay on hover/tap */}
         <div 
           className={cn(
-            "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center p-6 opacity-0 transition-opacity duration-300",
+            "absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent",
+            "flex items-end justify-center p-8 opacity-0 transition-opacity duration-500",
             isMobile ? "active:opacity-100" : "group-hover:opacity-100"
           )}
         >
@@ -292,13 +280,12 @@ const OutfitCard = ({
         </div>
       </div>
       
-      <CardContent className="p-5">
-        <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+      <CardContent className="p-6">
+        <h3 className="font-serif text-lg mb-3 flex items-center gap-2">
           {style} <span className="text-muted-foreground/40">•</span> {occasion}
-          {index < 2 && <ThumbsUp className="h-4 w-4 text-yellow-500 ml-1" />}
         </h3>
         <p className={cn(
-          "text-sm text-muted-foreground transition-all duration-300",
+          "text-sm text-muted-foreground font-light leading-relaxed transition-all duration-300",
           isExpanded ? "line-clamp-none" : "line-clamp-3"
         )}>
           {description}
@@ -306,13 +293,12 @@ const OutfitCard = ({
         {description.length > 120 && (
           <button 
             onClick={handleExpand} 
-            className="text-xs text-indigo-500 dark:text-indigo-400 font-medium mt-2 hover:underline focus:outline-none focus-visible"
+            className="text-xs text-primary/70 font-serif mt-3 hover:text-primary transition-colors"
           >
             {isExpanded ? "Show less" : "Read more"}
           </button>
         )}
         
-        {/* Rating component */}
         <div className="mt-4">
           <p className="text-xs text-muted-foreground mb-2">
             {feedbackSubmitted ? "Thank you for your feedback!" : "Rate this outfit:"}
