@@ -71,5 +71,38 @@ export const outfitImages = {
       'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800',
       'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=800'
     ]
+  },
+  women: {
+    dresses: [
+      'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=800',
+      'https://images.unsplash.com/photo-1572804013427-4d7ca7268217?q=80&w=800',
+      'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?q=80&w=800'
+    ],
+    skirts: [
+      'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?q=80&w=800',
+      'https://images.unsplash.com/photo-1577900232427-20e8f915ca37?q=80&w=800',
+      'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=800'
+    ],
+    tops: [
+      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=800',
+      'https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=800',
+      'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=800'
+    ],
+    pants: [
+      'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=800',
+      'https://images.unsplash.com/photo-1555689502-c4b22d76c56f?q=80&w=800',
+      'https://images.unsplash.com/photo-1548624149-f9b1930f5a33?q=80&w=800'
+    ],
+    accessories: [
+      'https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?q=80&w=800',
+      'https://images.unsplash.com/photo-1589128777073-263566ae5e4d?q=80&w=800',
+      'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=800'
+    ],
+    shoes: [
+      'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800',
+      'https://images.unsplash.com/photo-1560343090-f0409e92791a?q=80&w=800',
+      'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=800'
+    ]
   }
 };
+
