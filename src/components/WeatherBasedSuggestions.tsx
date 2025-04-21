@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { MapPin, Cloud, Sun, Droplets, Wind, Loader2, Snowflake, CloudLightning 
 import OutfitCard from '@/components/OutfitCard';
 import { toast } from 'sonner';
 import ThreeDModelViewer from '@/components/3D/ThreeDModelViewer';
+import { outfitImages } from '@/lib/outfit-data';
 
 interface WeatherData {
   location: string;
@@ -148,7 +148,7 @@ const WeatherBasedSuggestions = () => {
   
   const generateOutfitRecommendations = (condition: string, temperature: number) => {
     const recommendations: WeatherOutfit[] = [];
-    const images = weatherOutfitImages[condition as keyof typeof weatherOutfitImages] || [];
+    const images = outfitImages.weather[condition as keyof typeof outfitImages.weather] || [];
     const models = weatherModelUrls[condition as keyof typeof weatherModelUrls] || [];
     
     // Always add some basic recommendations based on weather condition
@@ -491,6 +491,7 @@ const WeatherBasedSuggestions = () => {
                   style={outfit.style}
                   occasion={outfit.occasion}
                   description={outfit.description}
+                  image={outfit.imageUrl}
                 />
                 
                 {outfit.modelUrl && (

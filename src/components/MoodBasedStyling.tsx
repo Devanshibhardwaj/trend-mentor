@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { Loader2, Heart, Sparkles, Zap, Sun, Moon, Smile, Coffee, Music, Book, S
 import OutfitCard from '@/components/OutfitCard';
 import { toast } from 'sonner';
 import ThreeDModelViewer from '@/components/3D/ThreeDModelViewer';
+import { outfitImages } from '@/lib/outfit-data';
 
 interface MoodOutfit {
   id: string;
@@ -170,8 +170,8 @@ const MoodBasedStyling = () => {
   
   const generateOutfitRecommendations = (selectedMood: string, energy: number) => {
     const recommendations: MoodOutfit[] = [];
+    const images = outfitImages.mood[selectedMood as keyof typeof outfitImages.mood] || [];
     const models = moodModelUrls[selectedMood as keyof typeof moodModelUrls] || [];
-    const images = moodImageUrls[selectedMood as keyof typeof moodImageUrls] || [];
     const colors = moodColorPalettes[selectedMood as keyof typeof moodColorPalettes] || [];
     
     if (selectedMood === 'happy' || selectedMood === 'energetic') {
