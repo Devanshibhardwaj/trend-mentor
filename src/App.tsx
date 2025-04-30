@@ -14,6 +14,7 @@ import AdvancedFeatures from "./pages/AdvancedFeatures";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import WeatherStyling from "./pages/WeatherStyling";
+import Gallery from "./pages/Gallery";
 import AdminSync from "./pages/AdminSync";
 import NotFound from "./pages/NotFound";
 import "./App.css";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/weather-styling" element={<WeatherStyling />} />
+              <Route path="/gallery" element={<Gallery />} />
               <Route path="/admin-sync" element={<AdminSync />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
