@@ -34,10 +34,11 @@ const ThreeDModelViewer = ({
     if (!theme) return 'studio';
     
     switch (theme) {
-      case 'elegant': return 'city';
-      case 'vibrant': return 'sunset';
-      case 'playful': return 'park';
-      case 'cosmic': return 'night';
+      case 'nautical': return 'city';
+      case 'sunset': return 'sunset';
+      case 'forest': return 'park';
+      case 'galaxy': return 'night';
+      case 'system': return 'studio';
       default: return 'studio';
     }
   };
@@ -130,7 +131,7 @@ const ThreeDModelViewer = ({
           }}
           onError={handleCanvasError}
         >
-          <color attach="background" args={[theme === 'elegant' ? '#fcfbf9' : theme === 'cosmic' ? '#13111c' : '#ffffff']} />
+          <color attach="background" args={[theme === 'nautical' ? '#fcfbf9' : theme === 'galaxy' ? '#13111c' : '#ffffff']} />
           
           <Suspense fallback={null}>
             <PresentationControls
