@@ -1,5 +1,5 @@
 
-import { Sun, Moon, Sparkles, Star, CloudSun } from "lucide-react";
+import { Anchor, Sunset, Leaf, Moon, CloudSun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -65,7 +65,7 @@ export default function ThemeToggle() {
           onMouseLeave={() => setIsHovered(false)}
         >
           <motion.div 
-            className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full z-0"
+            className="absolute inset-0 bg-blue-500/10 dark:bg-blue-500/20 rounded-full z-0"
             variants={bgVariants}
             initial="initial"
             animate={isHovered ? "hover" : "animate"}
@@ -83,26 +83,26 @@ export default function ThemeToggle() {
               whileHover="hover"
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              {theme === "elegant" && (
-                <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
+              {theme === "nautical" && (
+                <Anchor className="h-[1.2rem] w-[1.2rem] text-blue-500" />
               )}
-              {theme === "vibrant" && (
-                <Sparkles className="h-[1.2rem] w-[1.2rem] text-pink-400" />
+              {theme === "sunset" && (
+                <Sunset className="h-[1.2rem] w-[1.2rem] text-orange-400" />
               )}
-              {theme === "playful" && (
-                <Star className="h-[1.2rem] w-[1.2rem] text-yellow-400" />
+              {theme === "forest" && (
+                <Leaf className="h-[1.2rem] w-[1.2rem] text-green-500" />
               )}
-              {theme === "cosmic" && (
-                <Sun className="h-[1.2rem] w-[1.2rem] text-purple-400" />
+              {theme === "galaxy" && (
+                <Moon className="h-[1.2rem] w-[1.2rem] text-purple-500" />
               )}
               {theme === "system" && (
-                <CloudSun className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
+                <CloudSun className="h-[1.2rem] w-[1.2rem] text-gray-400" />
               )}
             </motion.div>
           </AnimatePresence>
           
           <motion.span 
-            className="absolute -bottom-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full"
+            className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0 }}
             transition={{ duration: 0.2 }}
@@ -122,41 +122,41 @@ export default function ThemeToggle() {
         >
           <motion.li variants={dropdownItemVariants} custom={0}>
             <DropdownMenuItem 
-              onClick={() => setTheme("elegant")} 
-              className="flex gap-2 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors rounded-md"
+              onClick={() => setTheme("nautical")} 
+              className="flex gap-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors rounded-md"
             >
-              <Moon className="h-[1rem] w-[1rem] text-indigo-400" />
-              <span>Elegant Mode</span>
+              <Anchor className="h-[1rem] w-[1rem] text-blue-500" />
+              <span>Nautical Mode</span>
             </DropdownMenuItem>
           </motion.li>
           
           <motion.li variants={dropdownItemVariants} custom={1}>
             <DropdownMenuItem 
-              onClick={() => setTheme("vibrant")} 
-              className="flex gap-2 cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors rounded-md"
+              onClick={() => setTheme("sunset")} 
+              className="flex gap-2 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors rounded-md"
             >
-              <Sparkles className="h-[1rem] w-[1rem] text-pink-400" />
-              <span>Vibrant Mode</span>
+              <Sunset className="h-[1rem] w-[1rem] text-orange-400" />
+              <span>Sunset Mode</span>
             </DropdownMenuItem>
           </motion.li>
           
           <motion.li variants={dropdownItemVariants} custom={2}>
             <DropdownMenuItem 
-              onClick={() => setTheme("playful")} 
-              className="flex gap-2 cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors rounded-md"
+              onClick={() => setTheme("forest")} 
+              className="flex gap-2 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors rounded-md"
             >
-              <Star className="h-[1rem] w-[1rem] text-yellow-400" />
-              <span>Playful Mode</span>
+              <Leaf className="h-[1rem] w-[1rem] text-green-500" />
+              <span>Forest Mode</span>
             </DropdownMenuItem>
           </motion.li>
           
           <motion.li variants={dropdownItemVariants} custom={3}>
             <DropdownMenuItem 
-              onClick={() => setTheme("cosmic")} 
+              onClick={() => setTheme("galaxy")} 
               className="flex gap-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors rounded-md"
             >
-              <Sun className="h-[1rem] w-[1rem] text-purple-400" />
-              <span>Cosmic Mode</span>
+              <Moon className="h-[1rem] w-[1rem] text-purple-500" />
+              <span>Galaxy Mode</span>
             </DropdownMenuItem>
           </motion.li>
           

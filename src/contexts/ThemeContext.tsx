@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Theme = "elegant" | "vibrant" | "playful" | "cosmic" | "system";
+type Theme = "nautical" | "sunset" | "forest" | "galaxy" | "system";
 
 type ThemeContextType = {
   theme: Theme;
@@ -31,18 +31,18 @@ const ThemeTransition = ({ children }: { children: React.ReactNode }) => {
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("elegant");
+  const [theme, setTheme] = useState<Theme>("nautical");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     // Check if user has previously set a theme preference
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme && ["elegant", "vibrant", "playful", "cosmic", "system"].includes(savedTheme)) {
+    if (savedTheme && ["nautical", "sunset", "forest", "galaxy", "system"].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
-      // Default to elegant theme for new users
-      setTheme("elegant");
+      // Default to nautical theme for new users
+      setTheme("nautical");
     }
   }, []);
 
@@ -63,7 +63,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.add(`from-${previousTheme}`);
     
     // Remove all possible theme classes
-    root.classList.remove("elegant", "vibrant", "playful", "cosmic", "system", "from-elegant", "from-vibrant", "from-playful", "from-cosmic", "from-system");
+    root.classList.remove("nautical", "sunset", "forest", "galaxy", "system", "from-nautical", "from-sunset", "from-forest", "from-galaxy", "from-system");
     
     // Add the new theme class
     root.classList.add(theme);
@@ -85,7 +85,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     setTheme(prevTheme => {
       // Cycle through themes
-      const themes: Theme[] = ["elegant", "vibrant", "playful", "cosmic", "system"];
+      const themes: Theme[] = ["nautical", "sunset", "forest", "galaxy", "system"];
       const currentIndex = themes.indexOf(prevTheme);
       const nextIndex = (currentIndex + 1) % themes.length;
       return themes[nextIndex];
