@@ -163,17 +163,19 @@ const CosmicBackground = ({
         }}
       />
 
-      {/* Create a style tag for star animations */}
-      <style jsx global>{`
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-        
-        .cosmic-star {
-          transition: transform 0.5s ease-out;
-        }
-      `}</style>
+      {/* Add the CSS for star animations using standard style tag */}
+      <style>
+        {`
+          @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+          }
+          
+          .cosmic-star {
+            transition: transform 0.5s ease-out;
+          }
+        `}
+      </style>
     </motion.div>
   );
 };
