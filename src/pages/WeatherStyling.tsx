@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -254,7 +255,7 @@ const WeatherStyling = () => {
       });
       recommendations.push({
         id: '15',
-6 style: 'Winter',
+        style: 'Winter',
         occasion: 'Snow Activities',
         description: 'Technical snow gear including waterproof and insulated jacket and pants, moisture-wicking base layers, insulated boots, and snow accessories.',
         imageUrl: images[2],
