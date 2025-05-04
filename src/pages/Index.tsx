@@ -5,13 +5,14 @@ import Hero from '@/components/Hero';
 import RecommendationForm from '@/components/RecommendationForm';
 import OutfitCard from '@/components/OutfitCard';
 import Footer from '@/components/Footer';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles, Star, Zap } from 'lucide-react';
+import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles } from 'lucide-react';
 import IntroAnimation from '@/components/IntroAnimation';
 import OnboardingSequence from '@/components/OnboardingSequence';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
+import LuxuryShowcase from '@/components/LuxuryShowcase';
+import CelestialNavigation from '@/components/CelestialNavigation';
 
 const SAMPLE_OUTFITS = [
   {
@@ -166,6 +167,12 @@ const Index = () => {
         
         <main className="flex-grow">
           <Hero />
+          
+          {/* Add the new Celestial Navigation component */}
+          <CelestialNavigation />
+          
+          {/* Add the new Luxury Showcase component */}
+          <LuxuryShowcase />
           
           <section id="features" className="py-20 px-6 md:px-10 bg-gradient-to-b from-indigo-100/30 to-background">
             <div className="max-w-7xl mx-auto">

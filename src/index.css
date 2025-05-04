@@ -36,6 +36,19 @@
   100% { border-radius: 60% 40% 30% 70%/60% 30% 70% 40%; }
 }
 
+/* Additional animations */
+@keyframes ping-slow {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes galaxy-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Additional theme transitions */
 .theme-transitioning {
   transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
@@ -108,6 +121,48 @@ body:has(.cosmic-orbit-item) {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
   }
+}
+
+/* Interactive museum experience */
+.gallery-interactive-item {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+
+.gallery-interactive-item:hover {
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.gallery-interactive-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), 
+                              rgba(255, 255, 255, 0.2) 0%, 
+                              transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gallery-interactive-item:hover::before {
+  opacity: 1;
+}
+
+/* Celestial navigation animations */
+.animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.galaxy-backdrop {
+  background: radial-gradient(ellipse at center, rgba(30, 30, 60, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  animation: galaxy-spin 240s linear infinite;
 }
 
 /* * {
