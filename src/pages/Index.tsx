@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -6,7 +7,7 @@ import RecommendationForm from '@/components/RecommendationForm';
 import OutfitCard from '@/components/OutfitCard';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles } from 'lucide-react';
+import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles, Star, Zap } from 'lucide-react';
 import IntroAnimation from '@/components/IntroAnimation';
 import OnboardingSequence from '@/components/OnboardingSequence';
 import { AnimatePresence, motion } from 'framer-motion';
