@@ -16,12 +16,14 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const Hero = () => {
   const [loaded, setLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [feedback, setFeedback] = useState("");
   const heroRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
   
   useEffect(() => {
     setLoaded(true);
@@ -48,14 +50,6 @@ const Hero = () => {
     };
   }, []);
 
-  // Scroll to the features section when the user clicks the "Learn More" button
-  const scrollToFeatures = () => {
-    const featuresSection = document.getElementById('features');
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   // Calculate movement for parallax effect
   const calculateTransform = (depth: number) => {
     const moveX = (mousePosition.x - 0.5) * depth;
@@ -65,7 +59,6 @@ const Hero = () => {
 
   // Handle feedback submission
   const handleFeedbackSubmit = () => {
-    // Here you would typically send the feedback to your backend
     console.log("Feedback submitted:", feedback);
     toast({
       title: "Feedback Received",
@@ -74,26 +67,40 @@ const Hero = () => {
     setFeedback("");
   };
 
+  // Apply different background styles based on theme
+  const isLightTheme = theme === "sunset" || theme === "forest" || theme === "system";
+
   return (
     <section 
       ref={heroRef} 
       className="relative overflow-hidden py-20 lg:py-28"
       style={{
-        background: "linear-gradient(135deg, #121212 0%, #000000 100%)"
+        background: isLightTheme ? "linear-gradient(135deg, #fff6e5 0%, #fff9f0 100%)" : "linear-gradient(135deg, #121212 0%, #000000 100%)"
       }}
     >
       {/* Ambient background effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000')] bg-cover bg-center opacity-5"></div>
-        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-gray-700/30 blur-3xl"></div>
-        <div className="absolute top-40 -left-40 h-96 w-96 rounded-full bg-gray-600/30 blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-gray-500/20 blur-3xl"></div>
+        {isLightTheme ? (
+          <>
+            <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000')] bg-cover bg-center opacity-5"></div>
+            <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-orange-200/30 blur-3xl"></div>
+            <div className="absolute top-40 -left-40 h-96 w-96 rounded-full bg-orange-100/30 blur-3xl"></div>
+            <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-orange-50/20 blur-3xl"></div>
+          </>
+        ) : (
+          <>
+            <div className="absolute top-0 right-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2000')] bg-cover bg-center opacity-5"></div>
+            <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-gray-700/30 blur-3xl"></div>
+            <div className="absolute top-40 -left-40 h-96 w-96 rounded-full bg-gray-600/30 blur-3xl"></div>
+            <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-gray-500/20 blur-3xl"></div>
+          </>
+        )}
         
-        {/* Animated light particles */}
+        {/* Animated light particles - adjust for light theme */}
         {Array.from({ length: 20 }).map((_, i) => (
           <div 
             key={i}
-            className="absolute rounded-full bg-white/40 animate-ping"
+            className={`absolute rounded-full ${isLightTheme ? 'bg-orange-400/30' : 'bg-white/40'} animate-ping`}
             style={{
               width: `${Math.random() * 12 + 4}px`,
               height: `${Math.random() * 12 + 4}px`,
@@ -106,9 +113,9 @@ const Hero = () => {
           ></div>
         ))}
         
-        {/* Additional decorative elements */}
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br from-gray-700/10 to-transparent rounded-full blur-2xl"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-gradient-to-tl from-gray-600/10 to-transparent rounded-full blur-2xl"></div>
+        {/* Additional decorative elements - adjusted for light theme */}
+        <div className={`absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br ${isLightTheme ? 'from-orange-200/10' : 'from-gray-700/10'} to-transparent rounded-full blur-2xl`}></div>
+        <div className={`absolute bottom-1/3 right-1/3 w-48 h-48 bg-gradient-to-tl ${isLightTheme ? 'from-orange-100/10' : 'from-gray-600/10'} to-transparent rounded-full blur-2xl`}></div>
       </div>
       
       <div className="container relative z-10">
@@ -118,25 +125,25 @@ const Hero = () => {
               "space-y-6 transition-all duration-700 transform",
               loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             )}>
-              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm mx-auto md:mx-0">
-                <div className="bg-gray-800/50 p-1.5 rounded-full relative overflow-hidden group">
-                  <Sparkles className="h-4 w-4 text-gray-300" />
+              <div className={`inline-flex items-center gap-2 ${isLightTheme ? 'bg-orange-500/10' : 'bg-white/10'} px-4 py-2 rounded-full backdrop-blur-sm mx-auto md:mx-0`}>
+                <div className={`${isLightTheme ? 'bg-orange-100/50' : 'bg-gray-800/50'} p-1.5 rounded-full relative overflow-hidden group`}>
+                  <Sparkles className={`h-4 w-4 ${isLightTheme ? 'text-orange-500' : 'text-gray-300'}`} />
                 </div>
-                <span className="text-sm font-medium text-white/80">
+                <span className={`text-sm font-medium ${isLightTheme ? 'text-orange-800' : 'text-white/80'}`}>
                   AI-Powered Style Assistant
                 </span>
               </div>
               
-              <h1 className="font-bold text-4xl md:text-5xl lg:text-6xl leading-tight text-white">
+              <h1 className={`font-bold text-4xl md:text-5xl lg:text-6xl leading-tight ${isLightTheme ? 'text-gray-800' : 'text-white'}`}>
                 Discover Your{" "}
                 <span className="relative">
-                  <span className="bg-gradient-to-r from-gray-300 via-white to-gray-300 bg-clip-text text-transparent">
+                  <span className={`bg-gradient-to-r ${isLightTheme ? 'from-orange-600 via-orange-500 to-orange-600' : 'from-gray-300 via-white to-gray-300'} bg-clip-text text-transparent`}>
                     Perfect Style
                   </span>
                 </span>{" "}
                 with AI
               </h1>
-              <p className="text-white/70 text-base md:text-lg max-w-md mx-auto md:mx-0">
+              <p className={`${isLightTheme ? 'text-gray-700' : 'text-white/70'} text-base md:text-lg max-w-md mx-auto md:mx-0`}>
                 StyleSage AI analyzes your preferences and current trends to create
                 personalized outfit recommendations that boost your confidence.
               </p>
@@ -147,7 +154,7 @@ const Hero = () => {
               loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             )}>
               <Link to="/weather-styling">
-                <Button className="bg-gradient-to-r from-gray-800 to-black hover:from-gray-900 hover:to-gray-800 rounded-lg px-6 py-6 text-base shadow-lg shadow-gray-900/20 hover:shadow-gray-900/40 hover:-translate-y-1 group transition-all duration-300">
+                <Button className={`${isLightTheme ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700' : 'bg-gradient-to-r from-gray-800 to-black hover:from-gray-900 hover:to-gray-800'} rounded-lg px-6 py-6 text-base shadow-lg shadow-orange-900/10 hover:shadow-orange-900/20 hover:-translate-y-1 group transition-all duration-300 text-white`}>
                   <Cloud className="h-4 w-4 group-hover:animate-bounce" />
                   <span className="relative overflow-hidden">
                     Today's Outfit Recommendation
@@ -155,8 +162,8 @@ const Hero = () => {
                 </Button>
               </Link>
               <Link to="/auth?tab=register">
-                <Button variant="outline" className="rounded-lg px-6 py-6 text-base border-white/20 text-white hover:bg-white/10 transition-all group">
-                  <Zap className="h-4 w-4 text-yellow-400" />
+                <Button variant="outline" className={`rounded-lg px-6 py-6 text-base border-orange-300/20 ${isLightTheme ? 'text-orange-700 hover:bg-orange-100/20' : 'text-white hover:bg-white/10'} transition-all group`}>
+                  <Zap className={`h-4 w-4 ${isLightTheme ? 'text-orange-500' : 'text-yellow-400'}`} />
                   Create Your Style Profile
                 </Button>
               </Link>
@@ -170,8 +177,13 @@ const Hero = () => {
             >
               <Button 
                 variant="ghost" 
-                className="flex items-center gap-2 text-white/70 mt-4 hover:text-white hover:bg-white/10" 
-                onClick={scrollToFeatures}
+                className={`flex items-center gap-2 ${isLightTheme ? 'text-gray-600 hover:text-gray-800 hover:bg-gray-100/50' : 'text-white/70 hover:text-white hover:bg-white/10'} mt-4`}
+                onClick={() => {
+                  const featuresSection = document.getElementById('features');
+                  if (featuresSection) {
+                    featuresSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
               >
                 Learn how it works
                 <ChevronDown className="h-4 w-4 animate-bounce" />

@@ -31,7 +31,7 @@ const ThemeTransition = ({ children }: { children: React.ReactNode }) => {
 };
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("nautical");
+  const [theme, setTheme] = useState<Theme>("sunset");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<Theme | null>(null);
 
@@ -41,8 +41,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (savedTheme && ["nautical", "sunset", "forest", "galaxy", "system"].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
-      // Default to nautical theme for new users
-      setTheme("nautical");
+      // Default to sunset theme (light theme) for new users
+      setTheme("sunset");
     }
   }, []);
 
