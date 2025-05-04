@@ -1,7 +1,6 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Sparkles, Zap, Cloud, ChevronDown, Star, Wand2, Calendar, MessageCircle } from "lucide-react";
+import { Sparkles, Zap, Cloud, ChevronDown, MessageCircle, Shirt } from "lucide-react";
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -96,7 +95,6 @@ const Hero = () => {
           </>
         )}
         
-        {/* Animated light particles - adjust for light theme */}
         {Array.from({ length: 20 }).map((_, i) => (
           <div 
             key={i}
@@ -113,7 +111,6 @@ const Hero = () => {
           ></div>
         ))}
         
-        {/* Additional decorative elements - adjusted for light theme */}
         <div className={`absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-br ${isLightTheme ? 'from-orange-200/10' : 'from-gray-700/10'} to-transparent rounded-full blur-2xl`}></div>
         <div className={`absolute bottom-1/3 right-1/3 w-48 h-48 bg-gradient-to-tl ${isLightTheme ? 'from-orange-100/10' : 'from-gray-600/10'} to-transparent rounded-full blur-2xl`}></div>
       </div>
@@ -125,12 +122,13 @@ const Hero = () => {
               "space-y-6 transition-all duration-700 transform",
               loaded ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
             )}>
+              {/* New Tagline Badge */}
               <div className={`inline-flex items-center gap-2 ${isLightTheme ? 'bg-orange-500/10' : 'bg-white/10'} px-4 py-2 rounded-full backdrop-blur-sm mx-auto md:mx-0`}>
                 <div className={`${isLightTheme ? 'bg-orange-100/50' : 'bg-gray-800/50'} p-1.5 rounded-full relative overflow-hidden group`}>
-                  <Sparkles className={`h-4 w-4 ${isLightTheme ? 'text-orange-500' : 'text-gray-300'}`} />
+                  <Shirt className={`h-4 w-4 ${isLightTheme ? 'text-orange-500' : 'text-gray-300'}`} />
                 </div>
                 <span className={`text-sm font-medium ${isLightTheme ? 'text-orange-800' : 'text-white/80'}`}>
-                  AI-Powered Style Assistant
+                  Fashion Meets Technology
                 </span>
               </div>
               
@@ -143,6 +141,12 @@ const Hero = () => {
                 </span>{" "}
                 with AI
               </h1>
+
+              {/* New concise tagline explaining site purpose */}
+              <p className={`${isLightTheme ? 'text-gray-700 text-xl font-semibold' : 'text-white/90 text-xl font-semibold'} max-w-md mx-auto md:mx-0`}>
+                Your Personal AI Stylist for Every Occasion
+              </p>
+
               <p className={`${isLightTheme ? 'text-gray-700' : 'text-white/70'} text-base md:text-lg max-w-md mx-auto md:mx-0`}>
                 StyleSage AI analyzes your preferences and current trends to create
                 personalized outfit recommendations that boost your confidence.
@@ -199,6 +203,11 @@ const Hero = () => {
           >
             {/* Main feature image */}
             <div className="relative mx-auto md:mx-0 max-w-md">
+              {/* Visual indicator of site purpose - added visual badge */}
+              <div className="absolute -top-4 -left-4 z-20 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg transform -rotate-6">
+                <span className="font-bold text-sm">Smart Style Recommendations</span>
+              </div>
+              
               <div className="absolute inset-0 bg-gradient-to-br from-gray-700/30 via-gray-600/20 to-gray-500/30 rounded-2xl blur-2xl -z-10 transform rotate-6 scale-105"></div>
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
                 <img
@@ -231,7 +240,7 @@ const Hero = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-gray-700/20 rounded-full">
-                  <Calendar className="h-4 w-4 text-gray-300" />
+                  <Sparkles className="h-4 w-4 text-gray-300" />
                 </div>
                 <p className="text-xs font-medium text-white">Event styling</p>
               </div>
@@ -243,7 +252,7 @@ const Hero = () => {
             >
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-gray-600/20 rounded-full">
-                  <Wand2 className="h-4 w-4 text-gray-300" />
+                  <Zap className="h-4 w-4 text-gray-300" />
                 </div>
                 <p className="text-xs font-medium text-white">Smart style tips</p>
               </div>
