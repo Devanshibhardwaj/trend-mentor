@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -50,6 +51,7 @@
   }
 }
 
+/* Existing animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -95,9 +97,96 @@
   to { transform: rotate(360deg); }
 }
 
-/* Additional theme transitions */
+/* New premium animations */
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 150, 100, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 150, 100, 0.6); }
+}
+
+@keyframes border-shine {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes soft-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+/* Theme transitions */
 .theme-transitioning {
   transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
+}
+
+/* Premium styling classes */
+.premium-bg {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.dark .premium-bg {
+  background: linear-gradient(135deg, #2a2d3e 0%, #16171d 100%);
+}
+
+.premium-card {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  transition: all 0.5s ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-border {
+  position: relative;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: -1px;
+  border-radius: inherit;
+  background: linear-gradient(to right, #ff7e5f, #feb47b, #ffcb80, #ff7e5f);
+  background-size: 200% 200%;
+  animation: border-shine 3s linear infinite;
+  z-index: -1;
+}
+
+.dark .gradient-border::before {
+  background: linear-gradient(to right, #4776E6, #8E54E9, #4776E6);
+  background-size: 200% 200%;
+  animation: border-shine 3s linear infinite;
+}
+
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+  background-size: 200% 200%;
+  animation: gradient-flow 3s ease infinite;
+}
+
+.dark .gradient-text {
+  background-image: linear-gradient(to right, #4776E6, #8E54E9);
+}
+
+.floating-element {
+  animation: soft-bounce 6s ease-in-out infinite;
 }
 
 /* Enhance cosmic styling on the weather page */
@@ -240,6 +329,98 @@ body:has(.cosmic-orbit-item) {
 .animate-confetti-fall {
   animation: confetti-fall 3s ease-out forwards;
 }
+
+/* New glass morphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark .glass-panel {
+  background: rgba(20, 20, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel:hover {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+/* Interactive layer effects */
+.layer-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.layer-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.1) 50%, 
+    rgba(255,255,255,0) 100%);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  animation: shimmer 3s infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Premium button effects */
+.button-premium {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-premium span {
+  position: relative;
+  z-index: 1;
+}
+
+.button-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.button-premium:hover::before {
+  transform: translateX(100%);
+}
+
+/* Animations for card paragraphs */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease forwards;
+}
+
+.animate-delay-100 { animation-delay: 0.1s; }
+.animate-delay-200 { animation-delay: 0.2s; }
+.animate-delay-300 { animation-delay: 0.3s; }
+.animate-delay-400 { animation-delay: 0.4s; }
 
 /* * {
   @apply border-border;
