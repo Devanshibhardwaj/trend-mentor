@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Sparkles, Shirt, ShoppingBag, Wand2 } from 'lucide-react';
+import { Sparkles, Shirt, ShoppingBag, Wand2, FastForward } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface IntroAnimationProps {
   onComplete: () => void;
@@ -9,9 +10,15 @@ interface IntroAnimationProps {
 
 const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
   const [step, setStep] = useState(0);
+  const [showSkip, setShowSkip] = useState(false);
   
   useEffect(() => {
     const sequence = [1000, 2000, 3000, 4000];
+    
+    // Show skip button after a short delay
+    const skipTimer = setTimeout(() => {
+      setShowSkip(true);
+    }, 500);
     
     const timers = sequence.map((delay, index) => {
       return setTimeout(() => {
@@ -26,6 +33,7 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
+      clearTimeout(skipTimer);
     };
   }, [onComplete]);
   
@@ -98,6 +106,24 @@ const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
       variants={containerVariants}
       exit="exit"
     >
+      {showSkip && (
+        <motion.div 
+          className="absolute top-4 right-4 z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/70 hover:text-white hover:bg-white/10 gap-1"
+            onClick={onComplete}
+          >
+            Skip <FastForward className="h-3 w-3" />
+          </Button>
+        </motion.div>
+      )}
+      
       <motion.div className="text-center px-6">
         <AnimatePresence mode="wait">
           {step === 0 && (

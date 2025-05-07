@@ -10,7 +10,8 @@ import {
   ShoppingBag, 
   Sparkles, 
   UserCircle2, 
-  Zap 
+  Zap,
+  FastForward
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -239,16 +240,16 @@ const OnboardingSequence = ({ onComplete }: OnboardingSequenceProps) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
+            transition={{ delay: 0.5 }}
             className="absolute top-4 right-4"
           >
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={handleComplete}
-              className="text-white hover:bg-indigo-500/20"
+              className="text-white hover:bg-indigo-500/20 gap-1"
             >
-              Skip Tour
+              Skip <FastForward className="h-3 w-3" />
             </Button>
           </motion.div>
         )}
