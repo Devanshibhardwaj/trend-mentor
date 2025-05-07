@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -117,6 +116,29 @@
 @keyframes soft-bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-15px); }
+}
+
+/* New fashion intro animations */
+@keyframes aura-pulse {
+  0%, 100% { filter: blur(8px); opacity: 0.7; }
+  50% { filter: blur(12px); opacity: 0.9; }
+}
+
+@keyframes color-shift {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(30deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+@keyframes text-glow {
+  0%, 100% { text-shadow: 0 0 8px rgba(255,255,255,0.6); }
+  50% { text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(100,200,255,0.4); }
+}
+
+@keyframes silhouette-morph {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
 }
 
 /* Theme transitions */

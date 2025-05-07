@@ -14,6 +14,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import LuxuryShowcase from '@/components/LuxuryShowcase';
 import CelestialNavigation from '@/components/CelestialNavigation';
+import FashionIntroAnimation from '@/components/FashionIntroAnimation';
 
 const SAMPLE_OUTFITS = [
   {
@@ -69,13 +70,15 @@ const SAMPLE_OUTFITS = [
 const Index = () => {
   const [loaded, setLoaded] = useState(false);
   const [likedOutfits, setLikedOutfits] = useState<{[key: number]: boolean}>({});
-  const [showIntro, setShowIntro] = useState(true);
+  const [showFashionIntro, setShowFashionIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showPersonalityQuiz, setShowPersonalityQuiz] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
   
   useEffect(() => {
+    const hasSeenFashionIntro = localStorage.getItem('hasSeenFashionIntro');
     const hasSeenIntro = localStorage.getItem('hasSeenIntro');
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
     const hasCompletedQuiz = localStorage.getItem('hasCompletedQuiz');
@@ -89,17 +92,23 @@ const Index = () => {
       }
     }
     
-    if (hasSeenIntro) {
-      setShowIntro(false);
+    if (hasSeenFashionIntro) {
+      setShowFashionIntro(false);
       
-      if (hasSeenOnboarding) {
-        if (hasCompletedQuiz) {
-          setContentVisible(true);
+      if (hasSeenIntro) {
+        setShowIntro(false);
+        
+        if (hasSeenOnboarding) {
+          if (hasCompletedQuiz) {
+            setContentVisible(true);
+          } else {
+            setShowPersonalityQuiz(true);
+          }
         } else {
-          setShowPersonalityQuiz(true);
+          setShowOnboarding(true);
         }
       } else {
-        setShowOnboarding(true);
+        setShowIntro(true);
       }
     } else {
       document.body.style.overflow = 'hidden';
@@ -107,6 +116,12 @@ const Index = () => {
     
     setLoaded(true);
   }, []);
+  
+  const handleFashionIntroComplete = () => {
+    setShowFashionIntro(false);
+    setShowIntro(true);
+    localStorage.setItem('hasSeenFashionIntro', 'true');
+  };
   
   const handleIntroComplete = () => {
     document.body.style.overflow = '';
@@ -198,6 +213,10 @@ const Index = () => {
 
   return (
     <>
+      <AnimatePresence>
+        {showFashionIntro && <FashionIntroAnimation onComplete={handleFashionIntroComplete} />}
+      </AnimatePresence>
+      
       <AnimatePresence>
         {showIntro && <IntroAnimation onComplete={handleIntroComplete} />}
       </AnimatePresence>
