@@ -11,10 +11,22 @@ export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [rotateIcon, setRotateIcon] = useState(false);
+  const [userPref, setUserPref] = useState<string | null>(null);
   
   // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
+    
+    // Check user preferences
+    try {
+      const savedPrefs = localStorage.getItem('userPreferences');
+      if (savedPrefs) {
+        const prefs = JSON.parse(savedPrefs);
+        setUserPref(prefs.timePreference);
+      }
+    } catch (e) {
+      console.error("Error loading user preferences:", e);
+    }
   }, []);
   
   // Add rotation effect when theme changes
@@ -28,10 +40,38 @@ export default function ThemeToggle() {
   
   if (!mounted) return null;
   
+  const getThemeTooltip = () => {
+    switch (theme) {
+      case 'nautical':
+        return "Nautical theme for clean, minimalist designs";
+      case 'sunset':
+        return "Sunset theme for warm, inviting experiences";
+      case 'forest':
+        return "Forest theme for creative, natural aesthetics";
+      case 'galaxy':
+        return "Galaxy theme for dark mode lovers";
+      default:
+        return "System theme";
+    }
+  };
+  
   const iconVariants = {
-    initial: { scale: 0.8, rotate: -10, opacity: 0 },
-    animate: { scale: 1, rotate: 0, opacity: 1 },
-    exit: { scale: 0.8, rotate: 10, opacity: 0 },
+    hidden: { opacity: 0, scale: 0.6, y: 20 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: { 
+        type: "spring", 
+        stiffness: 260, 
+        damping: 20 
+      } 
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 1.5,
+      transition: { duration: 0.5 }
+    },
     hover: { scale: 1.2, rotate: 5 },
     rotate: { rotate: 360, transition: { duration: 0.6 } }
   };
@@ -53,6 +93,21 @@ export default function ThemeToggle() {
       }
     })
   };
+
+  // Suggest a theme based on user preferences
+  const getSuggestedThemeText = () => {
+    if (userPref === 'night-owl' && theme !== 'galaxy') {
+      return "Try Galaxy theme";
+    } else if (userPref === 'early-bird' && theme !== 'sunset') {
+      return "Try Sunset theme";
+    } else if (userPref === null) {
+      return null; // No suggestion if no preferences
+    } else {
+      return null; // No suggestion if already using appropriate theme
+    }
+  };
+
+  const suggestedTheme = getSuggestedThemeText();
 
   return (
     <DropdownMenu>
@@ -120,6 +175,16 @@ export default function ThemeToggle() {
           animate="visible"
           className="space-y-1"
         >
+          {suggestedTheme && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mb-2 px-2 py-1.5 text-xs bg-primary/5 rounded-md text-center font-medium text-primary"
+            >
+              {suggestedTheme} 🌟
+            </motion.div>
+          )}
+          
           <motion.li variants={dropdownItemVariants} custom={0}>
             <DropdownMenuItem 
               onClick={() => setTheme("nautical")} 

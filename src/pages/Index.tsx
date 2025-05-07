@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -10,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Cloud, Calendar, Map, ChevronRight, Heart, Sparkles, Star, Zap } from 'lucide-react';
 import IntroAnimation from '@/components/IntroAnimation';
 import OnboardingSequence from '@/components/OnboardingSequence';
+import PersonalityQuiz, { UserPreferences } from '@/components/PersonalityQuiz';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import LuxuryShowcase from '@/components/LuxuryShowcase';
@@ -71,17 +71,33 @@ const Index = () => {
   const [likedOutfits, setLikedOutfits] = useState<{[key: number]: boolean}>({});
   const [showIntro, setShowIntro] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showPersonalityQuiz, setShowPersonalityQuiz] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
   
   useEffect(() => {
     const hasSeenIntro = localStorage.getItem('hasSeenIntro');
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    const hasCompletedQuiz = localStorage.getItem('hasCompletedQuiz');
+    const savedPreferences = localStorage.getItem('userPreferences');
+    
+    if (savedPreferences) {
+      try {
+        setUserPreferences(JSON.parse(savedPreferences));
+      } catch (e) {
+        console.error("Error parsing saved preferences:", e);
+      }
+    }
     
     if (hasSeenIntro) {
       setShowIntro(false);
       
       if (hasSeenOnboarding) {
-        setContentVisible(true);
+        if (hasCompletedQuiz) {
+          setContentVisible(true);
+        } else {
+          setShowPersonalityQuiz(true);
+        }
       } else {
         setShowOnboarding(true);
       }
@@ -104,12 +120,44 @@ const Index = () => {
   
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    
+    // After onboarding, show personality quiz
+    setShowPersonalityQuiz(true);
+  };
+
+  const handlePersonalityQuizComplete = (preferences: UserPreferences) => {
+    setShowPersonalityQuiz(false);
     setContentVisible(true);
+    setUserPreferences(preferences);
+    
+    // Store user preferences
+    localStorage.setItem('userPreferences', JSON.stringify(preferences));
+    localStorage.setItem('hasCompletedQuiz', 'true');
     
     toast.success("Welcome to StyleSage!", {
-      description: "Your personal AI-powered fashion assistant",
+      description: "Your personalized experience awaits",
       duration: 5000,
     });
+    
+    // Apply any UX adjustments based on browsing speed preference
+    applyUxPreferences(preferences);
+  };
+
+  const applyUxPreferences = (preferences: UserPreferences) => {
+    // This function could apply various UX adjustments based on user preferences
+    // For example, change animation speeds, adjust information density, etc.
+    const root = document.documentElement;
+    
+    // Example: Adjust animation speeds based on browsing preference
+    if (preferences.browsingSpeed === 'direct') {
+      root.style.setProperty('--animation-speed', '0.2s');
+    } else if (preferences.browsingSpeed === 'explorer') {
+      root.style.setProperty('--animation-speed', '0.5s');
+    } else {
+      root.style.setProperty('--animation-speed', '0.3s');
+    }
+    
+    // You could add more personalization options here
   };
 
   const toggleLike = (index: number) => {
@@ -158,6 +206,12 @@ const Index = () => {
         {showOnboarding && <OnboardingSequence onComplete={handleOnboardingComplete} />}
       </AnimatePresence>
       
+      <AnimatePresence>
+        {showPersonalityQuiz && (
+          <PersonalityQuiz onComplete={handlePersonalityQuizComplete} />
+        )}
+      </AnimatePresence>
+      
       <motion.div
         className="min-h-screen bg-background flex flex-col"
         initial={{ opacity: 0 }}
@@ -168,6 +222,31 @@ const Index = () => {
         
         <main className="flex-grow">
           <Hero />
+          
+          {/* Personalized greeting if we have user preferences */}
+          {userPreferences && (
+            <motion.div 
+              className="max-w-7xl mx-auto px-6 py-4 mt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="bg-primary/5 border border-primary/10 rounded-lg p-4 flex items-center gap-4">
+                <div className="bg-primary/10 rounded-full p-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {userPreferences.timePreference === 'early-bird' 
+                      ? 'Good morning, early bird! We\'ve brightened things up for you.' 
+                      : userPreferences.timePreference === 'night-owl'
+                        ? 'Welcome, night owl! We\'ve set a more relaxing ambiance for you.'
+                        : 'Welcome back to StyleSage!'}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
           
           {/* Add the new Celestial Navigation component */}
           <CelestialNavigation />
@@ -293,7 +372,7 @@ const Index = () => {
                 >
                   <div className="aspect-[4/3] rounded-lg flex items-center justify-center overflow-hidden image-hover">
                     <img 
-                      src="https://images.unsplash.com/photo-1536593998369-f0d25ed0fb1d?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" 
+                      src="https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200" 
                       alt="Weather-based outfit recommendation" 
                       className="w-full h-full object-cover"
                     />
