@@ -1,336 +1,173 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+ 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --foreground: 222.2 84% 4.9%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
     --radius: 0.5rem;
-    --animation-speed: 0.3s;
   }
  
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --destructive-foreground: 0 85.7% 97.3%;
+ 
+    --ring: 217.2 32.6% 17.5%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-/* Existing animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes rotate-gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes morphing {
-  0% { border-radius: 60% 40% 30% 70%/60% 30% 70% 40%; }
-  50% { border-radius: 30% 60% 70% 40%/50% 60% 30% 60%; }
-  100% { border-radius: 60% 40% 30% 70%/60% 30% 70% 40%; }
-}
-
-/* Additional animations */
-@keyframes ping-slow {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
+/* Holographic and futuristic effects */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-@keyframes galaxy-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* New premium animations */
-@keyframes gradient-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(255, 150, 100, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(255, 150, 100, 0.6); }
-}
-
-@keyframes border-shine {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes soft-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
-}
-
-/* New fashion intro animations */
-@keyframes aura-pulse {
-  0%, 100% { filter: blur(8px); opacity: 0.7; }
-  50% { filter: blur(12px); opacity: 0.9; }
-}
-
-@keyframes color-shift {
-  0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(30deg); }
-  100% { filter: hue-rotate(0deg); }
-}
-
-@keyframes text-glow {
-  0%, 100% { text-shadow: 0 0 8px rgba(255,255,255,0.6); }
-  50% { text-shadow: 0 0 15px rgba(255,255,255,0.9), 0 0 25px rgba(100,200,255,0.4); }
-}
-
-@keyframes silhouette-morph {
-  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
-  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-}
-
-/* Theme transitions */
-.theme-transitioning {
-  transition: background-color 0.8s ease-in-out, color 0.8s ease-in-out;
-}
-
-/* Premium styling classes */
-.premium-bg {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
-.dark .premium-bg {
-  background: linear-gradient(135deg, #2a2d3e 0%, #16171d 100%);
-}
-
-.premium-card {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(15px);
-  transition: all 0.5s ease;
-}
-
-.premium-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.gradient-border {
-  position: relative;
-  background-clip: padding-box;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: -1px;
-  border-radius: inherit;
-  background: linear-gradient(to right, #ff7e5f, #feb47b, #ffcb80, #ff7e5f);
+.holographic-text {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(120, 120, 255, 0.8) 50%,
+    rgba(255, 120, 255, 0.8) 100%
+  );
   background-size: 200% 200%;
-  animation: border-shine 3s linear infinite;
-  z-index: -1;
-}
-
-.dark .gradient-border::before {
-  background: linear-gradient(to right, #4776E6, #8E54E9, #4776E6);
-  background-size: 200% 200%;
-  animation: border-shine 3s linear infinite;
-}
-
-.gradient-text {
-  background-clip: text;
   -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+  background-clip: text;
+  animation: gradient-shift 5s ease infinite;
+}
+
+.holographic-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(120, 120, 255, 0.3) 50%,
+    rgba(255, 120, 255, 0.3) 100%
+  );
   background-size: 200% 200%;
-  animation: gradient-flow 3s ease infinite;
+  animation: gradient-shift 5s ease infinite;
 }
 
-.dark .gradient-text {
-  background-image: linear-gradient(to right, #4776E6, #8E54E9);
+.neon-glow {
+  filter: drop-shadow(0 0 8px rgba(255, 100, 255, 0.8));
 }
 
-.floating-element {
-  animation: soft-bounce 6s ease-in-out infinite;
+.cyber-grid {
+  background-image: linear-gradient(
+    to right,
+    rgba(32, 202, 255, 0.1) 1px,
+    transparent 1px
+  ),
+  linear-gradient(
+    to bottom,
+    rgba(32, 202, 255, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
 }
 
-/* Enhance cosmic styling on the weather page */
-body:has(.cosmic-orbit-item) {
-  scroll-behavior: smooth;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: black;
+/* Interactive tilt effect */
+.hover-3d {
+  transition: transform 0.2s ease-out;
+  transform-style: preserve-3d;
 }
 
-/* Improve the visibility of footer on dark backgrounds */
-.min-h-screen:has(.cosmic-orbit-item) footer {
-  backdrop-filter: blur(10px);
-  background-color: rgba(0, 0, 0, 0.3);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+.hover-3d:hover {
+  transform: translateZ(20px) rotateX(2deg) rotateY(2deg);
 }
 
-/* Gallery & Museum styling */
-.exhibit-frame {
-  position: relative;
-  border: 12px solid #f8f8f8;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.exhibit-frame:hover {
-  transform: translateY(-5px);
-}
-
-.exhibit-spotlight {
-  position: relative;
-  overflow: hidden;
-}
-
-.exhibit-spotlight::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+/* Confetti animation */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  z-index: 9999;
   pointer-events: none;
+  border-radius: 0;
 }
 
-.exhibit-spotlight:hover::after {
-  opacity: 1;
+.animate-confetti-fall {
+  animation: confetti-fall 5s linear forwards;
 }
 
-/* Audio guide controls */
-.audio-controls {
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.8);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-/* Art gallery cursor */
-.gallery-cursor {
-  cursor: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='10' fill='rgba(0,0,0,0.3)'/%3E%3Ccircle cx='16' cy='16' r='4' fill='white'/%3E%3C/svg%3E"), auto;
-}
-
-@media (min-width: 768px) {
-  .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-}
-
-/* Interactive museum experience */
-.gallery-interactive-item {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.5s ease;
-}
-
-.gallery-interactive-item:hover {
-  transform: scale(1.02);
-  z-index: 10;
-}
-
-.gallery-interactive-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), 
-                              rgba(255, 255, 255, 0.2) 0%, 
-                              transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.gallery-interactive-item:hover::before {
-  opacity: 1;
-}
-
-/* Celestial navigation animations */
-.animate-ping-slow {
-  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.galaxy-backdrop {
-  background: radial-gradient(ellipse at center, rgba(30, 30, 60, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
-  animation: galaxy-spin 240s linear infinite;
-}
-
-/* Animation adjustments that use CSS variables */
-.transition-all {
-  transition-duration: var(--animation-speed, 0.3s);
-}
-
-/* Animation for confetti effect */
 @keyframes confetti-fall {
   0% {
-    transform: translateY(-100%) rotate(0deg);
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
     opacity: 1;
   }
   100% {
@@ -339,111 +176,37 @@ body:has(.cosmic-orbit-item) {
   }
 }
 
-.confetti {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.animate-confetti-fall {
-  animation: confetti-fall 3s ease-out forwards;
-}
-
-/* New glass morphism effects */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-  transition: all 0.3s ease;
-}
-
-.dark .glass-panel {
-  background: rgba(20, 20, 30, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-panel:hover {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-}
-
-/* Interactive layer effects */
-.layer-card {
-  position: relative;
+/* Image hover effects */
+.image-hover {
   overflow: hidden;
 }
 
-.layer-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, 
-    rgba(255,255,255,0) 0%, 
-    rgba(255,255,255,0.1) 50%, 
-    rgba(255,255,255,0) 100%);
-  transform: rotate(45deg);
-  transition: all 0.6s ease;
-  animation: shimmer 3s infinite;
-  z-index: 1;
-  pointer-events: none;
+.image-hover img {
+  transition: transform 0.7s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-/* Premium button effects */
-.button-premium {
-  position: relative;
-  overflow: hidden;
+.image-hover:hover img {
+  transform: scale(1.07);
 }
 
-.button-premium span {
-  position: relative;
-  z-index: 1;
+/* Theme-specific card styles */
+.theme-card {
+  @apply bg-card text-card-foreground border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow;
 }
 
-.button-premium::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
+.theme-button {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
 
-.button-premium:hover::before {
-  transform: translateX(100%);
+/* Animated text gradient */
+.animated-text-gradient {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% 100%;
+  animation: text-gradient-animation 8s linear infinite;
 }
 
-/* Animations for card paragraphs */
-@keyframes fade-in-up {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes text-gradient-animation {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
 }
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s ease forwards;
-}
-
-.animate-delay-100 { animation-delay: 0.1s; }
-.animate-delay-200 { animation-delay: 0.2s; }
-.animate-delay-300 { animation-delay: 0.3s; }
-.animate-delay-400 { animation-delay: 0.4s; }
-
-/* * {
-  @apply border-border;
-} */

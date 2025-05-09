@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import LuxuryShowcase from '@/components/LuxuryShowcase';
 import CelestialNavigation from '@/components/CelestialNavigation';
 import FashionIntroAnimation from '@/components/FashionIntroAnimation';
+import StyleDnaScanner, { StylePreferences } from '@/components/StyleDnaScanner';
 
 const SAMPLE_OUTFITS = [
   {
@@ -73,22 +74,34 @@ const Index = () => {
   const [showFashionIntro, setShowFashionIntro] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showStyleDnaScanner, setShowStyleDnaScanner] = useState(false);
   const [showPersonalityQuiz, setShowPersonalityQuiz] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
+  const [stylePreferences, setStylePreferences] = useState<StylePreferences | null>(null);
   
   useEffect(() => {
     const hasSeenFashionIntro = localStorage.getItem('hasSeenFashionIntro');
     const hasSeenIntro = localStorage.getItem('hasSeenIntro');
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    const hasCompletedDnaScan = localStorage.getItem('hasCompletedDnaScan');
     const hasCompletedQuiz = localStorage.getItem('hasCompletedQuiz');
     const savedPreferences = localStorage.getItem('userPreferences');
+    const savedStylePreferences = localStorage.getItem('stylePreferences');
     
     if (savedPreferences) {
       try {
         setUserPreferences(JSON.parse(savedPreferences));
       } catch (e) {
         console.error("Error parsing saved preferences:", e);
+      }
+    }
+    
+    if (savedStylePreferences) {
+      try {
+        setStylePreferences(JSON.parse(savedStylePreferences));
+      } catch (e) {
+        console.error("Error parsing saved style preferences:", e);
       }
     }
     
@@ -99,10 +112,14 @@ const Index = () => {
         setShowIntro(false);
         
         if (hasSeenOnboarding) {
-          if (hasCompletedQuiz) {
-            setContentVisible(true);
+          if (hasCompletedDnaScan) {
+            if (hasCompletedQuiz) {
+              setContentVisible(true);
+            } else {
+              setShowPersonalityQuiz(true);
+            }
           } else {
-            setShowPersonalityQuiz(true);
+            setShowStyleDnaScanner(true);
           }
         } else {
           setShowOnboarding(true);
@@ -124,19 +141,27 @@ const Index = () => {
   };
   
   const handleIntroComplete = () => {
-    document.body.style.overflow = '';
     setShowIntro(false);
-    
     localStorage.setItem('hasSeenIntro', 'true');
-    
     // After intro, show onboarding
     setShowOnboarding(true);
   };
   
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+    // After onboarding, show style DNA scanner
+    setShowStyleDnaScanner(true);
+  };
+  
+  const handleStyleDnaScanComplete = (preferences: StylePreferences) => {
+    setShowStyleDnaScanner(false);
+    setStylePreferences(preferences);
     
-    // After onboarding, show personality quiz
+    // Store style preferences
+    localStorage.setItem('stylePreferences', JSON.stringify(preferences));
+    localStorage.setItem('hasCompletedDnaScan', 'true');
+    
+    // After DNA scan, show personality quiz
     setShowPersonalityQuiz(true);
   };
 
@@ -149,8 +174,14 @@ const Index = () => {
     localStorage.setItem('userPreferences', JSON.stringify(preferences));
     localStorage.setItem('hasCompletedQuiz', 'true');
     
-    toast.success("Welcome to StyleSage!", {
-      description: "Your personalized experience awaits",
+    document.body.style.overflow = '';
+    
+    // Combine style and personality data for a more personalized message
+    const styleDescription = stylePreferences?.silhouette === 'structured' ? 'structured' : 
+                            stylePreferences?.silhouette === 'flowing' ? 'flowing' : 'bold';
+    
+    toast.success("Welcome to Your Fashion Multiverse!", {
+      description: `Your ${styleDescription} style profile has been created. Enjoy your personalized experience!`,
       duration: 5000,
     });
     
@@ -223,6 +254,12 @@ const Index = () => {
       
       <AnimatePresence>
         {showOnboarding && <OnboardingSequence onComplete={handleOnboardingComplete} />}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {showStyleDnaScanner && (
+          <StyleDnaScanner onComplete={handleStyleDnaScanComplete} />
+        )}
       </AnimatePresence>
       
       <AnimatePresence>
