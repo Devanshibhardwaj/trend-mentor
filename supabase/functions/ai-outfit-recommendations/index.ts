@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -9,7 +10,10 @@ const fashionTrends = [
   "Relaxed fits combined with structured pieces",
   "Neutral tones with bold accessories",
   "Vintage-inspired modern outfits",
-  "Athleisure with a formal twist"
+  "Athleisure with a formal twist",
+  "Statement oversized pieces balanced with fitted items",
+  "Elevated basics with luxury touches",
+  "Unexpected color combinations that complement each other"
 ];
 
 // Add mood-based style descriptions
@@ -29,11 +33,29 @@ const moodStyles = {
     colors: ["red", "deep blue", "black", "emerald"],
     patterns: ["structured", "defined", "intentional"]
   },
+  professional: {
+    description: "Polished, tailored items that convey competence and authority",
+    colors: ["navy", "charcoal", "burgundy", "ivory"],
+    patterns: ["minimal", "classic", "refined"]
+  },
   creative: {
     description: "Expressive items that showcase your artistic personality",
     colors: ["mixed", "vibrant", "unexpected", "multicolor"],
     patterns: ["artistic", "eclectic", "unconventional"]
+  },
+  nightlife: {
+    description: "Eye-catching statement pieces that shine after dark",
+    colors: ["metallic", "black", "jewel tones", "shimmer"],
+    patterns: ["bold", "dramatic", "textured"]
   }
+};
+
+// Color palette recommendations based on preference
+const colorPalettes = {
+  neutral: ["beige", "gray", "taupe", "ivory", "sand"],
+  warm: ["terracotta", "rust", "amber", "coral", "burgundy"],
+  cool: ["navy", "slate blue", "teal", "emerald", "lavender"],
+  vibrant: ["magenta", "emerald", "cobalt", "tangerine", "violet"]
 };
 
 const corsHeaders = {
@@ -156,7 +178,7 @@ serve(async (req) => {
 
     // Enhance with mood-based recommendations if provided
     if (moodContext) {
-      const { mood, energyLevel, vibe } = moodContext;
+      const { mood, energyLevel, vibe, colorPreference } = moodContext;
       
       // Add mood-specific keywords and adjust explanation
       if (mood && moodStyles[mood as keyof typeof moodStyles]) {
@@ -176,6 +198,18 @@ serve(async (req) => {
             ...moodStyle.patterns
           ];
         });
+        
+        // Add color preference if provided
+        if (colorPreference && colorPalettes[colorPreference as keyof typeof colorPalettes]) {
+          const preferredColors = colorPalettes[colorPreference as keyof typeof colorPalettes];
+          
+          Object.keys(occasionKeywords).forEach(category => {
+            occasionKeywords[category] = [
+              ...occasionKeywords[category],
+              ...preferredColors
+            ];
+          });
+        }
         
         // Enhance explanation with mood context
         explanation = `This ${occasion} outfit is curated for your ${mood} mood with ${moodStyle.description}. `;
@@ -198,6 +232,11 @@ serve(async (req) => {
           explanation += `The fun, expressive elements showcase your personality.`;
         } else if (vibe === 'minimalist') {
           explanation += `The clean lines and thoughtful simplicity create an intentional aesthetic.`;
+        }
+        
+        // Add color preference context if provided
+        if (colorPreference) {
+          explanation += ` We've incorporated a ${colorPreference} color palette to enhance your personal style.`;
         }
       }
     }
@@ -228,7 +267,9 @@ serve(async (req) => {
       JSON.stringify({
         outfit,
         explanation,
-        trend
+        trend,
+        success: true,
+        message: "Personalized outfit created based on your mood and style preferences"
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
