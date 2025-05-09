@@ -210,3 +210,143 @@
   0% { background-position: 0% 50%; }
   100% { background-position: 300% 50%; }
 }
+
+/* New Landing Page Style Additions */
+/* Smooth reveal animations */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal-up.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered reveal for items in a list */
+.stagger-reveal > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease-out;
+}
+
+.stagger-reveal.active > *:nth-child(1) { transition-delay: 0.1s; }
+.stagger-reveal.active > *:nth-child(2) { transition-delay: 0.2s; }
+.stagger-reveal.active > *:nth-child(3) { transition-delay: 0.3s; }
+.stagger-reveal.active > *:nth-child(4) { transition-delay: 0.4s; }
+.stagger-reveal.active > *:nth-child(5) { transition-delay: 0.5s; }
+.stagger-reveal.active > *:nth-child(6) { transition-delay: 0.6s; }
+
+.stagger-reveal.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Gradient button hover effect */
+.gradient-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.gradient-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: all 0.6s ease;
+}
+
+.gradient-btn:hover::before {
+  left: 100%;
+}
+
+/* Floating element animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 3s ease infinite;
+}
+
+.floating-slow {
+  animation: float 5s ease infinite;
+}
+
+.floating-slower {
+  animation: float 7s ease infinite;
+}
+
+/* Modern text highlight effect */
+.highlight-text {
+  position: relative;
+  z-index: 1;
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30%;
+  background: linear-gradient(to right, rgba(139, 92, 246, 0.3), rgba(71, 196, 255, 0.3));
+  z-index: -1;
+  transform: skewX(-5deg);
+}
+
+/* Fancy card hover effects */
+.fancy-card {
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.fancy-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.1));
+  pointer-events: none;
+}
+
+.fancy-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Pill badge with soft glow */
+.pill-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.pill-badge-glow {
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* Glassmorphism effect for cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-card {
+  background: rgba(15, 15, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
