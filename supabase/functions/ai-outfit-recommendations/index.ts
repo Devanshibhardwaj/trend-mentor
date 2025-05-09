@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -13,6 +12,30 @@ const fashionTrends = [
   "Athleisure with a formal twist"
 ];
 
+// Add mood-based style descriptions
+const moodStyles = {
+  happy: {
+    description: "Uplifting pieces that reflect your positive energy",
+    colors: ["yellow", "orange", "bright blue", "coral"],
+    patterns: ["cheerful", "sunny", "playful"]
+  },
+  relaxed: {
+    description: "Comfortable and easygoing items that help maintain your calm state",
+    colors: ["soft blue", "sage green", "lavender", "neutral"],
+    patterns: ["subtle", "simple", "uncluttered"]
+  },
+  confident: {
+    description: "Bold, structured pieces that enhance your powerful presence",
+    colors: ["red", "deep blue", "black", "emerald"],
+    patterns: ["structured", "defined", "intentional"]
+  },
+  creative: {
+    description: "Expressive items that showcase your artistic personality",
+    colors: ["mixed", "vibrant", "unexpected", "multicolor"],
+    patterns: ["artistic", "eclectic", "unconventional"]
+  }
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -25,7 +48,7 @@ serve(async (req) => {
   }
 
   try {
-    const { wardrobeItems, occasion } = await req.json();
+    const { wardrobeItems, occasion, moodContext } = await req.json();
     
     if (!wardrobeItems || !Array.isArray(wardrobeItems) || wardrobeItems.length < 2) {
       return new Response(
@@ -129,6 +152,54 @@ serve(async (req) => {
         'Accessories': ['sporty', 'athletic', 'functional']
       };
       explanation = "This sports outfit prioritizes functionality and comfort while maintaining style. The athletic pieces work together for an active lifestyle, following the trend of athleisure with versatile performance features.";
+    }
+
+    // Enhance with mood-based recommendations if provided
+    if (moodContext) {
+      const { mood, energyLevel, vibe } = moodContext;
+      
+      // Add mood-specific keywords and adjust explanation
+      if (mood && moodStyles[mood as keyof typeof moodStyles]) {
+        const moodStyle = moodStyles[mood as keyof typeof moodStyles];
+        
+        // Add mood-related keywords to each category
+        Object.keys(occasionKeywords).forEach(category => {
+          // Add color keywords based on mood
+          occasionKeywords[category] = [
+            ...occasionKeywords[category],
+            ...moodStyle.colors
+          ];
+          
+          // Add pattern keywords based on mood
+          occasionKeywords[category] = [
+            ...occasionKeywords[category],
+            ...moodStyle.patterns
+          ];
+        });
+        
+        // Enhance explanation with mood context
+        explanation = `This ${occasion} outfit is curated for your ${mood} mood with ${moodStyle.description}. `;
+        
+        // Add energy level context
+        if (energyLevel === 'low') {
+          explanation += `The subtle, understated pieces maintain comfort while still looking put-together. `;
+        } else if (energyLevel === 'medium') {
+          explanation += `The balanced proportions and thoughtful details create a harmonious look. `;
+        } else if (energyLevel === 'high') {
+          explanation += `The bold elements and eye-catching details help you stand out while staying true to your style. `;
+        }
+        
+        // Add vibe context
+        if (vibe === 'casual') {
+          explanation += `The casual, effortless vibe keeps you comfortable and confident.`;
+        } else if (vibe === 'elegant') {
+          explanation += `The refined, sophisticated touches elevate your look.`;
+        } else if (vibe === 'playful') {
+          explanation += `The fun, expressive elements showcase your personality.`;
+        } else if (vibe === 'minimalist') {
+          explanation += `The clean lines and thoughtful simplicity create an intentional aesthetic.`;
+        }
+      }
     }
     
     // Map wardrobe categories to API categories

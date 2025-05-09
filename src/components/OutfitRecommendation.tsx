@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Sparkles } from 'lucide-react';
+import { Loader2, RefreshCw, Sparkles, Smile } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { generateOutfitRecommendation, generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendation';
+import MoodBasedOutfits, { MoodData } from '@/components/MoodBasedOutfits';
 
 interface WardrobeItem {
   id: string;
@@ -76,6 +77,8 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
   const [useAI, setUseAI] = useState(false);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [aiTrend, setAiTrend] = useState<string | null>(null);
+  const [showMoodSelector, setShowMoodSelector] = useState(false);
+  const [currentMood, setCurrentMood] = useState<MoodData | null>(null);
 
   const occasionOptions = [
     { value: "casual", label: "Casual" },
@@ -121,7 +124,13 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       // Use our local AI recommendation system
       toast.info("Generating outfit with local AI model...");
       
-      const result = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion);
+      const moodContext = currentMood ? {
+        mood: currentMood.mood,
+        energyLevel: currentMood.energyLevel,
+        vibe: currentMood.vibe
+      } : undefined;
+      
+      const result = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
       
       if (!result || !result.outfit) {
         throw new Error("AI could not generate a recommendation");
@@ -296,6 +305,26 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
     setAiExplanation(null);
     setAiTrend(null);
   };
+  
+  const handleMoodSelected = (moodData: MoodData) => {
+    setCurrentMood(moodData);
+    setShowMoodSelector(false);
+    
+    // Adjust the occasion based on mood/vibe if appropriate
+    if (moodData.vibe === 'elegant') {
+      setOccasion('formal');
+    } else if (moodData.vibe === 'casual') {
+      setOccasion('casual');
+    } else if (moodData.vibe === 'playful') {
+      setOccasion('party');
+    }
+    
+    // Automatically generate an outfit with the new mood
+    setTimeout(() => {
+      setUseAI(true);
+      generateOutfit();
+    }, 300);
+  };
 
   if (isLoading) {
     return (
@@ -308,6 +337,10 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
         <div className="h-10 bg-muted rounded"></div>
       </div>
     );
+  }
+
+  if (showMoodSelector) {
+    return <MoodBasedOutfits onSelectMood={handleMoodSelected} />;
   }
 
   return (
@@ -327,9 +360,20 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
               {useAI && <Sparkles className="h-4 w-4 ml-1 text-yellow-400" />}
             </Label>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {useAI && "Using browser AI (no costs)"}
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => setShowMoodSelector(true)}
+          >
+            <Smile className="h-4 w-4" />
+            <span>Mood</span>
+            {currentMood && (
+              <Badge variant="outline" className="ml-1 text-xs">
+                {currentMood.mood}
+              </Badge>
+            )}
+          </Button>
         </div>
         
         <div className="flex flex-wrap gap-2 mb-4">
@@ -369,6 +413,20 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
             )}
           </Button>
         </div>
+        
+        {currentMood && (
+          <div className="p-4 bg-primary/5 rounded-lg mt-4 mb-4">
+            <h5 className="font-medium flex items-center">
+              <Smile className="h-4 w-4 mr-2" /> 
+              Based on your mood
+            </h5>
+            <div className="flex flex-wrap gap-1 mt-2">
+              <Badge variant="outline">{currentMood.mood}</Badge>
+              <Badge variant="outline">{currentMood.vibe}</Badge>
+              <Badge variant="outline">{currentMood.energyLevel} energy</Badge>
+            </div>
+          </div>
+        )}
         
         {outfit && (
           <div className="space-y-4 mt-4">

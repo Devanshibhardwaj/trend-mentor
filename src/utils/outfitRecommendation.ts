@@ -23,6 +23,13 @@ interface OutfitRecommendationResult {
   trend: string;
 }
 
+interface MoodContext {
+  mood: string;
+  energyLevel: 'low' | 'medium' | 'high';
+  vibe: string;
+  colorPreference?: string;
+}
+
 // Categories map for matching model outputs to wardrobe categories
 const categoryMap: Record<string, string> = {
   'tops': 'Tops',
@@ -65,6 +72,30 @@ const fashionTrends = [
   "Vintage-inspired modern outfits",
   "Athleisure with a formal twist"
 ];
+
+// Mood-based style descriptions to enhance explanations
+const moodStyleMap: Record<string, Record<string, string>> = {
+  happy: {
+    low: "light, comfortable pieces with subtle pops of color",
+    medium: "bright, cheerful pieces with balanced proportions",
+    high: "vibrant colors and bold, statement pieces"
+  },
+  relaxed: {
+    low: "soft, loose-fitting fabrics in neutral tones",
+    medium: "comfortable layers with gentle textures",
+    high: "flowy silhouettes in soothing colors"
+  },
+  confident: {
+    low: "well-tailored basics with clean lines",
+    medium: "structured pieces with intentional details",
+    high: "bold silhouettes and eye-catching accents"
+  },
+  creative: {
+    low: "interesting textures and subtle pattern mixing",
+    medium: "playful proportions and artistic elements",
+    high: "unexpected combinations and artistic statement pieces"
+  }
+};
 
 /**
  * Get image embeddings using a vision model
@@ -110,7 +141,8 @@ const classifyClothingItems = (items: WardrobeItem[]) => {
  */
 export const generateOutfitRecommendation = async (
   wardrobeItems: WardrobeItem[],
-  occasion: string
+  occasion: string,
+  moodContext?: MoodContext
 ): Promise<OutfitRecommendationResult> => {
   try {
     // Start by classifying the items
@@ -120,7 +152,7 @@ export const generateOutfitRecommendation = async (
     const outfit: Record<string, { id: string; name: string }> = {};
     let usedItems = new Set<string>();
     
-    // Outfit rules based on occasion
+    // Helper function to select items
     const selectItemForCategory = (category: string, keywords: string[] = []) => {
       if (!categorizedItems[category] || categorizedItems[category].length === 0) {
         return null;
@@ -157,6 +189,7 @@ export const generateOutfitRecommendation = async (
     let occasionKeywords: Record<string, string[]> = {};
     let explanation = '';
     
+    // Basic occasion-based preferences
     if (occasion === 'casual') {
       occasionKeywords = {
         'Tops': ['t-shirt', 'casual', 'cotton', 'comfortable'],
@@ -204,6 +237,42 @@ export const generateOutfitRecommendation = async (
       explanation = "This sports outfit prioritizes functionality and comfort while maintaining style. The athletic pieces work together for an active lifestyle.";
     }
     
+    // Enhance with mood-based preferences if provided
+    if (moodContext) {
+      const { mood, energyLevel, vibe } = moodContext;
+      
+      // Add mood-specific keywords
+      if (mood === 'happy') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'bright', 'colorful', 'yellow'];
+      } else if (mood === 'relaxed') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'soft', 'comfortable', 'blue'];
+        occasionKeywords['Bottoms'] = [...(occasionKeywords['Bottoms'] || []), 'loose', 'comfortable'];
+      } else if (mood === 'confident') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'structured', 'bold', 'red'];
+      } else if (mood === 'creative') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'pattern', 'unique', 'artistic'];
+        occasionKeywords['Accessories'] = [...(occasionKeywords['Accessories'] || []), 'statement', 'unique'];
+      }
+      
+      // Add vibe-specific keywords
+      if (vibe === 'minimalist') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'clean', 'simple', 'basic'];
+        occasionKeywords['Bottoms'] = [...(occasionKeywords['Bottoms'] || []), 'clean', 'simple'];
+      } else if (vibe === 'elegant') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'sophisticated', 'refined'];
+        occasionKeywords['Footwear'] = [...(occasionKeywords['Footwear'] || []), 'polished', 'refined'];
+      } else if (vibe === 'playful') {
+        occasionKeywords['Tops'] = [...(occasionKeywords['Tops'] || []), 'fun', 'colorful'];
+        occasionKeywords['Accessories'] = [...(occasionKeywords['Accessories'] || []), 'fun', 'playful'];
+      }
+      
+      // Enhance explanation with mood context
+      const moodStyle = moodStyleMap[mood]?.[energyLevel] || '';
+      if (moodStyle) {
+        explanation = `This outfit reflects your ${mood} mood with ${moodStyle}. It's perfect for a ${vibe} ${occasion} look that will make you feel confident and authentic.`;
+      }
+    }
+    
     // Create the outfit with our occasion-specific keywords
     Object.entries(occasionKeywords).forEach(([category, keywords]) => {
       const item = selectItemForCategory(category, keywords);
@@ -240,10 +309,11 @@ export const generateOutfitRecommendation = async (
  */
 export const generateAdvancedOutfitRecommendation = async (
   wardrobeItems: WardrobeItem[],
-  occasion: string
+  occasion: string,
+  moodContext?: MoodContext
 ): Promise<OutfitRecommendationResult> => {
   // For now, we'll use the same implementation as the basic version
-  // In a future iteration, this could use more advanced techniques with
-  // transformers.js for better recommendations
-  return generateOutfitRecommendation(wardrobeItems, occasion);
+  // but with the mood context passed through
+  return generateOutfitRecommendation(wardrobeItems, occasion, moodContext);
 };
+
