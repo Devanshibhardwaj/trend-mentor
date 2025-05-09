@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Smile, Palette, Zap, Crown, Coffee, Briefcase, Sparkles, CircleArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { getOutfitsByMood } from '@/lib/outfit-collections';
 
 interface MoodBasedOutfitProps {
   onSelectMood: (mood: MoodData) => void;
@@ -68,6 +69,12 @@ const MoodBasedOutfits = ({ onSelectMood, isLoading = false }: MoodBasedOutfitPr
     if (!selectedMood || !selectedEnergy || !selectedVibe) {
       toast.error("Please select all options to get personalized recommendations");
       return;
+    }
+
+    // Get matching outfits for this mood
+    const matchingOutfits = getOutfitsByMood(selectedMood);
+    if (matchingOutfits.length > 0) {
+      toast.success(`Found ${matchingOutfits.length} trending outfits for your mood!`);
     }
 
     onSelectMood({
