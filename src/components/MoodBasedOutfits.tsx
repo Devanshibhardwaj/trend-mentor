@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Smile, Palette, Zap, Crown, Cafe, Briefcase, Sparkles, CircleArrowRight } from 'lucide-react';
+import { Heart, Smile, Palette, Zap, Crown, Coffee, Briefcase, Sparkles, CircleArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface MoodBasedOutfitProps {
@@ -38,7 +38,7 @@ const MoodBasedOutfits = ({ onSelectMood, isLoading = false }: MoodBasedOutfitPr
   const moods = [
     { id: 'happy', label: 'Happy', icon: <Smile className="h-5 w-5" />, color: 'bg-yellow-100 text-yellow-800 border-yellow-300', description: 'Uplifting pieces to match your energy' },
     { id: 'confident', label: 'Confident Queen', icon: <Crown className="h-5 w-5" />, color: 'bg-purple-100 text-purple-800 border-purple-300', description: 'Bold looks to showcase your power' },
-    { id: 'relaxed', label: 'Relaxed', icon: <Cafe className="h-5 w-5" />, color: 'bg-blue-100 text-blue-800 border-blue-300', description: 'Comfortable yet stylish ensembles' },
+    { id: 'relaxed', label: 'Relaxed', icon: <Coffee className="h-5 w-5" />, color: 'bg-blue-100 text-blue-800 border-blue-300', description: 'Comfortable yet stylish ensembles' },
     { id: 'professional', label: 'Boss Energy', icon: <Briefcase className="h-5 w-5" />, color: 'bg-indigo-100 text-indigo-800 border-indigo-300', description: 'Polished looks for career success' },
     { id: 'creative', label: 'Creative', icon: <Palette className="h-5 w-5" />, color: 'bg-pink-100 text-pink-800 border-pink-300', description: 'Express your unique artistic vibe' },
     { id: 'nightlife', label: 'Nightlife Spark', icon: <Sparkles className="h-5 w-5" />, color: 'bg-violet-100 text-violet-800 border-violet-300', description: 'Stand out after sunset' }
