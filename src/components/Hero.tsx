@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Sparkles, Star, ArrowRight, Heart, Search } from "lucide-react";
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Hero = () => {
   const [loaded, setLoaded] = useState(false);
@@ -51,7 +50,7 @@ const Hero = () => {
       quote: "Finally found my style identity after years of fashion confusion!",
       name: "Morgan Lee",
       role: "Graphic Designer",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150"
+      image: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?q=80&w=150"
     }
   ];
   

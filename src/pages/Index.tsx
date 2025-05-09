@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -13,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 import FashionIntroAnimation from '@/components/FashionIntroAnimation';
 import StyleDnaScanner, { StylePreferences } from '@/components/StyleDnaScanner';
+import { Star } from 'lucide-react';
 
 const Index = () => {
   const [loaded, setLoaded] = useState(false);
