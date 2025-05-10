@@ -65,6 +65,13 @@ const QUESTIONS: Message[] = [
   }
 ];
 
+// Helper function to convert string to valid energyLevel type
+const getValidEnergyLevel = (energy: string): "low" | "medium" | "high" => {
+  if (energy === 'low') return "low";
+  if (energy === 'high') return "high";
+  return "medium"; // Default to medium for any other value
+};
+
 const StylistChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
@@ -191,10 +198,10 @@ const StylistChat = () => {
       const season = mapWeatherToSeason(weather);
       const vibe = mapMoodToVibe(mood);
       
-      // Create mood context for the recommendation system
+      // Create mood context for the recommendation system with properly typed energyLevel
       const moodContext = {
         mood: mood,
-        energyLevel: mood === 'relaxed' ? 'low' : mood === 'confident' ? 'high' : 'medium',
+        energyLevel: mood === 'relaxed' ? "low" as const : mood === 'confident' ? "high" as const : "medium" as const,
         vibe: vibe,
         weather: season
       };
