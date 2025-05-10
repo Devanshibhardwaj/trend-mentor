@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import TrendingOutfits from '@/components/TrendingOutfits';
 import StepGuide from '@/components/StepGuide';
 import FilterBar, { FilterOptions } from '@/components/FilterBar';
+import StylistChat from '@/components/StylistChat';
 
 function Index() {
   // Create empty wardrobeItems array for homepage display
@@ -74,6 +75,9 @@ function Index() {
       </main>
       
       <Footer />
+      
+      {/* Add the Stylist Chat component */}
+      <StylistChat />
     </div>
   );
 }
