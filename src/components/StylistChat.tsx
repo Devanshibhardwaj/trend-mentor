@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -16,6 +15,8 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendation';
 import { outfitImages } from '@/lib/outfit-data';
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Message {
   id: string;
@@ -35,6 +36,13 @@ interface ChatOutfit {
     footwear?: { name: string; };
     accessories?: { name: string; };
   };
+}
+
+interface WardrobeItem {
+  id: string;
+  name: string;
+  category: string;
+  imageUrl: string;
 }
 
 const INITIAL_MESSAGE: Message = {
@@ -80,8 +88,46 @@ const StylistChat = () => {
   const [chatData, setChatData] = useState<Record<string, string>>({});
   const [outfits, setOutfits] = useState<ChatOutfit[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
 
+  const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user's wardrobe items when chat opens
+  useEffect(() => {
+    if (isOpen && user) {
+      fetchUserWardrobe();
+    }
+  }, [isOpen, user]);
+
+  const fetchUserWardrobe = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('wardrobe_items')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching wardrobe:', error);
+        return;
+      }
+
+      if (data) {
+        // Map the data to the expected format
+        const items: WardrobeItem[] = data.map(item => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          imageUrl: item.image_url || ''
+        }));
+        setWardrobeItems(items);
+      }
+    } catch (error) {
+      console.error('Failed to fetch wardrobe items:', error);
+    }
+  };
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -205,39 +251,87 @@ const StylistChat = () => {
         vibe: vibe,
         weather: season
       };
+
+      let chatOutfits: ChatOutfit[] = [];
       
-      // Generate outfit recommendations (we'll create 3)
-      const result1 = await generateAdvancedOutfitRecommendation([], occasion, moodContext);
-      const result2 = await generateAdvancedOutfitRecommendation([], occasion, moodContext);
-      const result3 = await generateAdvancedOutfitRecommendation([], occasion, moodContext);
-      
-      // Create chat outfits
-      const chatOutfits: ChatOutfit[] = [
-        {
-          name: `${vibe.charAt(0).toUpperCase() + vibe.slice(1)} ${occasion} Look`,
-          description: result1.explanation || `A ${vibe} outfit perfect for ${occasion} occasions.`,
-          imageUrl: getRandomImage(outfitImages.occasion, occasion) || 
-                   getRandomImage(outfitImages.mood, mood) ||
-                   getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny'),
-          items: result1.outfit
-        },
-        {
-          name: `${style.charAt(0).toUpperCase() + style.slice(1)} ${occasion} Outfit`,
-          description: result2.explanation || `A stylish ${style} outfit for your ${occasion} plans.`,
-          imageUrl: getRandomImage(outfitImages.occasion, occasion) || 
-                   getRandomImage(outfitImages.mood, mood) ||
-                   getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny'),
-          items: result2.outfit
-        },
-        {
-          name: `${weather.charAt(0).toUpperCase() + weather.slice(1)}-Weather ${occasion} Ensemble`,
-          description: result3.explanation || `An outfit suitable for ${weather} weather during your ${occasion} activities.`,
-          imageUrl: getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny') ||
-                   getRandomImage(outfitImages.occasion, occasion) ||
-                   getRandomImage(outfitImages.mood, mood),
-          items: result3.outfit
+      // If user has wardrobe items, try to use them in recommendations
+      if (wardrobeItems.length > 0) {
+        try {
+          // Try to use the AI service to generate personalized recommendations
+          const aiResult = await fetch(`${window.origin}/functions/v1/ai-outfit-recommendations`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY || ''}`
+            },
+            body: JSON.stringify({
+              wardrobeItems,
+              occasion,
+              moodContext
+            })
+          });
+          
+          if (aiResult.ok) {
+            const data = await aiResult.json();
+            if (data.outfit) {
+              // Format the AI-generated outfit
+              const aiOutfit: ChatOutfit = {
+                name: `Your Personalized ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} Look`,
+                description: data.explanation || `A customized outfit created just for you based on your wardrobe items.`,
+                imageUrl: wardrobeItems.find(item => 
+                  item.id === (data.outfit.top?.id || data.outfit.bottom?.id || data.outfit.outerwear?.id)
+                )?.imageUrl || getRandomImage(outfitImages.occasion, occasion),
+                items: data.outfit
+              };
+              chatOutfits.push(aiOutfit);
+            }
+          }
+        } catch (error) {
+          console.error("Error calling AI service:", error);
+          // Will fall back to regular recommendations
         }
-      ];
+      }
+      
+      // If no AI-based recommendations or not enough, generate regular ones
+      if (chatOutfits.length < 3) {
+        // Generate outfit recommendations (we'll create up to 3)
+        const result1 = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
+        const result2 = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
+        const result3 = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
+        
+        // Create chat outfits from recommendations
+        const regularOutfits: ChatOutfit[] = [
+          {
+            name: `${vibe.charAt(0).toUpperCase() + vibe.slice(1)} ${occasion} Look`,
+            description: result1.explanation || `A ${vibe} outfit perfect for ${occasion} occasions.`,
+            imageUrl: getRandomImage(outfitImages.occasion, occasion) || 
+                     getRandomImage(outfitImages.mood, mood) ||
+                     getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny'),
+            items: result1.outfit
+          },
+          {
+            name: `${style.charAt(0).toUpperCase() + style.slice(1)} ${occasion} Outfit`,
+            description: result2.explanation || `A stylish ${style} outfit for your ${occasion} plans.`,
+            imageUrl: getRandomImage(outfitImages.occasion, occasion) || 
+                     getRandomImage(outfitImages.mood, mood) ||
+                     getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny'),
+            items: result2.outfit
+          },
+          {
+            name: `${weather.charAt(0).toUpperCase() + weather.slice(1)}-Weather ${occasion} Ensemble`,
+            description: result3.explanation || `An outfit suitable for ${weather} weather during your ${occasion} activities.`,
+            imageUrl: getRandomImage(outfitImages.weather, weather === 'rainy' ? 'rainy' : 'sunny') ||
+                     getRandomImage(outfitImages.occasion, occasion) ||
+                     getRandomImage(outfitImages.mood, mood),
+            items: result3.outfit
+          }
+        ];
+        
+        // Fill up to 3 outfits
+        while (chatOutfits.length < 3 && regularOutfits.length > 0) {
+          chatOutfits.push(regularOutfits.shift() as ChatOutfit);
+        }
+      }
       
       setOutfits(chatOutfits);
       
@@ -247,7 +341,9 @@ const StylistChat = () => {
         return [...filtered, {
           id: 'results',
           isUser: false,
-          text: `Here are ${chatOutfits.length} outfits I've put together based on your preferences:`,
+          text: wardrobeItems.length > 0 
+            ? `Here are ${chatOutfits.length} outfits I've put together based on your preferences and wardrobe items:` 
+            : `Here are ${chatOutfits.length} outfits I've put together based on your preferences:`,
         }];
       });
       
