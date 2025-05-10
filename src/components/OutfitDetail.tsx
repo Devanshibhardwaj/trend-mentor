@@ -1,187 +1,196 @@
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { OutfitItem } from '@/lib/outfit-collections';
-import { ExternalLink, ShoppingBag, ChevronDown, ChevronUp, Tag } from 'lucide-react';
-import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { OutfitItem } from "@/lib/outfit-collections";
+import { motion } from "framer-motion";
+import { Layers, Store, Info } from "lucide-react";
+import ProductCard from './ProductCard';
 
 interface OutfitDetailProps {
   outfit: OutfitItem;
-  index?: number;
+  index: number;
 }
 
-const OutfitDetail = ({ outfit, index = 0 }: OutfitDetailProps) => {
-  const [showShopLinks, setShowShopLinks] = useState(false);
+const OutfitDetail = ({ outfit, index }: OutfitDetailProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleSaveOutfit = () => {
-    toast.success("Outfit saved to your favorites!");
+  const outfitItems = [
+    { name: "Top", value: outfit.top },
+    { name: "Bottom", value: outfit.bottom },
+    { name: "Footwear", value: outfit.footwear },
+    { name: "Outerwear", value: outfit.outerwear },
+  ].filter((item) => item.value);
+
+  const hasProducts = outfit.products && (
+    outfit.products.top || 
+    outfit.products.bottom || 
+    outfit.products.footwear || 
+    outfit.products.outerwear || 
+    (outfit.products.accessories && outfit.products.accessories.length > 0)
+  );
+
+  const staggeredAnimation = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: 0.3,
+      delay: index * 0.1
+    }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="overflow-hidden"
-    >
-      <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
-        {outfit.imageUrl && (
-          <div className="relative h-64 overflow-hidden">
-            <img 
-              src={outfit.imageUrl} 
-              alt={outfit.name} 
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
+    <>
+      <motion.div 
+        {...staggeredAnimation} 
+        className="relative overflow-hidden group"
+      >
+        <Card className="overflow-hidden h-full flex flex-col">
+          <div className="relative aspect-video overflow-hidden">
+            <img
+              src={outfit.imageUrl || `https://source.unsplash.com/random/300x200/?${outfit.vibe},${outfit.occasion}`}
+              alt={outfit.name}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute top-3 right-3 flex flex-col gap-2">
-              <Badge 
-                variant="secondary" 
-                className="capitalize bg-white/80 dark:bg-black/50 backdrop-blur-sm"
-              >
-                {outfit.gender}
+            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/60 to-transparent p-3">
+              <Badge variant="outline" className="bg-white/20 text-white backdrop-blur-sm mr-2">
+                {outfit.vibe}
               </Badge>
-              <Badge 
-                variant="secondary" 
-                className="capitalize bg-white/80 dark:bg-black/50 backdrop-blur-sm"
-              >
-                {outfit.season}
+              <Badge variant="outline" className="bg-white/20 text-white backdrop-blur-sm">
+                {outfit.occasion}
               </Badge>
             </div>
           </div>
-        )}
-        
-        <CardContent className="p-5">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-lg font-medium">{outfit.name}</h3>
-            <Badge variant="outline" className="capitalize bg-primary/10">
-              {outfit.vibe}
-            </Badge>
-          </div>
           
-          <p className="text-sm text-muted-foreground mb-4 capitalize">
-            Perfect for: {outfit.occasion}
-          </p>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-lg font-medium">{outfit.name}</CardTitle>
+          </CardHeader>
           
-          <div className="space-y-3">
-            {outfit.top && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Top:</span>
-                <Badge variant="outline" className="font-normal capitalize">{outfit.top}</Badge>
-              </div>
-            )}
+          <CardContent className="flex-grow px-4 pb-4">
+            <div className="flex flex-wrap gap-2">
+              {outfitItems.map((item) => (
+                <Badge key={`${outfit.id}-${item.name}`} variant="secondary" className="font-normal">
+                  {item.name}: {item.value}
+                </Badge>
+              ))}
+              
+              {outfit.accessories && outfit.accessories.length > 0 && (
+                <Badge variant="secondary" className="font-normal">
+                  Accessories: {outfit.accessories.length}
+                </Badge>
+              )}
+            </div>
             
-            {outfit.bottom && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Bottom:</span>
-                <Badge variant="outline" className="font-normal capitalize">{outfit.bottom}</Badge>
-              </div>
-            )}
+            <div className="mt-4 flex justify-between items-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsOpen(true)}
+                className="gap-1.5"
+              >
+                <Info className="h-3.5 w-3.5" /> Details
+              </Button>
+              
+              {hasProducts && (
+                <Badge 
+                  variant="default" 
+                  className="gap-1 cursor-pointer hover:bg-primary/90"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <Store className="h-3 w-3" />
+                  Shop Look
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{outfit.name}</DialogTitle>
+          </DialogHeader>
+          
+          <Tabs defaultValue="items">
+            <TabsList className="w-full">
+              <TabsTrigger value="items" className="flex-1">
+                <Layers className="h-4 w-4 mr-1.5" /> Outfit Items
+              </TabsTrigger>
+              {hasProducts && (
+                <TabsTrigger value="shop" className="flex-1">
+                  <Store className="h-4 w-4 mr-1.5" /> Shop This Look
+                </TabsTrigger>
+              )}
+            </TabsList>
             
-            {outfit.footwear && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Footwear:</span>
-                <Badge variant="outline" className="font-normal capitalize">{outfit.footwear}</Badge>
-              </div>
-            )}
-            
-            {outfit.accessories && outfit.accessories.length > 0 && (
-              <div className="flex items-start justify-between">
-                <span className="text-sm">Accessories:</span>
-                <div className="flex flex-wrap justify-end gap-1 max-w-[70%]">
-                  {outfit.accessories.map((accessory, i) => (
-                    <Badge key={i} variant="outline" className="font-normal capitalize">
-                      {accessory}
-                    </Badge>
-                  ))}
+            <TabsContent value="items" className="mt-4">
+              <div className="grid gap-4">
+                {outfitItems.map((item) => (
+                  item.value && (
+                    <div key={item.name} className="flex items-center gap-2">
+                      <Badge variant="outline" className="font-normal">{item.name}</Badge>
+                      <span>{item.value}</span>
+                    </div>
+                  )
+                ))}
+                
+                {outfit.accessories && outfit.accessories.length > 0 && (
+                  <div>
+                    <Badge variant="outline" className="font-normal mb-2">Accessories</Badge>
+                    <ul className="list-disc list-inside ml-1 space-y-1">
+                      {outfit.accessories.map((accessory, i) => (
+                        <li key={`accessory-${i}`} className="text-sm">{accessory}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                <div className="mt-2">
+                  <p className="text-sm text-muted-foreground">
+                    {`This ${outfit.vibe} outfit is perfect for ${outfit.occasion} occasions during ${outfit.season} season.`}
+                  </p>
                 </div>
               </div>
-            )}
-          </div>
-          
-          <div className="mt-5 space-y-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full flex items-center justify-center"
-              onClick={() => setShowShopLinks(!showShopLinks)}
-            >
-              <ShoppingBag className="h-4 w-4 mr-2" />
-              {showShopLinks ? "Hide Shop Links" : "Show Shop Links"}
-              {showShopLinks ? (
-                <ChevronUp className="h-4 w-4 ml-2" />
-              ) : (
-                <ChevronDown className="h-4 w-4 ml-2" />
-              )}
-            </Button>
+            </TabsContent>
             
-            {showShopLinks && outfit.shopLinks && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="space-y-2 pt-2"
-              >
-                {outfit.shopLinks.top && (
-                  <ShopLinkItem label="Top" url={outfit.shopLinks.top} />
-                )}
+            {hasProducts && (
+              <TabsContent value="shop" className="mt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {outfit.products?.top && (
+                    <ProductCard product={outfit.products.top} category="Top" />
+                  )}
+                  {outfit.products?.bottom && (
+                    <ProductCard product={outfit.products.bottom} category="Bottom" />
+                  )}
+                  {outfit.products?.footwear && (
+                    <ProductCard product={outfit.products.footwear} category="Footwear" />
+                  )}
+                  {outfit.products?.outerwear && (
+                    <ProductCard product={outfit.products.outerwear} category="Outerwear" />
+                  )}
+                </div>
                 
-                {outfit.shopLinks.bottom && (
-                  <ShopLinkItem label="Bottom" url={outfit.shopLinks.bottom} />
+                {outfit.products?.accessories && outfit.products.accessories.length > 0 && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium mb-3">Accessories</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {outfit.products.accessories.map((product) => (
+                        <ProductCard key={product.id} product={product} category="Accessory" />
+                      ))}
+                    </div>
+                  </div>
                 )}
-                
-                {outfit.shopLinks.footwear && (
-                  <ShopLinkItem label="Footwear" url={outfit.shopLinks.footwear} />
-                )}
-                
-                {outfit.shopLinks.outerwear && (
-                  <ShopLinkItem label="Outerwear" url={outfit.shopLinks.outerwear} />
-                )}
-                
-                {outfit.shopLinks.accessories && outfit.shopLinks.accessories.length > 0 && (
-                  <>
-                    <p className="text-xs text-muted-foreground mt-1">Accessories:</p>
-                    {outfit.shopLinks.accessories.map((url, i) => (
-                      <ShopLinkItem 
-                        key={i}
-                        label={outfit.accessories?.[i] || `Item ${i+1}`}
-                        url={url}
-                      />
-                    ))}
-                  </>
-                )}
-              </motion.div>
+              </TabsContent>
             )}
-            
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="w-full"
-              onClick={handleSaveOutfit}
-            >
-              Save This Look
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
-
-const ShopLinkItem = ({ label, url }: { label: string; url: string }) => (
-  <a 
-    href={url} 
-    target="_blank" 
-    rel="noopener noreferrer"
-    className="flex items-center justify-between p-2 text-sm bg-background rounded-md border hover:bg-accent/10 transition-colors"
-  >
-    <div className="flex items-center">
-      <Tag className="h-3.5 w-3.5 mr-2 text-primary" />
-      <span className="capitalize">{label}</span>
-    </div>
-    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-  </a>
-);
 
 export default OutfitDetail;

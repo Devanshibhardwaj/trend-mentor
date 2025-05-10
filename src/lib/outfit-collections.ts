@@ -7,6 +7,17 @@ export interface ShopLinks {
   accessories?: string[];
 }
 
+export interface Product {
+  id: string;
+  title: string;
+  brand: string;
+  price: number;
+  category: string;
+  description: string;
+  images: string[]; // carousel-friendly
+  productUrl: string; // for redirecting to the store
+}
+
 export interface OutfitItem {
   id: number;
   name: string;
@@ -20,6 +31,13 @@ export interface OutfitItem {
   outerwear?: string;
   accessories?: string[];
   shopLinks?: ShopLinks;
+  products?: {
+    top?: Product;
+    bottom?: Product;
+    footwear?: Product;
+    outerwear?: Product;
+    accessories?: Product[];
+  };
   imageUrl?: string;
 }
 
@@ -46,6 +64,62 @@ export const trendingOutfits: OutfitItem[] = [
         "https://shop.com/canvas-tote",
         "https://shop.com/round-sunglasses",
         "https://shop.com/leather-belt"
+      ]
+    },
+    products: {
+      top: {
+        id: "grunge-tshirt-001",
+        title: "Oversized Vintage T-Shirt",
+        brand: "Urban Threads",
+        price: 29.99,
+        category: "Tops",
+        description: "Distressed oversized t-shirt with vintage band graphic, perfect for a grunge aesthetic.",
+        images: [
+          "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?q=80&w=500",
+          "https://images.unsplash.com/photo-1576871337586-9654f3d26351?q=80&w=500"
+        ],
+        productUrl: "https://shop.com/oversized-t-shirt"
+      },
+      bottom: {
+        id: "cargo-pants-001",
+        title: "Distressed Cargo Pants",
+        brand: "StreetGear",
+        price: 59.99,
+        category: "Bottoms",
+        description: "Loose-fitting cargo pants with multiple pockets and distressed detailing.",
+        images: [
+          "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=500",
+          "https://images.unsplash.com/photo-1542272604-65bfc8ff822a?q=80&w=500" 
+        ],
+        productUrl: "https://shop.com/cargo-pants"
+      },
+      accessories: [
+        {
+          id: "canvas-tote-001",
+          title: "Heavy Duty Canvas Tote",
+          brand: "Rustic Carry",
+          price: 35.00,
+          category: "Accessories",
+          description: "Durable canvas tote with reinforced handles, perfect for daily use.",
+          images: [
+            "https://images.unsplash.com/photo-1591561954555-607968c989ab?q=80&w=500",
+            "https://images.unsplash.com/photo-1591561954557-2314dd01dfbb?q=80&w=500"
+          ],
+          productUrl: "https://shop.com/canvas-tote"
+        },
+        {
+          id: "round-sunglasses-001",
+          title: "Vintage Round Sunglasses",
+          brand: "RetrOpt",
+          price: 24.99,
+          category: "Accessories",
+          description: "Retro-inspired round sunglasses with tinted lenses and metal frame.",
+          images: [
+            "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=500",
+            "https://images.unsplash.com/photo-1511499767701-dd8df265ab7f?q=80&w=500"
+          ],
+          productUrl: "https://shop.com/round-sunglasses"
+        }
       ]
     },
     imageUrl: "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?q=80&w=500"
