@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { generateOutfitRecommendation, generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendation';
 import MoodBasedOutfits, { MoodData } from '@/components/MoodBasedOutfits';
+import { FilterOptions } from '@/components/FilterBar';
 
 interface WardrobeItem {
   id: string;
@@ -20,6 +21,7 @@ interface WardrobeItem {
 interface OutfitRecommendationProps {
   wardrobeItems: WardrobeItem[];
   isLoading: boolean;
+  filters?: FilterOptions;
 }
 
 interface Outfit {
@@ -69,7 +71,7 @@ const getRandomOutfitImage = (occasion: string) => {
   return images;
 };
 
-const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendationProps) => {
+const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecommendationProps) => {
   const [generatingOutfit, setGeneratingOutfit] = useState(false);
   const [outfit, setOutfit] = useState<Outfit | null>(null);
   const [occasion, setOccasion] = useState<string>("casual");
@@ -87,6 +89,19 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
     { value: "sports", label: "Sports" },
     { value: "party", label: "Party" }
   ];
+
+  // Apply filters to the occasion if needed
+  useEffect(() => {
+    if (filters) {
+      if (filters.mood === 'work') {
+        setOccasion("business");
+      } else if (filters.mood === 'date') {
+        setOccasion("party");
+      } else if (filters.mood === 'chill') {
+        setOccasion("casual");
+      }
+    }
+  }, [filters]);
 
   const generateOutfit = async () => {
     if (wardrobeItems.length < 2) {
@@ -124,11 +139,14 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       // Use our local AI recommendation system
       toast.info("Generating outfit with local AI model...");
       
-      const moodContext = currentMood ? {
-        mood: currentMood.mood,
-        energyLevel: currentMood.energyLevel,
-        vibe: currentMood.vibe
-      } : undefined;
+      // Combine mood context with filters
+      const moodContext = {
+        mood: currentMood?.mood || filters?.mood || 'casual',
+        energyLevel: currentMood?.energyLevel || 'medium',
+        vibe: currentMood?.vibe || filters?.style || 'casual',
+        weather: filters?.weather || 'all',
+        budget: filters?.budget || 500
+      };
       
       const result = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
       
@@ -198,6 +216,11 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       // Create outfit based on occasion and available items
       const newOutfit: Outfit = {};
       
+      // Apply filters for more targeted outfit selection
+      const stylePreference = filters?.style || 'all';
+      const weatherPreference = filters?.weather || 'all';
+      const budgetLimit = filters?.budget || 500;
+      
       // Simple rule-based selection for different occasions
       if (occasion === "casual") {
         // For casual: prefer t-shirts, jeans, sneakers
@@ -231,6 +254,17 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
         newOutfit.accessories = getRandomItem(categorizedItems["Accessories"]);
       }
       
+      // Apply weather-based filtering
+      if (weatherPreference === 'rainy') {
+        // Prefer water-resistant items for rainy weather
+        newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "raincoat", "waterproof");
+        newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "boots", "waterproof");
+      } else if (weatherPreference === 'sunny') {
+        // Prefer lighter items for sunny weather
+        newOutfit.top = getRandomItem(categorizedItems["Tops"], "t-shirt", "tank");
+        newOutfit.outerwear = null; // No need for outerwear in sunny weather
+      }
+      
       // Fill in any missing categories with random items from that category
       if (!newOutfit.top && categorizedItems["Tops"]) {
         newOutfit.top = getRandomItem(categorizedItems["Tops"]);
@@ -247,6 +281,13 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
       if (!newOutfit.accessories && categorizedItems["Accessories"]) {
         newOutfit.accessories = getRandomItem(categorizedItems["Accessories"]);
       }
+      
+      // Budget filtering: Remove any items that exceed budget
+      Object.entries(newOutfit).forEach(([category, item]) => {
+        if (item && 'price' in item && item.price > budgetLimit) {
+          newOutfit[category as keyof Outfit] = undefined;
+        }
+      });
       
       // Check if we have at least 2 items to make an outfit
       const outfitItemCount = Object.values(newOutfit).filter(Boolean).length;
@@ -390,6 +431,24 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
           ))}
         </div>
         
+        {filters && (
+          <div className="p-4 bg-primary/5 rounded-lg mt-4 mb-4">
+            <h5 className="font-medium">Active filters</h5>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {filters.mood !== 'all' && (
+                <Badge variant="outline">Mood: {filters.mood}</Badge>
+              )}
+              {filters.weather !== 'all' && (
+                <Badge variant="outline">Weather: {filters.weather}</Badge>
+              )}
+              {filters.style !== 'all' && (
+                <Badge variant="outline">Style: {filters.style}</Badge>
+              )}
+              <Badge variant="outline">Budget: ${filters.budget}</Badge>
+            </div>
+          </div>
+        )}
+        
         <div className="mb-4">
           <Button 
             onClick={generateOutfit} 
@@ -415,7 +474,7 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading }: OutfitRecommendation
         </div>
         
         {currentMood && (
-          <div className="p-4 bg-primary/5 rounded-lg mt-4 mb-4">
+          <div className="p-4 bg-primary/5 rounded-lg mt-4">
             <h5 className="font-medium flex items-center">
               <Smile className="h-4 w-4 mr-2" /> 
               Based on your mood
