@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -20,7 +19,16 @@ import { outfitImages } from '@/lib/outfit-data';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from '@/contexts/AuthContext';
 import { useWeather } from '@/services/WeatherService';
+import ChatTooltip from './ChatTooltip';
 
+// Helper function to convert string to valid energyLevel type
+const getValidEnergyLevel = (energy: string): "low" | "medium" | "high" => {
+  if (energy === 'low') return "low";
+  if (energy === 'high') return "high";
+  return "medium"; // Default to medium for any other value
+};
+
+// Keep existing interfaces
 interface Message {
   id: string;
   isUser: boolean;
@@ -48,6 +56,7 @@ interface WardrobeItem {
   imageUrl: string;
 }
 
+// ... keep existing code (INITIAL_MESSAGE and QUESTIONS constants)
 const INITIAL_MESSAGE: Message = {
   id: 'welcome',
   isUser: false,
@@ -76,13 +85,6 @@ const QUESTIONS: Message[] = [
   }
 ];
 
-// Helper function to convert string to valid energyLevel type
-const getValidEnergyLevel = (energy: string): "low" | "medium" | "high" => {
-  if (energy === 'low') return "low";
-  if (energy === 'high') return "high";
-  return "medium"; // Default to medium for any other value
-};
-
 const StylistChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
@@ -93,6 +95,7 @@ const StylistChat = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
   const [weatherDetected, setWeatherDetected] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -104,6 +107,18 @@ const StylistChat = () => {
     loadWeatherData,
     getFashionWeather
   } = useWeather();
+
+  // Show tooltip on initial load if chat is closed
+  useEffect(() => {
+    if (!isOpen && !localStorage.getItem('tooltipShown')) {
+      const timer = setTimeout(() => {
+        setShowTooltip(true);
+        localStorage.setItem('tooltipShown', 'true');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   // Fetch user's wardrobe items when chat opens
   useEffect(() => {
@@ -154,6 +169,8 @@ const StylistChat = () => {
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+    setShowTooltip(false); // Hide tooltip when chat toggles
+    
     if (!isOpen) {
       // Reset chat when opening
       setMessages([INITIAL_MESSAGE]);
@@ -233,6 +250,7 @@ const StylistChat = () => {
     handleSendMessage(option);
   };
 
+  // ... keep existing code (mapWeatherToSeason, mapMoodToVibe, getRandomImage functions)
   const mapWeatherToSeason = (weather: string): string => {
     switch (weather.toLowerCase()) {
       case 'hot': 
@@ -425,10 +443,17 @@ const StylistChat = () => {
       {/* Chat button */}
       <Button 
         onClick={toggleChat}
+        onMouseEnter={() => !isOpen && setShowTooltip(true)}
         className="fixed right-4 bottom-4 rounded-full w-14 h-14 shadow-lg z-50 flex items-center justify-center"
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </Button>
+      
+      {/* Chat tooltip */}
+      <ChatTooltip 
+        isVisible={showTooltip && !isOpen}
+        onClose={() => setShowTooltip(false)}
+      />
       
       {/* Chat window */}
       <AnimatePresence>

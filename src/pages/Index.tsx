@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -56,7 +55,7 @@ function Index() {
       const weatherType = getFashionWeather();
       
       // Map weather condition to our filter options
-      let weatherFilter = 'all';
+      let weatherFilter: "sunny" | "rainy" | "all" = 'all';
       if (['rainy', 'cold'].includes(weatherType)) {
         weatherFilter = 'rainy';
       } else if (['hot', 'warm', 'sunny'].includes(weatherType)) {
@@ -84,7 +83,7 @@ function Index() {
     const promptLower = prompt.toLowerCase();
     
     // Extract mood
-    let mood = 'all';
+    let mood: "all" | "work" | "date" | "chill" = 'all';
     if (promptLower.includes('work') || promptLower.includes('office')) {
       mood = 'work';
     } else if (promptLower.includes('date') || promptLower.includes('party')) {
@@ -94,7 +93,7 @@ function Index() {
     }
     
     // Extract style
-    let style = 'all';
+    let style: "all" | "minimal" | "street" | "ethnic" = 'all';
     if (promptLower.includes('minimal') || promptLower.includes('clean')) {
       style = 'minimal';
     } else if (promptLower.includes('street') || promptLower.includes('urban')) {
@@ -120,7 +119,7 @@ function Index() {
     setFilters({
       mood,
       style,
-      weather: weatherData ? getFashionWeather() === 'rainy' ? 'rainy' : 'sunny' : 'all',
+      weather: weatherData && getFashionWeather() === 'rainy' ? 'rainy' : 'sunny',
       budget
     });
     
