@@ -10,6 +10,11 @@ import TrendingOutfits from '@/components/TrendingOutfits';
 import StepGuide from '@/components/StepGuide';
 import FilterBar, { FilterOptions } from '@/components/FilterBar';
 import StylistChat from '@/components/StylistChat';
+import SmartPromptBar from '@/components/SmartPromptBar';
+import { useWeather } from '@/services/WeatherService';
+import { Badge } from '@/components/ui/badge';
+import { CloudSun, MapPin } from 'lucide-react';
+import { toast } from 'sonner';
 
 function Index() {
   // Create empty wardrobeItems array for homepage display
@@ -21,6 +26,9 @@ function Index() {
     budget: 100,
     style: 'all'
   });
+  
+  // Use our weather hook
+  const { weatherData, isLoading: isLoadingWeather, loadWeatherData, getFashionWeather } = useWeather();
 
   useEffect(() => {
     async function fetchWardrobe() {
@@ -37,7 +45,90 @@ function Index() {
       }
     }
     fetchWardrobe();
+    
+    // Load weather data when page loads
+    loadWeatherData();
   }, []);
+  
+  // Update filters based on weather when weather data is loaded
+  useEffect(() => {
+    if (weatherData) {
+      const weatherType = getFashionWeather();
+      
+      // Map weather condition to our filter options
+      let weatherFilter = 'all';
+      if (['rainy', 'cold'].includes(weatherType)) {
+        weatherFilter = 'rainy';
+      } else if (['hot', 'warm', 'sunny'].includes(weatherType)) {
+        weatherFilter = 'sunny';
+      }
+      
+      setFilters(prev => ({
+        ...prev,
+        weather: weatherFilter
+      }));
+      
+      toast.info(`Showing outfits for ${weatherType} weather in ${weatherData.location}`, {
+        duration: 4000,
+        icon: <CloudSun size={18} />,
+      });
+    }
+  }, [weatherData]);
+  
+  // Handle smart prompt submission
+  const handlePromptSubmit = (prompt: string) => {
+    toast.success("Generating personalized recommendations...");
+    
+    // Parse natural language prompt to extract filters
+    // This is a simple implementation - in a real app, this would use NLP
+    const promptLower = prompt.toLowerCase();
+    
+    // Extract mood
+    let mood = 'all';
+    if (promptLower.includes('work') || promptLower.includes('office')) {
+      mood = 'work';
+    } else if (promptLower.includes('date') || promptLower.includes('party')) {
+      mood = 'date';
+    } else if (promptLower.includes('casual') || promptLower.includes('relax') || promptLower.includes('chill')) {
+      mood = 'chill';
+    }
+    
+    // Extract style
+    let style = 'all';
+    if (promptLower.includes('minimal') || promptLower.includes('clean')) {
+      style = 'minimal';
+    } else if (promptLower.includes('street') || promptLower.includes('urban')) {
+      style = 'street';
+    } else if (promptLower.includes('ethnic') || promptLower.includes('traditional')) {
+      style = 'ethnic';
+    }
+    
+    // Extract budget
+    let budget = 100;
+    const budgetMatch = promptLower.match(/(\d+)k|₹(\d+)/);
+    if (budgetMatch) {
+      if (budgetMatch[1]) {
+        // Handle "5k" format
+        budget = parseInt(budgetMatch[1]) * 1000;
+      } else if (budgetMatch[2]) {
+        // Handle "₹5000" format
+        budget = parseInt(budgetMatch[2]);
+      }
+    }
+    
+    // Update filters
+    setFilters({
+      mood,
+      style,
+      weather: weatherData ? getFashionWeather() === 'rainy' ? 'rainy' : 'sunny' : 'all',
+      budget
+    });
+    
+    // Scroll to outfit recommendations
+    document.getElementById('outfit-recommendations')?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  };
 
   return (
     <div className="min-h-screen">
@@ -47,6 +138,34 @@ function Index() {
       <main className="container mx-auto px-4">
         <section className="py-12">
           <Hero />
+          
+          {/* Smart prompt bar */}
+          <div className="mt-8">
+            <SmartPromptBar 
+              onPromptSubmit={handlePromptSubmit} 
+              className="max-w-3xl mx-auto"
+            />
+            
+            {/* Weather display */}
+            {weatherData && (
+              <div className="max-w-3xl mx-auto mt-4 flex justify-end">
+                <Badge 
+                  variant="outline" 
+                  className="flex items-center gap-1 bg-white"
+                >
+                  <MapPin size={12} className="text-primary" />
+                  <span>{weatherData.location}</span>
+                  <span className="mx-1">|</span>
+                  <img 
+                    src={weatherData.icon} 
+                    alt={weatherData.condition} 
+                    className="w-4 h-4" 
+                  />
+                  <span>{Math.round(weatherData.temperature)}°C</span>
+                </Badge>
+              </div>
+            )}
+          </div>
         </section>
         
         <section className="py-12">
@@ -63,7 +182,7 @@ function Index() {
           <VibesGallery />
         </section>
         
-        <section className="py-12">
+        <section className="py-12" id="outfit-recommendations">
           <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
           <FilterBar filters={filters} onChange={setFilters} />
           <OutfitRecommendation 

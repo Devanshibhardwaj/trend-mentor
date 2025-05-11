@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -9,7 +10,8 @@ import {
   Shirt, 
   MapPin, 
   Thermometer,
-  RefreshCw 
+  RefreshCw,
+  CloudSun 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +19,7 @@ import { generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendati
 import { outfitImages } from '@/lib/outfit-data';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from '@/contexts/AuthContext';
+import { useWeather } from '@/services/WeatherService';
 
 interface Message {
   id: string;
@@ -89,16 +92,36 @@ const StylistChat = () => {
   const [outfits, setOutfits] = useState<ChatOutfit[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
+  const [weatherDetected, setWeatherDetected] = useState(false);
 
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Use our weather hook
+  const { 
+    weatherData,
+    isLoading: isLoadingWeather,
+    loadWeatherData,
+    getFashionWeather
+  } = useWeather();
 
   // Fetch user's wardrobe items when chat opens
   useEffect(() => {
     if (isOpen && user) {
       fetchUserWardrobe();
+      // Load weather data when chat opens
+      if (!weatherDetected) {
+        loadWeatherData();
+      }
     }
   }, [isOpen, user]);
+  
+  // Update weather detected state when weather data loads
+  useEffect(() => {
+    if (weatherData) {
+      setWeatherDetected(true);
+    }
+  }, [weatherData]);
 
   const fetchUserWardrobe = async () => {
     if (!user) return;
@@ -165,6 +188,21 @@ const StylistChat = () => {
     } else if (currentQuestion === 1) {
       setChatData(prev => ({ ...prev, occasion: text.toLowerCase() }));
     } else if (currentQuestion === 2) {
+      // If we have weather data and we're at the weather question, use detected weather
+      if (weatherDetected && weatherData) {
+        const weatherCondition = getFashionWeather();
+        text = weatherCondition; // Override user selection with actual weather
+        
+        // Add a special message about detected weather
+        const weatherInfoMessage: Message = {
+          id: `weather-info-${Date.now()}`,
+          isUser: false,
+          text: `I've detected that it's ${weatherData.temperature}°C and ${weatherData.condition} in ${weatherData.location}. I'll recommend outfits suitable for ${weatherCondition} weather!`
+        };
+        
+        setMessages(prev => [...prev, weatherInfoMessage]);
+      }
+      
       setChatData(prev => ({ ...prev, weather: text.toLowerCase() }));
     } else if (currentQuestion === 3) {
       setChatData(prev => ({ ...prev, style: text.toLowerCase() }));
@@ -173,8 +211,17 @@ const StylistChat = () => {
     // If we still have questions, ask the next one
     if (currentQuestion < QUESTIONS.length) {
       setTimeout(() => {
-        setMessages(prev => [...prev, QUESTIONS[currentQuestion]]);
-        setCurrentQuestion(prev => prev + 1);
+        // If we're about to ask about weather and we already have detected weather,
+        // skip this question and go to style preferences
+        if (currentQuestion === 1 && weatherDetected) {
+          const weatherCondition = getFashionWeather();
+          setChatData(prev => ({ ...prev, weather: weatherCondition }));
+          setMessages(prev => [...prev, QUESTIONS[2]]);
+          setCurrentQuestion(3);
+        } else {
+          setMessages(prev => [...prev, QUESTIONS[currentQuestion]]);
+          setCurrentQuestion(prev => prev + 1);
+        }
       }, 800);
     } else {
       // We've asked all questions, generate outfits
@@ -247,7 +294,7 @@ const StylistChat = () => {
       // Create mood context for the recommendation system with properly typed energyLevel
       const moodContext = {
         mood: mood,
-        energyLevel: mood === 'relaxed' ? "low" as const : mood === 'confident' ? "high" as const : "medium" as const,
+        energyLevel: getValidEnergyLevel(mood === 'relaxed' ? 'low' : mood === 'confident' ? 'high' : 'medium'),
         vibe: vibe,
         weather: season
       };
@@ -398,15 +445,51 @@ const StylistChat = () => {
                   <Sparkles size={18} />
                   <h3 className="font-semibold">Personal Stylist</h3>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => handleStartOver()}
-                  className="text-white hover:text-white hover:bg-primary/80"
-                >
-                  <RefreshCw size={16} />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {weatherData && (
+                    <div className="flex items-center text-sm mr-2">
+                      <CloudSun size={16} className="mr-1" />
+                      <span>{Math.round(weatherData.temperature)}°C</span>
+                    </div>
+                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleStartOver()}
+                    className="text-white hover:text-white hover:bg-primary/80"
+                  >
+                    <RefreshCw size={16} />
+                  </Button>
+                </div>
               </div>
+              
+              {/* Location and weather info banner */}
+              {weatherData && (
+                <div className="bg-muted/30 px-4 py-2 text-xs flex items-center justify-between border-b">
+                  <div className="flex items-center">
+                    <MapPin size={12} className="mr-1 text-primary" />
+                    <span>{weatherData.location}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <img 
+                      src={weatherData.icon} 
+                      alt={weatherData.condition} 
+                      className="w-4 h-4 mr-1"
+                    />
+                    <span className="capitalize">{weatherData.condition}</span>
+                  </div>
+                </div>
+              )}
+              
+              {isLoadingWeather && (
+                <div className="bg-muted/30 px-4 py-2 text-xs flex items-center justify-center border-b">
+                  <div className="flex items-center">
+                    <CloudSun size={12} className="mr-1 animate-pulse" />
+                    <span>Detecting your location and weather...</span>
+                  </div>
+                </div>
+              )}
+              
               <CardContent className="p-0">
                 <div className="h-[400px] overflow-y-auto p-4 bg-muted/30">
                   {messages.map((message) => (
@@ -453,6 +536,20 @@ const StylistChat = () => {
                                 alt={outfit.name}
                                 className="w-full h-full object-cover"
                               />
+                              
+                              {/* Weather badge */}
+                              {weatherData && (
+                                <div className="absolute top-2 left-2">
+                                  <div className="bg-white/80 text-xs rounded-full px-2 py-1 flex items-center shadow-sm">
+                                    <img 
+                                      src={weatherData.icon} 
+                                      alt={weatherData.condition} 
+                                      className="w-3 h-3 mr-1"
+                                    />
+                                    <span>{Math.round(weatherData.temperature)}°C</span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             <div className="p-3 space-y-2">
                               <h4 className="font-medium text-sm">{outfit.name}</h4>
@@ -558,7 +655,7 @@ const StylistChat = () => {
                   </p>
                   <p className="flex items-center gap-1">
                     <MapPin size={12} /> 
-                    <span>Based on your occasion</span>
+                    <span>Based on your location</span>
                   </p>
                   <p className="flex items-center gap-1">
                     <Thermometer size={12} /> 
