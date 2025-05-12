@@ -666,42 +666,6 @@ const StylistChat = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Chat features overview - appears when chat is closed */}
-      <AnimatePresence>
-        {!isOpen && !showTooltip && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed right-6 bottom-24 w-[250px] z-40"
-          >
-            <Card className="shadow-md rounded-xl">
-              <CardContent className="p-3 text-xs">
-                <h4 className="font-semibold flex items-center gap-1 mb-2">
-                  <MessageCircle size={14} />
-                  <span>Ask me about your style</span>
-                </h4>
-                <div className="space-y-1 text-muted-foreground">
-                  <p className="flex items-center gap-1">
-                    <Shirt size={12} /> 
-                    <span>Get personalized outfits</span>
-                  </p>
-                  <p className="flex items-center gap-1">
-                    <MapPin size={12} /> 
-                    <span>Based on your location</span>
-                  </p>
-                  <p className="flex items-center gap-1">
-                    <Thermometer size={12} /> 
-                    <span>Weather-appropriate styles</span>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

@@ -194,8 +194,10 @@ function Index() {
       
       <Footer />
       
-      {/* Add the Stylist Chat component */}
-      <StylistChat />
+      {/* Add the Stylist Chat component with enough bottom padding to prevent overlap */}
+      <div className="pb-20">
+        <StylistChat />
+      </div>
     </div>
   );
 }
