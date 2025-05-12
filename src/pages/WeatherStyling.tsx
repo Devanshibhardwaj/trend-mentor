@@ -78,6 +78,9 @@ const WeatherStyling = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [activeWeather, setActiveWeather] = useState<string | null>('sunny');
+  const [popularLocations] = useState<string[]>(['New York', 'London', 'Tokyo', 'Paris', 'Sydney']);
 
   useEffect(() => {
     fetchWeather();
@@ -105,6 +108,24 @@ const WeatherStyling = () => {
     }
   };
 
+  const handleSearch = (value: string) => {
+    toast(`Searching for ${value}...`);
+    // In a real app, this would trigger a weather API call
+    fetchWeather();
+  };
+
+  const handleLocationDetect = () => {
+    toast('Detecting your location...');
+    // In a real app, this would use geolocation API
+    fetchWeather();
+  };
+
+  const handleSelectWeather = (weather: string) => {
+    setActiveWeather(weather);
+    toast(`Selected ${weather} weather condition`);
+    // In a real app, this could trigger outfit recommendations for this weather
+  };
+
   const getModelUrls = (condition: string): string[] => {
     return weatherModelUrls[condition as keyof typeof weatherModelUrls] || [];
   };
@@ -114,8 +135,21 @@ const WeatherStyling = () => {
       <CosmicBackground />
       <Navbar />
       <main className="relative z-10 px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-        <CosmicSearch onSearch={() => toast('Feature coming soon!')} />
-        <CosmicNavigation />
+        <CosmicSearch 
+          value={searchValue} 
+          onChange={setSearchValue} 
+          onSearch={handleSearch} 
+          onLocationDetect={handleLocationDetect} 
+          popularLocations={popularLocations}
+          loading={loading}
+        />
+        
+        <div className="mt-6">
+          <CosmicNavigation 
+            activeWeather={activeWeather} 
+            onSelectWeather={handleSelectWeather} 
+          />
+        </div>
 
         {loading ? (
           <div className="flex justify-center items-center mt-16">
@@ -125,7 +159,9 @@ const WeatherStyling = () => {
           <p className="text-center text-red-500 mt-10">{error}</p>
         ) : weatherData ? (
           <>
-            <CosmicWeatherDisplay data={weatherData} />
+            <div className="mt-6">
+              <CosmicWeatherDisplay weather={weatherData} />
+            </div>
             <h2 className="mt-10 text-xl font-bold text-center">Recommended Outfits</h2>
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {getModelUrls(weatherData.condition).map((modelUrl, index) => (
@@ -134,7 +170,7 @@ const WeatherStyling = () => {
                   id={`outfit-${index}`}
                   style={`Style ${index + 1}`}
                   occasion={`${weatherData.condition.charAt(0).toUpperCase() + weatherData.condition.slice(1)} Weather`}
-                  description={`Perfect outfit for ${weatherData.condition} weather in ${weatherData.location}`}
+                  description={`Perfect for ${weatherData.condition} weather in ${weatherData.location}`}
                   modelUrl={modelUrl}
                   index={index}
                 />
