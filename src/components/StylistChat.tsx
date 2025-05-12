@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from '@/contexts/AuthContext';
 import { useWeather } from '@/services/WeatherService';
 import ChatTooltip from './ChatTooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // Helper function to convert string to valid energyLevel type
 const getValidEnergyLevel = (energy: string): "low" | "medium" | "high" => {
@@ -441,13 +442,20 @@ const StylistChat = () => {
   return (
     <>
       {/* Chat button */}
-      <Button 
-        onClick={toggleChat}
-        onMouseEnter={() => !isOpen && setShowTooltip(true)}
-        className="fixed right-4 bottom-4 rounded-full w-14 h-14 shadow-lg z-50 flex items-center justify-center"
+      <motion.div
+        className="fixed right-6 bottom-6 z-50"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-      </Button>
+        <Button 
+          onClick={toggleChat}
+          onMouseEnter={() => !isOpen && setShowTooltip(true)}
+          className="rounded-full w-14 h-14 shadow-lg flex items-center justify-center"
+          aria-label="Chat with fashion stylist"
+        >
+          {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+        </Button>
+      </motion.div>
       
       {/* Chat tooltip */}
       <ChatTooltip 
@@ -462,9 +470,10 @@ const StylistChat = () => {
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed right-4 bottom-20 w-[350px] sm:w-[450px] max-h-[600px] z-50"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed right-4 bottom-24 w-[350px] sm:w-[450px] max-h-[600px] z-40 md:right-6"
           >
-            <Card className="shadow-lg border-primary/20 overflow-hidden">
+            <Card className="shadow-lg border-primary/20 overflow-hidden rounded-2xl">
               <div className="bg-primary p-4 text-white flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Sparkles size={18} />
@@ -660,15 +669,15 @@ const StylistChat = () => {
       
       {/* Chat features overview - appears when chat is closed */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !showTooltip && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="fixed right-4 bottom-20 w-[250px] z-40"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed right-6 bottom-24 w-[250px] z-40"
           >
-            <Card className="shadow-md">
+            <Card className="shadow-md rounded-xl">
               <CardContent className="p-3 text-xs">
                 <h4 className="font-semibold flex items-center gap-1 mb-2">
                   <MessageCircle size={14} />
