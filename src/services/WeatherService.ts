@@ -9,6 +9,7 @@ export interface WeatherData {
   icon: string;
   feelsLike: number;
   humidity: number;
+  windSpeed: number;
 }
 
 // Weather condition mapping to fashion terms
@@ -71,7 +72,8 @@ const fetchWeatherData = async (lat: number, lon: number): Promise<WeatherData> 
       condition: data.current.condition.text.toLowerCase(),
       icon: data.current.condition.icon,
       feelsLike: data.current.feelslike_c,
-      humidity: data.current.humidity
+      humidity: data.current.humidity,
+      windSpeed: data.current.wind_kph
     };
   } catch (error) {
     console.error('Error fetching weather data:', error);
