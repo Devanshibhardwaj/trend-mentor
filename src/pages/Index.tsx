@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -10,6 +11,8 @@ import StepGuide from '@/components/StepGuide';
 import FilterBar, { FilterOptions } from '@/components/FilterBar';
 import StylistChat from '@/components/StylistChat';
 import SmartPromptBar from '@/components/SmartPromptBar';
+import ActiveFilterTags from '@/components/ActiveFilterTags';
+import SavedOutfits from '@/components/SavedOutfits';
 import { useWeather } from '@/services/WeatherService';
 import { Badge } from '@/components/ui/badge';
 import { CloudSun, MapPin } from 'lucide-react';
@@ -78,6 +81,13 @@ function Index() {
     document.getElementById('outfit-recommendations')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleRemoveFilter = (filterKey: keyof FilterOptions) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterKey]: filterKey === 'budget' ? 100 : 'all'
+    }));
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -124,8 +134,12 @@ function Index() {
         </section>
         <section className="py-12" id="outfit-recommendations">
           <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
+          <ActiveFilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
           <FilterBar filters={filters} onChange={setFilters} />
           <OutfitRecommendation wardrobeItems={wardrobeItems} isLoading={isLoading} filters={filters} />
+        </section>
+        <section className="py-12" id="saved-outfits">
+          <SavedOutfits />
         </section>
       </main>
       <Footer />

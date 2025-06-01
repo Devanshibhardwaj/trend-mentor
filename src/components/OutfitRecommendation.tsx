@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Sparkles, Smile } from 'lucide-react';
+import { Loader2, RefreshCw, Sparkles, Smile, Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from '@/components/ui/switch';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { generateOutfitRecommendation, generateAdvancedOutfitRecommendation } from '@/utils/outfitRecommendation';
 import MoodBasedOutfits, { MoodData } from '@/components/MoodBasedOutfits';
 import { FilterOptions } from '@/components/FilterBar';
+import { useSavedOutfits } from '@/hooks/useSavedOutfits';
 
 interface WardrobeItem {
   id: string;
@@ -81,6 +82,8 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
   const [aiTrend, setAiTrend] = useState<string | null>(null);
   const [showMoodSelector, setShowMoodSelector] = useState(false);
   const [currentMood, setCurrentMood] = useState<MoodData | null>(null);
+
+  const { saveOutfit, isOutfitSaved } = useSavedOutfits();
 
   const occasionOptions = [
     { value: "casual", label: "Casual" },
@@ -367,6 +370,27 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
     }, 300);
   };
 
+  const handleSaveOutfit = () => {
+    if (!outfit) return;
+
+    const outfitItems = Object.values(outfit).filter(Boolean) as WardrobeItem[];
+    if (outfitItems.length === 0) {
+      toast.error('No outfit to save');
+      return;
+    }
+
+    const outfitName = `${occasion.charAt(0).toUpperCase() + occasion.slice(1)} outfit`;
+    
+    saveOutfit({
+      name: outfitName,
+      occasion: occasion,
+      items: outfitItems
+    });
+  };
+
+  const currentOutfitItems = outfit ? Object.values(outfit).filter(Boolean) as WardrobeItem[] : [];
+  const isCurrentOutfitSaved = isOutfitSaved(currentOutfitItems);
+
   if (isLoading) {
     return (
       <div className="animate-pulse flex flex-col space-y-4 p-6 border rounded-lg bg-card">
@@ -489,7 +513,28 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         
         {outfit && (
           <div className="space-y-4 mt-4">
-            <h4 className="font-medium text-md">Your {occasion} outfit:</h4>
+            <div className="flex justify-between items-center">
+              <h4 className="font-medium text-md">Your {occasion} outfit:</h4>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSaveOutfit}
+                disabled={isCurrentOutfitSaved}
+                className="gap-2"
+              >
+                {isCurrentOutfitSaved ? (
+                  <>
+                    <BookmarkCheck className="h-4 w-4" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Bookmark className="h-4 w-4" />
+                    Save Look
+                  </>
+                )}
+              </Button>
+            </div>
             
             {outfitImage && (
               <div className="overflow-hidden rounded-lg mb-4">
