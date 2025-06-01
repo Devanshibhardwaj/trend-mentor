@@ -13,9 +13,9 @@ import StylistChat from '@/components/StylistChat';
 import SmartPromptBar from '@/components/SmartPromptBar';
 import { useWeather } from '@/services/WeatherService';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CloudSun, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
+import Tooltip from '@/components/CustomTooltip';
 
 function Index() {
   const [wardrobeItems, setWardrobeItems] = useState([]);
@@ -101,65 +101,60 @@ function Index() {
   };
 
   return (
-    <TooltipProvider>
-      <div className="min-h-screen">
-        <Navbar />
-        <StepGuide />
-        <main className="container mx-auto px-4">
-          <section className="py-12">
-            <Hero />
-            <div className="mt-8">
-              <SmartPromptBar onPromptSubmit={handlePromptSubmit} className="max-w-3xl mx-auto" />
-              {weatherData && (
-                <div className="max-w-3xl mx-auto mt-4 flex justify-end">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="cursor-pointer">
-                        <Badge variant="outline" className="flex items-center gap-1 bg-white px-3 py-1">
-                          <MapPin size={12} className="text-primary" />
-                          <span>{weatherData.location}</span>
-                          <span className="mx-1">|</span>
-                          <img src={weatherData.icon} alt={weatherData.condition} className="w-4 h-4" />
-                          <span>{Math.round(weatherData.temperature)}°C</span>
-                        </Badge>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" className="p-3">
-                      <div className="text-xs space-y-1">
-                        <div><strong>Condition:</strong> {weatherData.condition}</div>
-                        <div><strong>Temperature:</strong> {Math.round(weatherData.temperature)}°C</div>
-                        <div><strong>Humidity:</strong> {weatherData.humidity}%</div>
-                        <div><strong>Wind Speed:</strong> {weatherData.windSpeed} km/h</div>
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              )}
-            </div>
-          </section>
-          <section className="py-12">
-            <HowItWorks />
-          </section>
-          <section className="py-12" id="trending-looks">
-            <h2 className="text-3xl font-bold mb-6">Trending Looks</h2>
-            <FilterBar filters={filters} onChange={setFilters} />
-            <TrendingOutfits filters={filters} />
-          </section>
-          <section className="py-12">
-            <VibesGallery />
-          </section>
-          <section className="py-12" id="outfit-recommendations">
-            <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
-            <FilterBar filters={filters} onChange={setFilters} />
-            <OutfitRecommendation wardrobeItems={wardrobeItems} isLoading={isLoading} filters={filters} />
-          </section>
-        </main>
-        <Footer />
-        <div className="pb-20">
-          <StylistChat />
-        </div>
+    <div className="min-h-screen">
+      <Navbar />
+      <StepGuide />
+      <main className="container mx-auto px-4">
+        <section className="py-12">
+          <Hero />
+          <div className="mt-8">
+            <SmartPromptBar onPromptSubmit={handlePromptSubmit} className="max-w-3xl mx-auto" />
+            {weatherData && (
+              <div className="max-w-3xl mx-auto mt-4 flex justify-end">
+                <Tooltip
+                  content={
+                    <div className="text-xs p-2 space-y-1">
+                      <div><strong>Condition:</strong> {weatherData.condition}</div>
+                      <div><strong>Temperature:</strong> {Math.round(weatherData.temperature)}°C</div>
+                      <div><strong>Humidity:</strong> {weatherData.humidity}%</div>
+                      <div><strong>Wind Speed:</strong> {weatherData.windSpeed} km/h</div>
+                    </div>
+                  }
+                >
+                  <Badge variant="outline" className="flex items-center gap-1 bg-white px-3 py-1">
+                    <MapPin size={12} className="text-primary" />
+                    <span>{weatherData.location}</span>
+                    <span className="mx-1">|</span>
+                    <img src={weatherData.icon} alt={weatherData.condition} className="w-4 h-4" />
+                    <span>{Math.round(weatherData.temperature)}°C</span>
+                  </Badge>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        </section>
+        <section className="py-12">
+          <HowItWorks />
+        </section>
+        <section className="py-12" id="trending-looks">
+          <h2 className="text-3xl font-bold mb-6">Trending Looks</h2>
+          <FilterBar filters={filters} onChange={setFilters} />
+          <TrendingOutfits filters={filters} />
+        </section>
+        <section className="py-12">
+          <VibesGallery />
+        </section>
+        <section className="py-12" id="outfit-recommendations">
+          <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
+          <FilterBar filters={filters} onChange={setFilters} />
+          <OutfitRecommendation wardrobeItems={wardrobeItems} isLoading={isLoading} filters={filters} />
+        </section>
+      </main>
+      <Footer />
+      <div className="pb-20">
+        <StylistChat />
       </div>
-    </TooltipProvider>
+    </div>
   );
 }
 
