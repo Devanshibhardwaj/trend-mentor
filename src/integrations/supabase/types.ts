@@ -9,7 +9,135 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      outfit_recommendations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_ai_generated: boolean | null
+          items: Json
+          name: string
+          occasion: string | null
+          season: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          items: Json
+          name: string
+          occasion?: string | null
+          season?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          items?: Json
+          name?: string
+          occasion?: string | null
+          season?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      outfits: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          occasion: string
+          style: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          occasion: string
+          style: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          occasion?: string
+          style?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          last_sign_in: string | null
+          sign_in_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          last_sign_in?: string | null
+          sign_in_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_sign_in?: string | null
+          sign_in_count?: number | null
+        }
+        Relationships: []
+      }
+      wardrobe_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

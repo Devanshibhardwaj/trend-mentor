@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -16,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { CloudSun, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import Tooltip from '@/components/CustomTooltip';
+import { parsePrompt } from '@/utils/parsePrompt';
 
 function Index() {
   const [wardrobeItems, setWardrobeItems] = useState([]);
@@ -65,38 +65,16 @@ function Index() {
 
   const handlePromptSubmit = (prompt: string) => {
     toast.success("Generating personalized recommendations...");
-    const promptLower = prompt.toLowerCase();
-    let mood: "all" | "work" | "date" | "chill" = 'all';
-    if (promptLower.includes('work') || promptLower.includes('office')) {
-      mood = 'work';
-    } else if (promptLower.includes('date') || promptLower.includes('party')) {
-      mood = 'date';
-    } else if (promptLower.includes('casual') || promptLower.includes('relax') || promptLower.includes('chill')) {
-      mood = 'chill';
-    }
-    let style: "all" | "minimal" | "street" | "ethnic" = 'all';
-    if (promptLower.includes('minimal') || promptLower.includes('clean')) {
-      style = 'minimal';
-    } else if (promptLower.includes('street') || promptLower.includes('urban')) {
-      style = 'street';
-    } else if (promptLower.includes('ethnic') || promptLower.includes('traditional')) {
-      style = 'ethnic';
-    }
-    let budget = 100;
-    const budgetMatch = promptLower.match(/(\d+)k|₹(\d+)/);
-    if (budgetMatch) {
-      if (budgetMatch[1]) {
-        budget = parseInt(budgetMatch[1]) * 1000;
-      } else if (budgetMatch[2]) {
-        budget = parseInt(budgetMatch[2]);
-      }
-    }
+    
+    const parsedPrompt = parsePrompt(prompt);
+    
     setFilters({
-      mood,
-      style,
+      mood: parsedPrompt.mood,
+      style: parsedPrompt.style,
       weather: weatherData && getFashionWeather() === 'rainy' ? 'rainy' : 'sunny',
-      budget
+      budget: parsedPrompt.budget
     });
+    
     document.getElementById('outfit-recommendations')?.scrollIntoView({ behavior: 'smooth' });
   };
 
