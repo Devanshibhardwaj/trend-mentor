@@ -23,6 +23,7 @@ interface OutfitRecommendationProps {
   wardrobeItems: WardrobeItem[];
   isLoading: boolean;
   filters?: FilterOptions;
+  onOutfitGenerated?: (outfitId: string) => void;
 }
 
 interface Outfit {
@@ -72,7 +73,7 @@ const getRandomOutfitImage = (occasion: string) => {
   return images;
 };
 
-const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecommendationProps) => {
+const OutfitRecommendation = ({ wardrobeItems, isLoading, filters, onOutfitGenerated }: OutfitRecommendationProps) => {
   const [generatingOutfit, setGeneratingOutfit] = useState(false);
   const [outfit, setOutfit] = useState<Outfit | null>(null);
   const [occasion, setOccasion] = useState<string>("casual");
@@ -123,10 +124,17 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         await generateBasicOutfit();
       }
       
-      // Set a random outfit image based on occasion
       setOutfitImage(getRandomOutfitImage(occasion));
       
-      toast.success("Outfit generated successfully!");
+      // Generate unique outfit ID and notify parent
+      const outfitId = Date.now().toString();
+      if (onOutfitGenerated) {
+        onOutfitGenerated(outfitId);
+      }
+      
+      toast.success("Outfit generated successfully! ✨", {
+        description: "Your personal stylist has created something amazing for you!"
+      });
     } catch (error) {
       console.error("Error generating outfit:", error);
       toast.error(error instanceof Error ? error.message : "Failed to generate outfit");
@@ -139,10 +147,8 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
 
   const generateAIOutfit = async () => {
     try {
-      // Use our local AI recommendation system
       toast.info("Generating outfit with local AI model...");
       
-      // Combine mood context with filters
       const moodContext = {
         mood: currentMood?.mood || filters?.mood || 'casual',
         energyLevel: currentMood?.energyLevel || 'medium',
@@ -157,7 +163,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         throw new Error("AI could not generate a recommendation");
       }
 
-      // Convert AI response to outfit structure
       const newOutfit: Outfit = {};
       const categories = ['top', 'bottom', 'outerwear', 'footwear', 'accessories'];
       
@@ -172,7 +177,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         }
       });
 
-      // Save explanation and trend if provided
       if (result.explanation) {
         setAiExplanation(result.explanation);
       }
@@ -183,7 +187,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
       
       setOutfit(newOutfit);
       
-      // Save recommendation to database if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const outfitItems = Object.values(newOutfit).filter(Boolean);
@@ -206,7 +209,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
   
   const generateBasicOutfit = async () => {
     try {
-      // Group items by category
       const categorizedItems: Record<string, WardrobeItem[]> = {};
       
       wardrobeItems.forEach(item => {
@@ -216,59 +218,47 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         categorizedItems[item.category].push(item);
       });
 
-      // Create outfit based on occasion and available items
       const newOutfit: Outfit = {};
       
-      // Apply filters for more targeted outfit selection
       const stylePreference = filters?.style || 'all';
       const weatherPreference = filters?.weather || 'all';
       const budgetLimit = filters?.budget || 500;
       
-      // Simple rule-based selection for different occasions
       if (occasion === "casual") {
-        // For casual: prefer t-shirts, jeans, sneakers
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "t-shirt", "shirt");
         newOutfit.bottom = getRandomItem(categorizedItems["Bottoms"], "jeans", "shorts");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "sneakers", "sandals");
         newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "jacket", "hoodie");
       } else if (occasion === "formal") {
-        // For formal: prefer dress shirts, suits, dress shoes
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "dress shirt", "blouse");
         newOutfit.bottom = getRandomItem(categorizedItems["Bottoms"], "slacks", "dress pants");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "dress shoes", "heels");
         newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "blazer", "suit jacket");
       } else if (occasion === "business") {
-        // For business: smart casual items
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "blouse", "button up");
         newOutfit.bottom = getRandomItem(categorizedItems["Bottoms"], "slacks", "skirt");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "loafers", "flats");
         newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "cardigan", "blazer");
       } else if (occasion === "sports") {
-        // For sports: athletic wear
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "jersey", "t-shirt");
         newOutfit.bottom = getRandomItem(categorizedItems["Bottoms"], "shorts", "joggers");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "sneakers", "running shoes");
         newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "track jacket", "windbreaker");
       } else if (occasion === "party") {
-        // For party: dressier items
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "blouse", "dress shirt");
         newOutfit.bottom = getRandomItem(categorizedItems["Bottoms"], "dress pants", "skirt");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "heels", "dress shoes");
         newOutfit.accessories = getRandomItem(categorizedItems["Accessories"]);
       }
       
-      // Apply weather-based filtering
       if (weatherPreference === 'rainy') {
-        // Prefer water-resistant items for rainy weather
         newOutfit.outerwear = getRandomItem(categorizedItems["Outerwear"], "raincoat", "waterproof");
         newOutfit.footwear = getRandomItem(categorizedItems["Footwear"], "boots", "waterproof");
       } else if (weatherPreference === 'sunny') {
-        // Prefer lighter items for sunny weather
         newOutfit.top = getRandomItem(categorizedItems["Tops"], "t-shirt", "tank");
-        newOutfit.outerwear = null; // No need for outerwear in sunny weather
+        newOutfit.outerwear = null;
       }
       
-      // Fill in any missing categories with random items from that category
       if (!newOutfit.top && categorizedItems["Tops"]) {
         newOutfit.top = getRandomItem(categorizedItems["Tops"]);
       }
@@ -285,14 +275,12 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
         newOutfit.accessories = getRandomItem(categorizedItems["Accessories"]);
       }
       
-      // Budget filtering: Remove any items that exceed budget
       Object.entries(newOutfit).forEach(([category, item]) => {
         if (item && 'price' in item && item.price > budgetLimit) {
           newOutfit[category as keyof Outfit] = undefined;
         }
       });
       
-      // Check if we have at least 2 items to make an outfit
       const outfitItemCount = Object.values(newOutfit).filter(Boolean).length;
       if (outfitItemCount < 2) {
         throw new Error("Not enough variety in your wardrobe to create an outfit");
@@ -300,7 +288,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
       
       setOutfit(newOutfit);
       
-      // Save recommendation to database if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const outfitItems = Object.values(newOutfit).filter(Boolean);
@@ -325,7 +312,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
   const getRandomItem = (items?: WardrobeItem[], ...preferredKeywords: string[]) => {
     if (!items || items.length === 0) return undefined;
     
-    // First try to find items matching preferred keywords
     if (preferredKeywords.length > 0) {
       const matchingItems = items.filter(item => 
         preferredKeywords.some(keyword => 
@@ -338,7 +324,6 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters }: OutfitRecom
       }
     }
     
-    // If no matching items found, pick a random one
     return items[Math.floor(Math.random() * items.length)];
   };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -13,6 +12,9 @@ import StylistChat from '@/components/StylistChat';
 import SmartPromptBar from '@/components/SmartPromptBar';
 import ActiveFilterTags from '@/components/ActiveFilterTags';
 import SavedOutfits from '@/components/SavedOutfits';
+import StylingTips from '@/components/StylingTips';
+import FeedbackSystem from '@/components/FeedbackSystem';
+import PersonalizedSupport from '@/components/PersonalizedSupport';
 import { useWeather } from '@/services/WeatherService';
 import { Badge } from '@/components/ui/badge';
 import { CloudSun, MapPin } from 'lucide-react';
@@ -29,6 +31,7 @@ function Index() {
     budget: 100,
     style: 'all'
   });
+  const [currentOutfitId, setCurrentOutfitId] = useState<string | null>(null);
 
   const { weatherData, isLoading: isLoadingWeather, loadWeatherData, getFashionWeather } = useWeather();
 
@@ -88,6 +91,11 @@ function Index() {
     }));
   };
 
+  const handleFeedbackSubmit = (feedback: any) => {
+    console.log('Feedback received:', feedback);
+    // Here you could send feedback to a backend or use it to improve recommendations
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -121,6 +129,14 @@ function Index() {
             )}
           </div>
         </section>
+
+        {/* Personalized Support Section */}
+        <section className="py-8">
+          <div className="max-w-md mx-auto">
+            <PersonalizedSupport filters={filters} />
+          </div>
+        </section>
+
         <section className="py-12">
           <HowItWorks />
         </section>
@@ -136,7 +152,25 @@ function Index() {
           <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
           <ActiveFilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
           <FilterBar filters={filters} onChange={setFilters} />
-          <OutfitRecommendation wardrobeItems={wardrobeItems} isLoading={isLoading} filters={filters} />
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <OutfitRecommendation 
+                wardrobeItems={wardrobeItems} 
+                isLoading={isLoading} 
+                filters={filters}
+                onOutfitGenerated={setCurrentOutfitId}
+              />
+            </div>
+            <div className="space-y-6">
+              <StylingTips filters={filters} />
+              {currentOutfitId && (
+                <FeedbackSystem 
+                  outfitId={currentOutfitId}
+                  onFeedbackSubmit={handleFeedbackSubmit}
+                />
+              )}
+            </div>
+          </div>
         </section>
         <section className="py-12" id="saved-outfits">
           <SavedOutfits />
