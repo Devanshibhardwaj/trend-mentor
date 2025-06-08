@@ -68,16 +68,16 @@ function Index() {
 
   const handlePromptSubmit = (prompt: string) => {
     toast.success("Generating personalized recommendations...");
-    
+
     const parsedPrompt = parsePrompt(prompt);
-    
+
     setFilters({
       mood: parsedPrompt.mood,
       style: parsedPrompt.style,
       weather: weatherData && getFashionWeather() === 'rainy' ? 'rainy' : 'sunny',
       budget: parsedPrompt.budget
     });
-    
+
     document.getElementById('outfit-recommendations')?.scrollIntoView({ behavior: 'smooth' });
   };
 
