@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -15,12 +16,18 @@ import SavedOutfits from '@/components/SavedOutfits';
 import StylingTips from '@/components/StylingTips';
 import FeedbackSystem from '@/components/FeedbackSystem';
 import PersonalizedSupport from '@/components/PersonalizedSupport';
+import FashionPersona from '@/components/FashionPersona';
+import MoodScannerBar from '@/components/MoodScannerBar';
+import MixAndMatch from '@/components/MixAndMatch';
+import EnhancedLookbook from '@/components/EnhancedLookbook';
+import ShoppingIntegration from '@/components/ShoppingIntegration';
 import { useWeather } from '@/services/WeatherService';
 import { Badge } from '@/components/ui/badge';
 import { CloudSun, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import Tooltip from '@/components/CustomTooltip';
 import { parsePrompt } from '@/utils/parsePrompt';
+import { motion } from 'framer-motion';
 
 function Index() {
   const [wardrobeItems, setWardrobeItems] = useState([]);
@@ -32,6 +39,9 @@ function Index() {
     style: 'all'
   });
   const [currentOutfitId, setCurrentOutfitId] = useState<string | null>(null);
+  const [selectedMood, setSelectedMood] = useState<string>('');
+  const [lastPrompt, setLastPrompt] = useState<string>('');
+  const [savedOutfits, setSavedOutfits] = useState<any[]>([]);
 
   const { weatherData, isLoading: isLoadingWeather, loadWeatherData, getFashionWeather } = useWeather();
 
@@ -50,6 +60,7 @@ function Index() {
     }
     fetchWardrobe();
     loadWeatherData();
+    loadSavedOutfits();
   }, []);
 
   useEffect(() => {
@@ -69,8 +80,22 @@ function Index() {
     }
   }, [weatherData]);
 
+  const loadSavedOutfits = () => {
+    try {
+      const saved = localStorage.getItem('savedOutfits');
+      if (saved) {
+        setSavedOutfits(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Error loading saved outfits:', error);
+    }
+  };
+
   const handlePromptSubmit = (prompt: string) => {
-    toast.success("Generating personalized recommendations...");
+    setLastPrompt(prompt);
+    toast.success("✨ Creating your perfect look...", {
+      description: "Our AI stylist is curating something amazing for you!"
+    });
 
     const parsedPrompt = parsePrompt(prompt);
 
@@ -84,6 +109,22 @@ function Index() {
     document.getElementById('outfit-recommendations')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleMoodSelect = (mood: string, emoji: string) => {
+    setSelectedMood(mood);
+    
+    // Map mood to filter mood
+    let filterMood: FilterOptions['mood'] = 'all';
+    if (mood === 'professional') filterMood = 'work';
+    else if (mood === 'romantic') filterMood = 'date';
+    else if (mood === 'relaxed') filterMood = 'chill';
+    
+    setFilters(prev => ({ ...prev, mood: filterMood }));
+    
+    toast.success(`${emoji} Perfect! Styling for your ${mood} mood`, {
+      description: "Let's create something that matches your vibe!"
+    });
+  };
+
   const handleRemoveFilter = (filterKey: keyof FilterOptions) => {
     setFilters(prev => ({
       ...prev,
@@ -93,15 +134,56 @@ function Index() {
 
   const handleFeedbackSubmit = (feedback: any) => {
     console.log('Feedback received:', feedback);
-    // Here you could send feedback to a backend or use it to improve recommendations
+    toast.success("Thanks for your feedback! 💝", {
+      description: "We're learning your style to improve future recommendations."
+    });
+  };
+
+  const handleSaveOutfit = (outfit: any) => {
+    const newOutfit = {
+      ...outfit,
+      id: Date.now().toString(),
+      savedAt: new Date().toISOString(),
+      likes: 0,
+      isLiked: false
+    };
+    
+    const updatedOutfits = [...savedOutfits, newOutfit];
+    setSavedOutfits(updatedOutfits);
+    localStorage.setItem('savedOutfits', JSON.stringify(updatedOutfits));
+  };
+
+  const handleRemoveOutfit = (id: string) => {
+    const updatedOutfits = savedOutfits.filter(outfit => outfit.id !== id);
+    setSavedOutfits(updatedOutfits);
+    localStorage.setItem('savedOutfits', JSON.stringify(updatedOutfits));
+  };
+
+  const handleLikeOutfit = (id: string) => {
+    const updatedOutfits = savedOutfits.map(outfit => 
+      outfit.id === id 
+        ? { 
+            ...outfit, 
+            isLiked: !outfit.isLiked,
+            likes: outfit.isLiked ? (outfit.likes || 0) - 1 : (outfit.likes || 0) + 1
+          }
+        : outfit
+    );
+    setSavedOutfits(updatedOutfits);
+    localStorage.setItem('savedOutfits', JSON.stringify(updatedOutfits));
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       <Navbar />
       <StepGuide />
       <main className="container mx-auto px-4">
-        <section className="py-12">
+        <motion.section 
+          className="py-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <Hero />
           <div className="mt-8">
             <SmartPromptBar onPromptSubmit={handlePromptSubmit} className="max-w-3xl mx-auto" />
@@ -117,7 +199,7 @@ function Index() {
                     </div>
                   }
                 >
-                  <Badge variant="outline" className="flex items-center gap-1 bg-white px-3 py-1">
+                  <Badge variant="outline" className="flex items-center gap-1 bg-white/80 backdrop-blur-sm px-3 py-1 shadow-sm">
                     <MapPin size={12} className="text-primary" />
                     <span>{weatherData.location}</span>
                     <span className="mx-1">|</span>
@@ -128,37 +210,97 @@ function Index() {
               </div>
             )}
           </div>
-        </section>
+        </motion.section>
+
+        {/* Mood Scanner */}
+        <motion.section 
+          className="py-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div className="max-w-4xl mx-auto">
+            <MoodScannerBar onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
+          </div>
+        </motion.section>
+
+        {/* Fashion Persona */}
+        {(selectedMood || lastPrompt || filters.mood !== 'all' || filters.style !== 'all') && (
+          <motion.section 
+            className="py-8"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <FashionPersona filters={filters} prompt={lastPrompt} mood={selectedMood} />
+            </div>
+          </motion.section>
+        )}
 
         {/* Personalized Support Section */}
-        <section className="py-8">
+        <motion.section 
+          className="py-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
           <div className="max-w-md mx-auto">
             <PersonalizedSupport filters={filters} />
           </div>
-        </section>
+        </motion.section>
 
-        <section className="py-12">
+        <motion.section 
+          className="py-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
           <HowItWorks />
-        </section>
-        <section className="py-12" id="trending-looks">
+        </motion.section>
+
+        <motion.section 
+          className="py-12" 
+          id="trending-looks"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
           <h2 className="text-3xl font-bold mb-6">Trending Looks</h2>
           <FilterBar filters={filters} onChange={setFilters} />
           <TrendingOutfits filters={filters} />
-        </section>
-        <section className="py-12">
+        </motion.section>
+
+        <motion.section 
+          className="py-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
           <VibesGallery />
-        </section>
-        <section className="py-12" id="outfit-recommendations">
-          <h2 className="text-3xl font-bold mb-6">Outfit Recommendations</h2>
+        </motion.section>
+
+        <motion.section 
+          className="py-12" 
+          id="outfit-recommendations"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <h2 className="text-3xl font-bold mb-6">AI Outfit Recommendations</h2>
           <ActiveFilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
           <FilterBar filters={filters} onChange={setFilters} />
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-8">
               <OutfitRecommendation 
                 wardrobeItems={wardrobeItems} 
                 isLoading={isLoading} 
                 filters={filters}
                 onOutfitGenerated={setCurrentOutfitId}
+              />
+              <ShoppingIntegration 
+                maxPrice={filters.budget}
+                style={filters.style}
               />
             </div>
             <div className="space-y-6">
@@ -171,10 +313,36 @@ function Index() {
               )}
             </div>
           </div>
-        </section>
-        <section className="py-12" id="saved-outfits">
-          <SavedOutfits />
-        </section>
+        </motion.section>
+
+        {/* Mix & Match Section */}
+        <motion.section 
+          className="py-12" 
+          id="mix-match"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+        >
+          <h2 className="text-3xl font-bold mb-6">Mix & Match Studio</h2>
+          <MixAndMatch 
+            wardrobeItems={wardrobeItems}
+            onSaveOutfit={handleSaveOutfit}
+          />
+        </motion.section>
+
+        <motion.section 
+          className="py-12" 
+          id="saved-outfits"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+        >
+          <EnhancedLookbook
+            savedOutfits={savedOutfits}
+            onRemoveOutfit={handleRemoveOutfit}
+            onLikeOutfit={handleLikeOutfit}
+          />
+        </motion.section>
       </main>
       <Footer />
       <div className="pb-20">
