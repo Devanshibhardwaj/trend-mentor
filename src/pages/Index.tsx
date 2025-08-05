@@ -12,7 +12,6 @@ import FilterBar, { FilterOptions } from '@/components/FilterBar';
 import StylistChat from '@/components/StylistChat';
 import SmartPromptBar from '@/components/SmartPromptBar';
 import ActiveFilterTags from '@/components/ActiveFilterTags';
-import SavedOutfits from '@/components/SavedOutfits';
 import StylingTips from '@/components/StylingTips';
 import FeedbackSystem from '@/components/FeedbackSystem';
 import PersonalizedSupport from '@/components/PersonalizedSupport';
@@ -32,17 +31,11 @@ import { motion } from 'framer-motion';
 function Index() {
   const [wardrobeItems, setWardrobeItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [filters, setFilters] = useState<FilterOptions>({
-    mood: 'all',
-    weather: 'all',
-    budget: 100,
-    style: 'all'
-  });
+  const [filters, setFilters] = useState<FilterOptions>({ mood: 'all', weather: 'all', budget: 100, style: 'all' });
   const [currentOutfitId, setCurrentOutfitId] = useState<string | null>(null);
   const [selectedMood, setSelectedMood] = useState<string>('');
   const [lastPrompt, setLastPrompt] = useState<string>('');
   const [savedOutfits, setSavedOutfits] = useState<any[]>([]);
-
   const { weatherData, isLoading: isLoadingWeather, loadWeatherData, getFashionWeather } = useWeather();
 
   useEffect(() => {
@@ -51,8 +44,10 @@ function Index() {
       try {
         const res = await fetch('/api/products');
         const data = await res.json();
+        if (!Array.isArray(data)) throw new Error('Invalid wardrobe data');
         setWardrobeItems(data);
       } catch (error) {
+        toast.error('Error fetching products. Please try again later.');
         console.error("Error fetching products:", error);
       } finally {
         setIsLoading(false);
@@ -67,11 +62,9 @@ function Index() {
     if (weatherData) {
       const weatherType = getFashionWeather();
       let weatherFilter: "sunny" | "rainy" | "all" = 'all';
-      if (['rainy', 'cold'].includes(weatherType)) {
-        weatherFilter = 'rainy';
-      } else if (['hot', 'warm', 'sunny'].includes(weatherType)) {
-        weatherFilter = 'sunny';
-      }
+      if (["rainy", "cold"].includes(weatherType)) weatherFilter = "rainy";
+      else if (["hot", "warm", "sunny"].includes(weatherType)) weatherFilter = "sunny";
+
       setFilters(prev => ({ ...prev, weather: weatherFilter }));
       toast.info(`Showing outfits for ${weatherType} weather in ${weatherData.location}`, {
         duration: 4000,
@@ -83,9 +76,7 @@ function Index() {
   const loadSavedOutfits = () => {
     try {
       const saved = localStorage.getItem('savedOutfits');
-      if (saved) {
-        setSavedOutfits(JSON.parse(saved));
-      }
+      if (saved) setSavedOutfits(JSON.parse(saved));
     } catch (error) {
       console.error('Error loading saved outfits:', error);
     }
@@ -93,12 +84,9 @@ function Index() {
 
   const handlePromptSubmit = (prompt: string) => {
     setLastPrompt(prompt);
-    toast.success("✨ Creating your perfect look...", {
-      description: "Our AI stylist is curating something amazing for you!"
-    });
+    toast.success("✨ Creating your perfect look...", { description: "Our AI stylist is curating something amazing for you!" });
 
-    const parsedPrompt = parsePrompt(prompt);
-
+    const parsedPrompt = parsePrompt(prompt) || { mood: 'all', style: 'all', budget: 100 };
     setFilters({
       mood: parsedPrompt.mood,
       style: parsedPrompt.style,
@@ -111,25 +99,19 @@ function Index() {
 
   const handleMoodSelect = (mood: string, emoji: string) => {
     setSelectedMood(mood);
-    
-    // Map mood to filter mood
     let filterMood: FilterOptions['mood'] = 'all';
     if (mood === 'professional') filterMood = 'work';
     else if (mood === 'romantic') filterMood = 'date';
     else if (mood === 'relaxed') filterMood = 'chill';
-    
+
     setFilters(prev => ({ ...prev, mood: filterMood }));
-    
     toast.success(`${emoji} Perfect! Styling for your ${mood} mood`, {
       description: "Let's create something that matches your vibe!"
     });
   };
 
   const handleRemoveFilter = (filterKey: keyof FilterOptions) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterKey]: filterKey === 'budget' ? 100 : 'all'
-    }));
+    setFilters(prev => ({ ...prev, [filterKey]: filterKey === 'budget' ? 100 : 'all' }));
   };
 
   const handleFeedbackSubmit = (feedback: any) => {
@@ -140,14 +122,7 @@ function Index() {
   };
 
   const handleSaveOutfit = (outfit: any) => {
-    const newOutfit = {
-      ...outfit,
-      id: Date.now().toString(),
-      savedAt: new Date().toISOString(),
-      likes: 0,
-      isLiked: false
-    };
-    
+    const newOutfit = { ...outfit, id: Date.now().toString(), savedAt: new Date().toISOString(), likes: 0, isLiked: false };
     const updatedOutfits = [...savedOutfits, newOutfit];
     setSavedOutfits(updatedOutfits);
     localStorage.setItem('savedOutfits', JSON.stringify(updatedOutfits));
@@ -162,11 +137,7 @@ function Index() {
   const handleLikeOutfit = (id: string) => {
     const updatedOutfits = savedOutfits.map(outfit => 
       outfit.id === id 
-        ? { 
-            ...outfit, 
-            isLiked: !outfit.isLiked,
-            likes: outfit.isLiked ? (outfit.likes || 0) - 1 : (outfit.likes || 0) + 1
-          }
+        ? { ...outfit, isLiked: !outfit.isLiked, likes: outfit.isLiked ? (outfit.likes || 0) - 1 : (outfit.likes || 0) + 1 }
         : outfit
     );
     setSavedOutfits(updatedOutfits);
