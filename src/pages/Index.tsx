@@ -29,7 +29,7 @@ import { parsePrompt } from '@/utils/parsePrompt';
 import { motion } from 'framer-motion';
 
 function Index() {
-  const [wardrobeItems, setWardrobeItems] = useState([]);
+  const [wardrobeItems, setWardrobeItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({ mood: 'all', weather: 'all', budget: 100, style: 'all' });
   const [currentOutfitId, setCurrentOutfitId] = useState<string | null>(null);
@@ -65,11 +65,13 @@ function Index() {
       if (["rainy", "cold"].includes(weatherType)) weatherFilter = "rainy";
       else if (["hot", "warm", "sunny"].includes(weatherType)) weatherFilter = "sunny";
 
-      setFilters(prev => ({ ...prev, weather: weatherFilter }));
-      toast.info(`Showing outfits for ${weatherType} weather in ${weatherData.location}`, {
-        duration: 4000,
-        icon: <CloudSun size={18} />,
-      });
+      if (weatherFilter !== filters.weather) {
+        setFilters(prev => ({ ...prev, weather: weatherFilter }));
+        toast.info(`Showing outfits for ${weatherType} weather in ${weatherData.location}`, {
+          duration: 4000,
+          icon: <CloudSun size={18} />,
+        });
+      }
     }
   }, [weatherData]);
 
