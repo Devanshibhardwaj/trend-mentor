@@ -147,53 +147,44 @@ function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+    <div className="min-h-screen luxury-gradient">
       <Navbar />
       <StepGuide />
-      <main className="container mx-auto px-4">
-        <motion.section 
-          className="py-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+      <main className="mx-auto">
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <Hero />
-          <div className="mt-8">
-            <SmartPromptBar onPromptSubmit={handlePromptSubmit} className="max-w-3xl mx-auto" />
-            {weatherData && (
-              <div className="max-w-3xl mx-auto mt-4 flex justify-end">
-                <Tooltip
-                  content={
-                    <div className="text-xs p-2 space-y-1">
+          <div className="container mx-auto px-4 -mt-16 relative z-10">
+            <div className="max-w-4xl mx-auto">
+              <SmartPromptBar onPromptSubmit={handlePromptSubmit} className="luxury-shadow-hover" />
+              {weatherData && (
+                <div className="mt-6 flex justify-end">
+                  <Tooltip content={
+                    <div className="text-xs p-3 space-y-2">
                       <div><strong>Condition:</strong> {weatherData.condition}</div>
                       <div><strong>Temperature:</strong> {Math.round(weatherData.temperature)}°C</div>
                       <div><strong>Humidity:</strong> {weatherData.humidity}%</div>
                       <div><strong>Wind Speed:</strong> {weatherData.windSpeed} km/h</div>
                     </div>
-                  }
-                >
-                  <Badge variant="outline" className="flex items-center gap-1 bg-white/80 backdrop-blur-sm px-3 py-1 shadow-sm">
-                    <MapPin size={12} className="text-primary" />
-                    <span>{weatherData.location}</span>
-                    <span className="mx-1">|</span>
-                    <img src={weatherData.icon} alt={weatherData.condition} className="w-4 h-4" />
-                    <span>{Math.round(weatherData.temperature)}°C</span>
-                  </Badge>
-                </Tooltip>
-              </div>
-            )}
+                  }>
+                    <Badge variant="outline" className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-4 py-2 shadow-sm border-border/50">
+                      <MapPin size={14} className="text-primary" />
+                      <span className="font-medium">{weatherData.location}</span>
+                      <span className="mx-1 text-muted-foreground">•</span>
+                      <img src={weatherData.icon} alt={weatherData.condition} className="w-5 h-5" />
+                      <span className="font-medium">{Math.round(weatherData.temperature)}°C</span>
+                    </Badge>
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           </div>
         </motion.section>
 
-        {/* Mood Scanner */}
-        <motion.section 
-          className="py-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <div className="max-w-4xl mx-auto">
-            <MoodScannerBar onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
+        <motion.section className="py-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} id="features">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <MoodScannerBar onMoodSelect={handleMoodSelect} selectedMood={selectedMood} />
+            </div>
           </div>
         </motion.section>
 

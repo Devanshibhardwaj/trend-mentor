@@ -14,65 +14,91 @@ const Navbar = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-20 items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative">
+              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Sparkles className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-20"></div>
             </div>
-            <span className="font-bold sm:inline-block">
-              StyleSage AI
-            </span>
+            <div className="flex flex-col">
+              <span className="font-display text-xl font-semibold tracking-tight">
+                StyleSage
+              </span>
+              <span className="text-xs text-muted-foreground font-medium tracking-wider uppercase">
+                AI Fashion
+              </span>
+            </div>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link to="/" className="transition-colors hover:text-foreground/80 flex items-center space-x-1">
-            <Home className="h-4 w-4" />
-            <span>Home</span>
+        <nav className="hidden lg:flex items-center space-x-8">
+          <Link to="/" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group">
+            <span className="flex items-center space-x-2">
+              <Home className="h-4 w-4" />
+              <span>Home</span>
+            </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/wardrobe" className="transition-colors hover:text-foreground/80 flex items-center space-x-1">
-            <Shirt className="h-4 w-4" />
-            <span>Wardrobe</span>
+          <Link to="/wardrobe" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group">
+            <span className="flex items-center space-x-2">
+              <Shirt className="h-4 w-4" />
+              <span>Wardrobe</span>
+            </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/virtual-try-on" className="transition-colors hover:text-foreground/80 flex items-center space-x-1">
-            <Camera className="h-4 w-4" />
-            <span>Virtual Try-On</span>
+          <Link to="/virtual-try-on" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group">
+            <span className="flex items-center space-x-2">
+              <Camera className="h-4 w-4" />
+              <span>Try-On</span>
+            </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link to="/weather-styling" className="transition-colors hover:text-foreground/80 flex items-center space-x-1">
-            <Cloud className="h-4 w-4" />
-            <span>What to Wear Today</span>
-          </Link>
-          <Link to="/advanced-features" className="transition-colors hover:text-foreground/80">
-            Advanced Features
+          <Link to="/weather-styling" className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group">
+            <span className="flex items-center space-x-2">
+              <Cloud className="h-4 w-4" />
+              <span>Weather</span>
+            </span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </nav>
         
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-4">
           <ThemeToggle />
           
           {user ? (
             <div className="flex items-center space-x-3">
               <Link to="/profile">
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10">
                   <UserCircle className="h-5 w-5" />
                 </Button>
               </Link>
-              <Button variant="outline" size="sm" onClick={() => signOut()}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => signOut()}
+                className="border-primary/20 hover:border-primary/40 hover:bg-primary/5"
+              >
                 Sign Out
               </Button>
             </div>
           ) : (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <Link to="/auth">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground hover:bg-primary/5"
+                >
                   Sign In
                 </Button>
               </Link>
               <Link to="/auth?tab=register">
-                <Button size="sm">
+                <Button size="sm" className="fashion-button">
                   Get Started
                 </Button>
               </Link>

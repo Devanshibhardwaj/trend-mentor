@@ -5,67 +5,87 @@
  
 @layer base {
   :root {
+    /* Fashion-forward color palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
+    --foreground: 0 0% 5%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
+    --popover-foreground: 0 0% 5%;
+
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --ring: 215 20.2% 65.1%;
- 
-    --radius: 0.5rem;
+    --card-foreground: 0 0% 5%;
+
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+
+    /* Luxury fashion primary - sophisticated black */
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+
+    /* Warm beige secondary for fashion elegance */
+    --secondary: 30 20% 94%;
+    --secondary-foreground: 0 0% 9%;
+
+    /* Fashion accent - muted gold */
+    --accent: 45 30% 85%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 0 0% 65%;
+
+    /* Fashion industry standard spacing */
+    --radius: 0.75rem;
+
+    /* Luxury design tokens */
+    --luxury-gradient: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(30 20% 94%) 100%);
+    --luxury-shadow: 0 8px 32px hsl(0 0% 0% / 0.08);
+    --luxury-shadow-hover: 0 16px 48px hsl(0 0% 0% / 0.12);
+    --luxury-spacing: 2rem;
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
- 
-    --ring: 217.2 32.6% 17.5%;
+    /* Dark mode luxury fashion palette */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 98%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
+
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+
+    /* Dark mode primary - crisp white */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+
+    /* Dark secondary */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* Dark accent - warm gold */
+    --accent: 45 60% 70%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 0 0% 25%;
+
+    /* Dark luxury tokens */
+    --luxury-gradient: linear-gradient(135deg, hsl(0 0% 6%) 0%, hsl(0 0% 12%) 100%);
+    --luxury-shadow: 0 8px 32px hsl(0 0% 0% / 0.3);
+    --luxury-shadow-hover: 0 16px 48px hsl(0 0% 0% / 0.4);
   }
 }
  
@@ -74,8 +94,55 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
+  
+  /* Premium typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Fashion-forward link styles */
+  a {
+    @apply transition-colors duration-300;
+  }
+}
+
+/* Luxury fashion design system */
+.luxury-gradient {
+  background: var(--luxury-gradient);
+}
+
+.luxury-shadow {
+  box-shadow: var(--luxury-shadow);
+}
+
+.luxury-shadow-hover {
+  box-shadow: var(--luxury-shadow-hover);
+}
+
+.fashion-card {
+  @apply bg-card border border-border rounded-lg overflow-hidden transition-all duration-500;
+  box-shadow: var(--luxury-shadow);
+}
+
+.fashion-card:hover {
+  box-shadow: var(--luxury-shadow-hover);
+  transform: translateY(-4px);
+}
+
+.fashion-button {
+  @apply inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-medium;
+  @apply transition-all duration-300 ease-out;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  box-shadow: var(--luxury-shadow);
+}
+
+.fashion-button:hover {
+  box-shadow: var(--luxury-shadow-hover);
+  transform: translateY(-2px);
 }
 
 /* Holographic and futuristic effects */
