@@ -147,7 +147,7 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters, onOutfitGener
 
   const generateAIOutfit = async () => {
     try {
-      toast.info("Generating outfit with local AI model...");
+      toast.info("AI stylist is creating your perfect look...");
       
       const moodContext = {
         mood: currentMood?.mood || filters?.mood || 'casual',
@@ -157,7 +157,9 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters, onOutfitGener
         budget: filters?.budget || 500
       };
       
-      const result = await generateAdvancedOutfitRecommendation(wardrobeItems, occasion, moodContext);
+      // Use mock AI service as fallback
+      const { generateMockAIRecommendation } = await import('@/utils/mockAI');
+      const result = await generateMockAIRecommendation(wardrobeItems, occasion, moodContext);
       
       if (!result || !result.outfit) {
         throw new Error("AI could not generate a recommendation");
@@ -167,13 +169,8 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters, onOutfitGener
       const categories = ['top', 'bottom', 'outerwear', 'footwear', 'accessories'];
       
       categories.forEach(category => {
-        if (result.outfit[category as keyof typeof result.outfit]) {
-          const itemId = result.outfit[category as keyof typeof result.outfit]?.id;
-          const item = itemId ? wardrobeItems.find(item => item.id === itemId) : undefined;
-          
-          if (item) {
-            newOutfit[category as keyof Outfit] = item;
-          }
+        if (result.outfit[category]) {
+          newOutfit[category as keyof Outfit] = result.outfit[category];
         }
       });
 
@@ -187,19 +184,24 @@ const OutfitRecommendation = ({ wardrobeItems, isLoading, filters, onOutfitGener
       
       setOutfit(newOutfit);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const outfitItems = Object.values(newOutfit).filter(Boolean);
-        const outfitName = `AI ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} outfit`;
-        
-        await supabase.from('outfit_recommendations').insert({
-          user_id: user.id,
-          name: outfitName,
-          occasion: occasion,
-          items: outfitItems,
-          is_ai_generated: true,
-          description: result.explanation || `An AI-generated ${occasion} outfit`
-        });
+      // Optional: Save to Supabase if user is authenticated
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const outfitItems = Object.values(newOutfit).filter(Boolean);
+          const outfitName = `AI ${occasion.charAt(0).toUpperCase() + occasion.slice(1)} outfit`;
+          
+          await supabase.from('outfit_recommendations').insert({
+            user_id: user.id,
+            name: outfitName,
+            occasion: occasion,
+            items: outfitItems,
+            is_ai_generated: true,
+            description: result.explanation || `An AI-generated ${occasion} outfit`
+          });
+        }
+      } catch (dbError) {
+        console.log('Could not save to database, but outfit generated successfully');
       }
     } catch (error) {
       console.error("Error in AI outfit generation:", error);

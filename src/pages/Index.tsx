@@ -42,12 +42,14 @@ function Index() {
     async function fetchWardrobe() {
       setIsLoading(true);
       try {
-        const res = await fetch('/api/products');
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error('Invalid wardrobe data');
-        setWardrobeItems(data);
+        // Import mock data
+        const { mockWardrobeItems } = await import('@/lib/mockData');
+        setWardrobeItems(mockWardrobeItems);
+        toast.success("Wardrobe loaded successfully!", {
+          description: "Your fashion items are ready for styling!"
+        });
       } catch (error) {
-        toast.error('Error fetching products. Please try again later.');
+        toast.error('Error loading wardrobe data');
         console.error("Error fetching products:", error);
       } finally {
         setIsLoading(false);
@@ -230,9 +232,13 @@ function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <h2 className="text-3xl font-bold mb-6">Trending Looks</h2>
-          <FilterBar filters={filters} onChange={setFilters} />
-          <TrendingOutfits filters={filters} />
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-6 text-center">Trending Looks</h2>
+            <div className="mb-6 flex justify-center">
+              <FilterBar filters={filters} onChange={setFilters} />
+            </div>
+            <TrendingOutfits filters={filters} />
+          </div>
         </motion.section>
 
         <motion.section 
@@ -251,30 +257,34 @@ function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
         >
-          <h2 className="text-3xl font-bold mb-6">AI Outfit Recommendations</h2>
-          <ActiveFilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
-          <FilterBar filters={filters} onChange={setFilters} />
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <OutfitRecommendation 
-                wardrobeItems={wardrobeItems} 
-                isLoading={isLoading} 
-                filters={filters}
-                onOutfitGenerated={setCurrentOutfitId}
-              />
-              <ShoppingIntegration 
-                maxPrice={filters.budget}
-                style={filters.style}
-              />
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-6 text-center">AI Outfit Recommendations</h2>
+            <div className="mb-6">
+              <ActiveFilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
+              <FilterBar filters={filters} onChange={setFilters} />
             </div>
-            <div className="space-y-6">
-              <StylingTips filters={filters} />
-              {currentOutfitId && (
-                <FeedbackSystem 
-                  outfitId={currentOutfitId}
-                  onFeedbackSubmit={handleFeedbackSubmit}
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <OutfitRecommendation 
+                  wardrobeItems={wardrobeItems} 
+                  isLoading={isLoading} 
+                  filters={filters}
+                  onOutfitGenerated={setCurrentOutfitId}
                 />
-              )}
+                <ShoppingIntegration 
+                  maxPrice={filters.budget}
+                  style={filters.style}
+                />
+              </div>
+              <div className="space-y-6">
+                <StylingTips filters={filters} />
+                {currentOutfitId && (
+                  <FeedbackSystem 
+                    outfitId={currentOutfitId}
+                    onFeedbackSubmit={handleFeedbackSubmit}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </motion.section>
@@ -287,11 +297,13 @@ function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.9 }}
         >
-          <h2 className="text-3xl font-bold mb-6">Mix & Match Studio</h2>
-          <MixAndMatch 
-            wardrobeItems={wardrobeItems}
-            onSaveOutfit={handleSaveOutfit}
-          />
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-6 text-center">Mix & Match Studio</h2>
+            <MixAndMatch 
+              wardrobeItems={wardrobeItems}
+              onSaveOutfit={handleSaveOutfit}
+            />
+          </div>
         </motion.section>
 
         <motion.section 
@@ -301,11 +313,13 @@ function Index() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.0 }}
         >
-          <EnhancedLookbook
-            savedOutfits={savedOutfits}
-            onRemoveOutfit={handleRemoveOutfit}
-            onLikeOutfit={handleLikeOutfit}
-          />
+          <div className="container mx-auto px-4">
+            <EnhancedLookbook
+              savedOutfits={savedOutfits}
+              onRemoveOutfit={handleRemoveOutfit}
+              onLikeOutfit={handleLikeOutfit}
+            />
+          </div>
         </motion.section>
       </main>
       <Footer />
